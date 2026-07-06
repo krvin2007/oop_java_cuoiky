@@ -4,7 +4,10 @@
  */
 package com.mycompany.quanlygara.controller;
 
-import com.mycompany.quanlygara.model.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -16,15 +19,17 @@ public class ReportController implements IReportService {
 
     @Override
     public double getRevenue(String fromDate, String toDate) throws Exception {
-        HoaDonDAO hoaDonDAO = new HoaDonDAO();
-        List<Invoice> invoices = hoaDonDAO.layTatCa();
-
+        double totalRevenue = 0;
         SimpleDateFormat sdfInput = new SimpleDateFormat("yyyy-MM-dd");
+
+        StringBuilder sql = new StringBuilder("SELECT SUM(total_amount) FROM invoices WHERE 1=1");
+
         Date start = null;
         Date end = null;
 
         if (fromDate != null && !fromDate.trim().isEmpty()) {
             start = sdfInput.parse(fromDate.trim());
+            sql.append(" AND payment_date >= ?");
         }
         if (toDate != null && !toDate.trim().isEmpty()) {
             Calendar cal = Calendar.getInstance();
@@ -33,23 +38,24 @@ public class ReportController implements IReportService {
             cal.set(Calendar.MINUTE, 59);
             cal.set(Calendar.SECOND, 59);
             end = cal.getTime();
+            sql.append(" AND payment_date <= ?");
         }
 
-        double totalRevenue = 0;
-        for (int i = 0; i < invoices.size(); i++) {
-            Invoice inv = invoices.get(i);
-            Date payDate = inv.getPaymentDate();
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-            boolean matches = true;
-            if (start != null && payDate.before(start)) {
-                matches = false;
+            int paramIndex = 1;
+            if (start != null) {
+                ps.setTimestamp(paramIndex++, new Timestamp(start.getTime()));
             }
-            if (end != null && payDate.after(end)) {
-                matches = false;
+            if (end != null) {
+                ps.setTimestamp(paramIndex++, new Timestamp(end.getTime()));
             }
 
-            if (matches) {
-                totalRevenue += inv.getTotalAmount();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    totalRevenue = rs.getDouble(1);
+                }
             }
         }
         return totalRevenue;
@@ -57,106 +63,73 @@ public class ReportController implements IReportService {
 
     @Override
     public Map<String, Integer> getMostUsedParts(int limit) throws Exception {
-        LinhKienDAO lkDAO = new LinhKienDAO();
-        PhieuSuaChuaDAO roDAO = new PhieuSuaChuaDAO();
-        List<RepairOrderDetail> allDetails = roDAO.getAllDetails();
-
-        Map<String, Integer> usageMap = new HashMap<>();
-        for (int i = 0; i < allDetails.size(); i++) {
-            RepairOrderDetail d = allDetails.get(i);
-            LinhKien p = lkDAO.layTheoId(d.getMaHangMuc());
-            if (p != null) { // Only count parts, not services
-                String partName = p.getTen();
-                int currentQty = usageMap.containsKey(partName) ? usageMap.get(partName) : 0;
-                usageMap.put(partName, currentQty + d.getSoLuong());
-            }
-        }
-
-        List<Map.Entry<String, Integer>> entryList = new ArrayList<>(usageMap.entrySet());
-        Collections.sort(entryList, new Comparator<Map.Entry<String, Integer>>() {
-            @Override
-            public int compare(Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) {
-                return e2.getValue().compareTo(e1.getValue());
-            }
-        });
-
         Map<String, Integer> result = new LinkedHashMap<>();
-        int count = 0;
-        for (int i = 0; i < entryList.size() && count < limit; i++) {
-            Map.Entry<String, Integer> entry = entryList.get(i);
-            result.put(entry.getKey(), entry.getValue());
-            count++;
+        String sql = "SELECT lk.ten, SUM(d.so_luong) as total_qty " +
+                "FROM repair_order_details d " +
+                "JOIN linh_kien lk ON LOWER(d.ma_hang_muc) = LOWER(lk.ma) " +
+                "GROUP BY lk.ten " +
+                "ORDER BY total_qty DESC " +
+                "LIMIT ?";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    result.put(rs.getString("ten"), rs.getInt("total_qty"));
+                }
+            }
         }
         return result;
     }
 
     @Override
     public Map<String, Integer> getMostRepairedVehicles(int limit) throws Exception {
-        PhieuSuaChuaDAO roDAO = new PhieuSuaChuaDAO();
-        XeDAO xeDAO = new XeDAO();
-
-        List<RepairOrder> orders = roDAO.layTatCa();
-        Map<String, Integer> repairMap = new HashMap<>();
-
-        for (int i = 0; i < orders.size(); i++) {
-            RepairOrder o = orders.get(i);
-            Vehicle v = xeDAO.layTheoId(o.getLicensePlate());
-            String vehicleInfo = (v != null) ? (v.getLicensePlate() + " - " + v.getBrand() + " " + v.getModel()) 
-                                             : o.getLicensePlate();
-
-            int currentCount = repairMap.containsKey(vehicleInfo) ? repairMap.get(vehicleInfo) : 0;
-            repairMap.put(vehicleInfo, currentCount + 1);
-        }
-
-        List<Map.Entry<String, Integer>> entryList = new ArrayList<>(repairMap.entrySet());
-        Collections.sort(entryList, new Comparator<Map.Entry<String, Integer>>() {
-            @Override
-            public int compare(Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) {
-                return e2.getValue().compareTo(e1.getValue());
-            }
-        });
-
         Map<String, Integer> result = new LinkedHashMap<>();
-        int count = 0;
-        for (int i = 0; i < entryList.size() && count < limit; i++) {
-            Map.Entry<String, Integer> entry = entryList.get(i);
-            result.put(entry.getKey(), entry.getValue());
-            count++;
+        String sql = "SELECT ro.license_plate, v.brand, v.model, COUNT(ro.order_id) as repair_count " +
+                "FROM repair_orders ro " +
+                "LEFT JOIN vehicles v ON LOWER(ro.license_plate) = LOWER(v.license_plate) " +
+                "GROUP BY ro.license_plate, v.brand, v.model " +
+                "ORDER BY repair_count DESC " +
+                "LIMIT ?";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String lp = rs.getString("license_plate");
+                    String brand = rs.getString("brand");
+                    String model = rs.getString("model");
+                    String vehicleInfo = (brand != null && model != null) ? (lp + " - " + brand + " " + model) : lp;
+                    result.put(vehicleInfo, rs.getInt("repair_count"));
+                }
+            }
         }
         return result;
     }
 
     @Override
     public Map<String, Integer> getMostActiveMechanics(int limit) throws Exception {
-        PhieuSuaChuaDAO roDAO = new PhieuSuaChuaDAO();
-        KyThuatVienDAO mechanicDAO = new KyThuatVienDAO();
-
-        List<RepairOrder> orders = roDAO.layTatCa();
-        Map<String, Integer> activeMap = new HashMap<>();
-
-        for (int i = 0; i < orders.size(); i++) {
-            RepairOrder o = orders.get(i);
-            Mechanic m = mechanicDAO.layTheoId(o.getMechanicId());
-            String mechanicName = (m != null) ? m.getName() : "Mechanic ID: " + o.getMechanicId();
-
-            int currentCount = activeMap.containsKey(mechanicName) ? activeMap.get(mechanicName) : 0;
-            activeMap.put(mechanicName, currentCount + 1);
-        }
-
-        List<Map.Entry<String, Integer>> entryList = new ArrayList<>(activeMap.entrySet());
-        Collections.sort(entryList, new Comparator<Map.Entry<String, Integer>>() {
-            @Override
-            public int compare(Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) {
-                return e2.getValue().compareTo(e1.getValue());
-            }
-        });
-
         Map<String, Integer> result = new LinkedHashMap<>();
-        int count = 0;
-        for (int i = 0; i < entryList.size() && count < limit; i++) {
-            Map.Entry<String, Integer> entry = entryList.get(i);
-            result.put(entry.getKey(), entry.getValue());
-            count++;
+        String sql = "SELECT ro.mechanic_id, m.name, COUNT(ro.order_id) as active_count " +
+                "FROM repair_orders ro " +
+                "LEFT JOIN mechanics m ON ro.mechanic_id = m.id " +
+                "GROUP BY ro.mechanic_id, m.name " +
+                "ORDER BY active_count DESC " +
+                "LIMIT ?";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int mechId = rs.getInt("mechanic_id");
+                    String name = rs.getString("name");
+                    String mechanicName = (name != null) ? name : "Mechanic ID: " + mechId;
+                    result.put(mechanicName, rs.getInt("active_count"));
+                }
+            }
         }
         return result;
     }
