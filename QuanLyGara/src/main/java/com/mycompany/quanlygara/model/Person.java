@@ -120,4 +120,13 @@ public abstract class Person {
     public String toString() {
         return "ID: " + id + ", Name: " + name + ", Phone: " + phone + ", Address: " + address;
     }
+
+    /**
+     * PHƯƠNG THỨC TRỪU TƯỢNG (ABSTRACT METHOD):
+     * - Thể hiện tính Abstraction (Trừu tượng) rõ ràng nhất.
+     * - Phương thức không có phần thân (body), bắt buộc tất cả các lớp con kế thừa 
+     *   phải cung cấp chi tiết triển khai riêng (Overriding).
+     * @return Chuỗi mô tả vai trò của đối tượng.
+     */
+    public abstract String getRoleDescription();
 }
