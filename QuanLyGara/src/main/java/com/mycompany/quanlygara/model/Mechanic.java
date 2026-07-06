@@ -108,4 +108,14 @@ public class Mechanic extends Person {
         return "Mechanic [" + super.toString() + ", Specialization: " + specialization + 
                ", Salary: " + String.format("%,.0f", salary) + " VND, Status: " + status + "]";
     }
+
+    /**
+     * TRIỂN KHAI PHƯƠNG THỨC TRỪU TƯỢNG (IMPLEMENT ABSTRACT METHOD):
+     * - Bắt buộc phải ghi đè phương thức trừu tượng từ lớp cha Person.
+     * - Thể hiện tính Abstraction và Polymorphism.
+     */
+    @Override
+    public String getRoleDescription() {
+        return "Vai trò: Thợ máy (Chuyên môn: " + this.specialization + ")";
+    }
 }
