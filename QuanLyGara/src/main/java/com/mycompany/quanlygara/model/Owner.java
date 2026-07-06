@@ -51,4 +51,14 @@ public class Owner extends Person {
     public String toString() {
         return "Owner [" + super.toString() + "]";
     }
+
+    /**
+     * TRIỂN KHAI PHƯƠNG THỨC TRỪU TƯỢNG (IMPLEMENT ABSTRACT METHOD):
+     * - Bắt buộc phải ghi đè phương thức trừu tượng từ lớp cha Person.
+     * - Thể hiện tính Abstraction và Polymorphism.
+     */
+    @Override
+    public String getRoleDescription() {
+        return "Vai trò: Chủ xe (Khách hàng sử dụng dịch vụ gara)";
+    }
 }

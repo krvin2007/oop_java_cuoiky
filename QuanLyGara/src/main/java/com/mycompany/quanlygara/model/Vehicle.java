@@ -15,17 +15,17 @@ public class Vehicle {
     private String brand;
     private String model;
     private int productionYear;
-    private int ownerId;
+    private Owner owner;
 
     public Vehicle() {
     }
 
-    public Vehicle(String licensePlate, String brand, String model, int productionYear, int ownerId) {
+    public Vehicle(String licensePlate, String brand, String model, int productionYear, Owner owner) {
         this.licensePlate = licensePlate;
         this.brand = brand;
         this.model = model;
         this.productionYear = productionYear;
-        this.ownerId = ownerId;
+        this.owner = owner;
     }
 
     public String getLicensePlate() {
@@ -60,12 +60,12 @@ public class Vehicle {
         this.productionYear = productionYear;
     }
 
-    public int getOwnerId() {
-        return ownerId;
+    public Owner getOwner() {
+        return owner;
     }
 
-    public void setOwnerId(int ownerId) {
-        this.ownerId = ownerId;
+    public void setOwner(Owner owner) {
+        this.owner = owner;
     }
 
     public void nhapInfo(Scanner sc) {
@@ -102,19 +102,18 @@ public class Vehicle {
                 System.out.println("Vui long nhap so nguyen hop le!");
             }
         }
-        while (true) {
-            try {
-                System.out.print("Nhap ID chu xe: ");
-                this.ownerId = Integer.parseInt(sc.nextLine());
-                break;
-            } catch (NumberFormatException e) {
-                System.out.println("Vui long nhap ID chu xe hop le!");
-            }
-        }
+        // Note: Owner should be set by the caller fetching from DAO based on input ID.
+        System.out.print("Nhap ID chu xe: ");
+        int inputOwnerId = 0;
+        try {
+            inputOwnerId = Integer.parseInt(sc.nextLine());
+        } catch (Exception e) {}
+        this.owner = new Owner();
+        this.owner.setId(inputOwnerId); // Temporary ID wrapper
     }
 
     @Override
     public String toString() {
-        return "Vehicle [License Plate: " + licensePlate + ", Brand: " + brand + ", Model: " + model + ", Production Year: " + productionYear + ", Owner ID: " + ownerId + "]";
+        return "Vehicle [License Plate: " + licensePlate + ", Brand: " + brand + ", Model: " + model + ", Production Year: " + productionYear + ", Owner: " + (owner != null ? owner.getName() : "null") + "]";
     }
 }

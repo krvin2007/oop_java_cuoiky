@@ -32,10 +32,10 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
              PreparedStatement ps = conn.prepareStatement(
                      "INSERT INTO repair_orders (license_plate, entry_date, exit_date, mechanic_id, status) VALUES (?, ?, ?, ?, ?)",
                      Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, order.getLicensePlate());
+            ps.setString(1, order.getVehicle() != null ? order.getVehicle().getLicensePlate() : null);
             ps.setTimestamp(2, order.getEntryDate() != null ? new Timestamp(order.getEntryDate().getTime()) : null);
             ps.setTimestamp(3, order.getExitDate() != null ? new Timestamp(order.getExitDate().getTime()) : null);
-            ps.setInt(4, order.getMechanicId());
+            ps.setInt(4, order.getMechanic() != null ? order.getMechanic().getId() : 0);
             ps.setString(5, order.getStatus());
             ps.executeUpdate();
             try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -47,7 +47,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
 
         // Cap nhat trang thai ky thuat vien thanh "Đang bận"
         KyThuatVienDAO mechanicDAO = new KyThuatVienDAO();
-        Mechanic m = mechanicDAO.layTheoId(order.getMechanicId());
+        Mechanic m = mechanicDAO.layTheoId(order.getMechanic() != null ? order.getMechanic().getId() : 0);
         if (m != null) {
             m.setStatus("Đang bận");
             mechanicDAO.capNhat(m);
@@ -61,27 +61,29 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
             throw new Exception("Phieu sua chua can cap nhat khong ton tai!");
         }
         String oldStatus = existing.getStatus();
+        int oldMechanicId = existing.getMechanic() != null ? existing.getMechanic().getId() : 0;
+        int newMechanicId = order.getMechanic() != null ? order.getMechanic().getId() : 0;
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(
                      "UPDATE repair_orders SET license_plate = ?, entry_date = ?, exit_date = ?, mechanic_id = ?, status = ? WHERE order_id = ?")) {
-            ps.setString(1, order.getLicensePlate());
+            ps.setString(1, order.getVehicle() != null ? order.getVehicle().getLicensePlate() : null);
             ps.setTimestamp(2, order.getEntryDate() != null ? new Timestamp(order.getEntryDate().getTime()) : null);
             ps.setTimestamp(3, order.getExitDate() != null ? new Timestamp(order.getExitDate().getTime()) : null);
-            ps.setInt(4, order.getMechanicId());
+            ps.setInt(4, newMechanicId);
             ps.setString(5, order.getStatus());
             ps.setInt(6, order.getOrderId());
             ps.executeUpdate();
         }
 
         KyThuatVienDAO mechanicDAO = new KyThuatVienDAO();
-        if (existing.getMechanicId() != order.getMechanicId()) {
-            Mechanic oldM = mechanicDAO.layTheoId(existing.getMechanicId());
+        if (oldMechanicId != newMechanicId) {
+            Mechanic oldM = mechanicDAO.layTheoId(oldMechanicId);
             if (oldM != null) {
                 oldM.setStatus("Đang rảnh");
                 mechanicDAO.capNhat(oldM);
             }
-            Mechanic newM = mechanicDAO.layTheoId(order.getMechanicId());
+            Mechanic newM = mechanicDAO.layTheoId(newMechanicId);
             if (newM != null && !"COMPLETED".equalsIgnoreCase(order.getStatus())) {
                 newM.setStatus("Đang bận");
                 mechanicDAO.capNhat(newM);
@@ -89,7 +91,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         }
 
         if ("COMPLETED".equalsIgnoreCase(order.getStatus()) && !"COMPLETED".equalsIgnoreCase(oldStatus)) {
-            Mechanic m = mechanicDAO.layTheoId(order.getMechanicId());
+            Mechanic m = mechanicDAO.layTheoId(newMechanicId);
             if (m != null) {
                 m.setStatus("Đang rảnh");
                 mechanicDAO.capNhat(m);
@@ -137,7 +139,8 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         // Neu chua hoan thanh, tra ky thuat vien ve trang thai ranh
         if (!"COMPLETED".equalsIgnoreCase(toRemove.getStatus())) {
             KyThuatVienDAO mechanicDAO = new KyThuatVienDAO();
-            Mechanic m = mechanicDAO.layTheoId(toRemove.getMechanicId());
+            int mId = toRemove.getMechanic() != null ? toRemove.getMechanic().getId() : 0;
+            Mechanic m = mechanicDAO.layTheoId(mId);
             if (m != null) {
                 m.setStatus("Đang rảnh");
                 mechanicDAO.capNhat(m);
@@ -328,13 +331,36 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
     private RepairOrder mapRow(ResultSet rs) throws SQLException {
         Timestamp entry = rs.getTimestamp("entry_date");
         Timestamp exit = rs.getTimestamp("exit_date");
-        return new RepairOrder(
-                rs.getInt("order_id"),
-                rs.getString("license_plate"),
+        int orderId = rs.getInt("order_id");
+        String licensePlate = rs.getString("license_plate");
+        int mechanicId = rs.getInt("mechanic_id");
+        String status = rs.getString("status");
+
+        com.mycompany.quanlygara.model.Vehicle vehicle = null;
+        com.mycompany.quanlygara.model.Mechanic mechanic = null;
+        java.util.List<RepairOrderDetail> detailList = new ArrayList<>();
+
+        try {
+            XeDAO xeDAO = new XeDAO();
+            vehicle = xeDAO.layTheoId(licensePlate);
+            
+            KyThuatVienDAO kyThuatVienDAO = new KyThuatVienDAO();
+            mechanic = kyThuatVienDAO.layTheoId(mechanicId);
+            
+            detailList = getDetailsByOrderId(orderId);
+        } catch (Exception e) {
+            System.out.println("Loi khi load thong tin chi tiet cho phieu sua chua: " + e.getMessage());
+        }
+
+        RepairOrder ro = new RepairOrder(
+                orderId,
+                vehicle,
                 entry != null ? new Date(entry.getTime()) : null,
                 exit != null ? new Date(exit.getTime()) : null,
-                rs.getInt("mechanic_id"),
-                rs.getString("status")
+                mechanic,
+                status
         );
+        ro.setDetails(detailList);
+        return ro;
     }
 }
