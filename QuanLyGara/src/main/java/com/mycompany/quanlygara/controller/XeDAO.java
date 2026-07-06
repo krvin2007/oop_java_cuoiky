@@ -38,7 +38,7 @@ public class XeDAO implements IRepository<Vehicle> {
                 ps.setString(2, vehicle.getBrand());
                 ps.setString(3, vehicle.getModel());
                 ps.setInt(4, vehicle.getProductionYear());
-                ps.setInt(5, vehicle.getOwnerId());
+                ps.setInt(5, vehicle.getOwner() != null ? vehicle.getOwner().getId() : 0);
                 ps.executeUpdate();
             }
         }
@@ -52,7 +52,7 @@ public class XeDAO implements IRepository<Vehicle> {
             ps.setString(1, vehicle.getBrand());
             ps.setString(2, vehicle.getModel());
             ps.setInt(3, vehicle.getProductionYear());
-            ps.setInt(4, vehicle.getOwnerId());
+            ps.setInt(4, vehicle.getOwner() != null ? vehicle.getOwner().getId() : 0);
             ps.setString(5, vehicle.getLicensePlate());
             int rows = ps.executeUpdate();
             if (rows == 0) {
@@ -138,7 +138,16 @@ public class XeDAO implements IRepository<Vehicle> {
     }
 
     private Vehicle mapRow(ResultSet rs) throws SQLException {
+        int ownerId = rs.getInt("owner_id");
+        com.mycompany.quanlygara.model.Owner owner = null;
+        try {
+            ChuXeDAO chuXeDAO = new ChuXeDAO();
+            owner = chuXeDAO.layTheoId(ownerId);
+        } catch (Exception e) {
+            System.out.println("Loi khi lay thong tin chu xe: " + e.getMessage());
+        }
+        
         return new Vehicle(rs.getString("license_plate"), rs.getString("brand"), rs.getString("model"),
-                rs.getInt("production_year"), rs.getInt("owner_id"));
+                rs.getInt("production_year"), owner);
     }
 }

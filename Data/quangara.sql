@@ -65,18 +65,31 @@ CREATE TABLE `linh_kien` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `mechanics`
+-- Table structure for table `employees`
 --
 
-CREATE TABLE `mechanics` (
+CREATE TABLE `employees` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `phone` varchar(20) NOT NULL,
   `address` varchar(255) DEFAULT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` varchar(50) NOT NULL,
   `specialization` varchar(255) DEFAULT NULL,
   `salary` double NOT NULL DEFAULT 0,
   `status` varchar(50) NOT NULL DEFAULT 'Đang rảnh'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `employees`
+--
+
+INSERT INTO `employees` (`id`, `name`, `phone`, `address`, `username`, `password`, `role`, `specialization`, `salary`, `status`) VALUES
+(1, 'Admin User', '0900000001', 'System', 'admin', 'admin', 'QuanLy', NULL, 0, 'Đang rảnh'),
+(2, 'Ketoan User', '0900000002', 'System', 'ketoan', '123456', 'KeToan', NULL, 0, 'Đang rảnh'),
+(3, 'Thukho User', '0900000003', 'System', 'thukho', '123456', 'ThuKho', NULL, 0, 'Đang rảnh'),
+(4, 'Thomay User', '0900000004', 'System', 'thomay', '123456', 'KyThuat', 'Chung', 5000000, 'Đang rảnh');
 
 -- --------------------------------------------------------
 
@@ -171,10 +184,11 @@ ALTER TABLE `linh_kien`
   ADD PRIMARY KEY (`ma`);
 
 --
--- Indexes for table `mechanics`
+-- Indexes for table `employees`
 --
-ALTER TABLE `mechanics`
+ALTER TABLE `employees`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `phone` (`phone`);
 
 --
@@ -217,10 +231,10 @@ ALTER TABLE `invoices`
   MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `mechanics`
+-- AUTO_INCREMENT for table `employees`
 --
-ALTER TABLE `mechanics`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `employees`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `owners`
@@ -254,7 +268,7 @@ ALTER TABLE `invoices`
 -- Constraints for table `repair_orders`
 --
 ALTER TABLE `repair_orders`
-  ADD CONSTRAINT `fk_order_mechanic` FOREIGN KEY (`mechanic_id`) REFERENCES `mechanics` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_order_mechanic` FOREIGN KEY (`mechanic_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_order_vehicle` FOREIGN KEY (`license_plate`) REFERENCES `vehicles` (`license_plate`) ON DELETE CASCADE;
 
 --
@@ -268,6 +282,7 @@ ALTER TABLE `repair_order_details`
 --
 ALTER TABLE `vehicles`
   ADD CONSTRAINT `fk_vehicle_owner` FOREIGN KEY (`owner_id`) REFERENCES `owners` (`id`) ON DELETE CASCADE;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

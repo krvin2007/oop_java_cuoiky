@@ -27,18 +27,19 @@ public class HoaDonDAO implements IRepository<Invoice> {
     @Override
     public void themMoi(Invoice invoice) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
+            int oId = invoice.getRepairOrder() != null ? invoice.getRepairOrder().getOrderId() : 0;
             try (PreparedStatement ps = conn.prepareStatement("SELECT invoice_id FROM invoices WHERE order_id = ?")) {
-                ps.setInt(1, invoice.getOrderId());
+                ps.setInt(1, oId);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        throw new Exception("Hoa don cho phieu sua chua ID = " + invoice.getOrderId() + " da ton tai!");
+                        throw new Exception("Hoa don cho phieu sua chua ID = " + oId + " da ton tai!");
                     }
                 }
             }
             try (PreparedStatement ps = conn.prepareStatement(
                     "INSERT INTO invoices (order_id, payment_date, total_part_cost, total_labor_cost, vat_rate, total_amount) VALUES (?, ?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS)) {
-                ps.setInt(1, invoice.getOrderId());
+                ps.setInt(1, invoice.getRepairOrder() != null ? invoice.getRepairOrder().getOrderId() : 0);
                 ps.setTimestamp(2, invoice.getPaymentDate() != null ? new Timestamp(invoice.getPaymentDate().getTime()) : null);
                 ps.setDouble(3, invoice.getTotalPartCost());
                 ps.setDouble(4, invoice.getTotalLaborCost());
@@ -59,7 +60,7 @@ public class HoaDonDAO implements IRepository<Invoice> {
         String sql = "UPDATE invoices SET order_id = ?, payment_date = ?, total_part_cost = ?, total_labor_cost = ?, vat_rate = ?, total_amount = ? WHERE invoice_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, invoice.getOrderId());
+            ps.setInt(1, invoice.getRepairOrder() != null ? invoice.getRepairOrder().getOrderId() : 0);
             ps.setTimestamp(2, invoice.getPaymentDate() != null ? new Timestamp(invoice.getPaymentDate().getTime()) : null);
             ps.setDouble(3, invoice.getTotalPartCost());
             ps.setDouble(4, invoice.getTotalLaborCost());
@@ -134,11 +135,12 @@ public class HoaDonDAO implements IRepository<Invoice> {
         }
 
         Invoice invoice = new Invoice();
-        invoice.setOrderId(orderId);
+        com.mycompany.quanlygara.model.RepairOrder ro = roDAO.layTheoId(orderId);
+        invoice.setRepairOrder(ro);
         invoice.setTotalPartCost(totalPartCost);
         invoice.setTotalLaborCost(totalLaborCost);
         invoice.setVatRate(0.10); // 10% VAT
-        invoice.calculateTotalAmount();
+        invoice.calculateTotal();
 
         return invoice;
     }
@@ -161,9 +163,18 @@ public class HoaDonDAO implements IRepository<Invoice> {
 
     private Invoice mapRow(ResultSet rs) throws SQLException {
         Timestamp pay = rs.getTimestamp("payment_date");
+        int orderId = rs.getInt("order_id");
+        com.mycompany.quanlygara.model.RepairOrder ro = null;
+        try {
+            PhieuSuaChuaDAO phieuDAO = new PhieuSuaChuaDAO();
+            ro = phieuDAO.layTheoId(orderId);
+        } catch (Exception e) {
+            System.out.println("Loi load phieu sua chua cho hoa don: " + e.getMessage());
+        }
+
         return new Invoice(
                 rs.getInt("invoice_id"),
-                rs.getInt("order_id"),
+                ro,
                 pay != null ? new Date(pay.getTime()) : null,
                 rs.getDouble("total_part_cost"),
                 rs.getDouble("total_labor_cost"),

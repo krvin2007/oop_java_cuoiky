@@ -15,26 +15,29 @@ import java.util.Scanner;
  */
 public class RepairOrder {
     private int orderId;
-    private String licensePlate;
+    private Vehicle vehicle;
     private Date entryDate;
     private Date exitDate;
-    private int mechanicId;
+    private Mechanic mechanic;
     private String status; // RECEIVING, REPAIRING, COMPLETED
+    private java.util.List<RepairOrderDetail> details;
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public RepairOrder() {
         this.entryDate = new Date();
         this.status = "RECEIVING";
+        this.details = new java.util.ArrayList<>();
     }
 
-    public RepairOrder(int orderId, String licensePlate, Date entryDate, Date exitDate, int mechanicId, String status) {
+    public RepairOrder(int orderId, Vehicle vehicle, Date entryDate, Date exitDate, Mechanic mechanic, String status) {
         this.orderId = orderId;
-        this.licensePlate = licensePlate;
+        this.vehicle = vehicle;
         this.entryDate = entryDate;
         this.exitDate = exitDate;
-        this.mechanicId = mechanicId;
+        this.mechanic = mechanic;
         this.status = status;
+        this.details = new java.util.ArrayList<>();
     }
 
     public int getOrderId() {
@@ -45,12 +48,12 @@ public class RepairOrder {
         this.orderId = orderId;
     }
 
-    public String getLicensePlate() {
-        return licensePlate;
+    public Vehicle getVehicle() {
+        return vehicle;
     }
 
-    public void setLicensePlate(String licensePlate) {
-        this.licensePlate = licensePlate;
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
     }
 
     public Date getEntryDate() {
@@ -69,12 +72,12 @@ public class RepairOrder {
         this.exitDate = exitDate;
     }
 
-    public int getMechanicId() {
-        return mechanicId;
+    public Mechanic getMechanic() {
+        return mechanic;
     }
 
-    public void setMechanicId(int mechanicId) {
-        this.mechanicId = mechanicId;
+    public void setMechanic(Mechanic mechanic) {
+        this.mechanic = mechanic;
     }
 
     public String getStatus() {
@@ -85,23 +88,40 @@ public class RepairOrder {
         this.status = status;
     }
 
+    public java.util.List<RepairOrderDetail> getDetails() {
+        return details;
+    }
+
+    public void setDetails(java.util.List<RepairOrderDetail> details) {
+        this.details = details;
+    }
+
+    public void addDetail(RepairOrderDetail detail) {
+        this.details.add(detail);
+    }
+
     public void nhapInfo(Scanner sc) {
         System.out.print("Nhap bien so xe (license plate): ");
-        this.licensePlate = sc.nextLine().trim();
-        while (this.licensePlate.isEmpty()) {
+        String inputLicensePlate = sc.nextLine().trim();
+        while (inputLicensePlate.isEmpty()) {
             System.out.print("Bien so xe khong duoc de trong! Moi nhap lai: ");
-            this.licensePlate = sc.nextLine().trim();
+            inputLicensePlate = sc.nextLine().trim();
         }
+        this.vehicle = new Vehicle();
+        this.vehicle.setLicensePlate(inputLicensePlate); // Temporary wrapper
+
         while (true) {
             try {
                 System.out.print("Nhap ID ky thuat vien dam nhan: ");
-                this.mechanicId = Integer.parseInt(sc.nextLine());
+                int mId = Integer.parseInt(sc.nextLine());
+                this.mechanic = new Mechanic();
+                this.mechanic.setId(mId); // Temporary wrapper
                 break;
             } catch (NumberFormatException e) {
                 System.out.println("Vui long nhap ID so nguyen hop le!");
             }
         }
-        System.out.print("Nhap ngay gio vao xuong (yyyy-MM-dd HH:mm:ss hoặc go Enter de lay hien tai): ");
+        System.out.print("Nhap ngay gio vao xuong (yyyy-MM-dd HH:mm:ss hoac go Enter de lay hien tai): ");
         String entryDateStr = sc.nextLine().trim();
         if (entryDateStr.isEmpty()) {
             this.entryDate = new Date();
@@ -120,8 +140,10 @@ public class RepairOrder {
     public String toString() {
         String entryStr = entryDate != null ? sdf.format(entryDate) : "N/A";
         String exitStr = exitDate != null ? sdf.format(exitDate) : "N/A";
-        return "RepairOrder [ID: " + orderId + ", License Plate: " + licensePlate + 
+        String lp = vehicle != null ? vehicle.getLicensePlate() : "null";
+        String mechName = mechanic != null ? mechanic.getName() : "null";
+        return "RepairOrder [ID: " + orderId + ", Vehicle: " + lp + 
                ", Entry: " + entryStr + ", Exit: " + exitStr + 
-               ", Mechanic ID: " + mechanicId + ", Status: " + status + "]";
+               ", Mechanic: " + mechName + ", Status: " + status + ", Details: " + details.size() + " items]";
     }
 }

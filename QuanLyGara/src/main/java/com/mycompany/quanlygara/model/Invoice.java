@@ -1,35 +1,29 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.quanlygara.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Scanner;
+import java.text.ParseException;
 
-/**
- *
- * @author ManhQuynh
- */
 public class Invoice {
     private int invoiceId;
-    private int orderId;
+    private RepairOrder repairOrder;
     private Date paymentDate;
     private double totalPartCost;
     private double totalLaborCost;
-    private double vatRate;
+    private double vatRate; // ví dụ 0.1 cho 10%
     private double totalAmount;
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public Invoice() {
         this.paymentDate = new Date();
-        this.vatRate = 0.10;
+        this.vatRate = 0.1; // mac dinh VAT 10%
     }
 
-    public Invoice(int invoiceId, int orderId, Date paymentDate, double totalPartCost, double totalLaborCost, double vatRate, double totalAmount) {
+    public Invoice(int invoiceId, RepairOrder repairOrder, Date paymentDate, double totalPartCost, double totalLaborCost, double vatRate, double totalAmount) {
         this.invoiceId = invoiceId;
-        this.orderId = orderId;
+        this.repairOrder = repairOrder;
         this.paymentDate = paymentDate;
         this.totalPartCost = totalPartCost;
         this.totalLaborCost = totalLaborCost;
@@ -37,74 +31,93 @@ public class Invoice {
         this.totalAmount = totalAmount;
     }
 
-    public int getInvoiceId() {
-        return invoiceId;
+    public int getInvoiceId() { return invoiceId; }
+    public void setInvoiceId(int invoiceId) { this.invoiceId = invoiceId; }
+
+    public RepairOrder getRepairOrder() { return repairOrder; }
+    public void setRepairOrder(RepairOrder repairOrder) { this.repairOrder = repairOrder; }
+
+    public Date getPaymentDate() { return paymentDate; }
+    public void setPaymentDate(Date paymentDate) { this.paymentDate = paymentDate; }
+
+    public double getTotalPartCost() { return totalPartCost; }
+    public void setTotalPartCost(double totalPartCost) { this.totalPartCost = totalPartCost; }
+
+    public double getTotalLaborCost() { return totalLaborCost; }
+    public void setTotalLaborCost(double totalLaborCost) { this.totalLaborCost = totalLaborCost; }
+
+    public double getVatRate() { return vatRate; }
+    public void setVatRate(double vatRate) { this.vatRate = vatRate; }
+
+    public double getTotalAmount() { return totalAmount; }
+    public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
+
+    public void calculateTotal() {
+        double subTotal = totalPartCost + totalLaborCost;
+        this.totalAmount = subTotal + (subTotal * vatRate);
     }
 
-    public void setInvoiceId(int invoiceId) {
-        this.invoiceId = invoiceId;
+    public void printInvoice() {
+        System.out.println("----- HOA DON THANH TOAN -----");
+        System.out.println("Ma hoa don: " + invoiceId);
+        System.out.println("Ma phieu sua: " + (repairOrder != null ? repairOrder.getOrderId() : "N/A"));
+        System.out.println("Ngay thanh toan: " + (paymentDate != null ? sdf.format(paymentDate) : "N/A"));
+        System.out.println("Tong tien linh kien: " + String.format("%,.0f", totalPartCost) + " VND");
+        System.out.println("Tong tien cong (Dich vu): " + String.format("%,.0f", totalLaborCost) + " VND");
+        System.out.println("Thue VAT (" + (vatRate * 100) + "%): " + String.format("%,.0f", (totalPartCost + totalLaborCost) * vatRate) + " VND");
+        System.out.println("-> TONG THANH TOAN: " + String.format("%,.0f", totalAmount) + " VND");
+        System.out.println("------------------------------");
     }
 
-    public int getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
-    }
-
-    public Date getPaymentDate() {
-        return paymentDate;
-    }
-
-    public void setPaymentDate(Date paymentDate) {
-        this.paymentDate = paymentDate;
-    }
-
-    public double getTotalPartCost() {
-        return totalPartCost;
-    }
-
-    public void setTotalPartCost(double totalPartCost) {
-        this.totalPartCost = totalPartCost;
-    }
-
-    public double getTotalLaborCost() {
-        return totalLaborCost;
-    }
-
-    public void setTotalLaborCost(double totalLaborCost) {
-        this.totalLaborCost = totalLaborCost;
-    }
-
-    public double getVatRate() {
-        return vatRate;
-    }
-
-    public void setVatRate(double vatRate) {
-        this.vatRate = vatRate;
-    }
-
-    public double getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public void calculateTotalAmount() {
-        double subTotal = this.totalPartCost + this.totalLaborCost;
-        this.totalAmount = subTotal + (subTotal * this.vatRate);
+    public void nhapInfo(Scanner sc) {
+        while (true) {
+            try {
+                System.out.print("Nhap ID phieu sua chua: ");
+                int oId = Integer.parseInt(sc.nextLine());
+                this.repairOrder = new RepairOrder();
+                this.repairOrder.setOrderId(oId);
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Vui long nhap so nguyen hop le!");
+            }
+        }
+        System.out.print("Nhap ngay thanh toan (yyyy-MM-dd HH:mm:ss hoac go Enter de lay hien tai): ");
+        String dStr = sc.nextLine().trim();
+        if (dStr.isEmpty()) {
+            this.paymentDate = new Date();
+        } else {
+            try {
+                this.paymentDate = sdf.parse(dStr);
+            } catch (ParseException e) {
+                System.out.println("Sai dinh dang, dung hien tai.");
+                this.paymentDate = new Date();
+            }
+        }
+        while (true) {
+            try {
+                System.out.print("Nhap tong tien linh kien: ");
+                this.totalPartCost = Double.parseDouble(sc.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Nhap so hop le!");
+            }
+        }
+        while (true) {
+            try {
+                System.out.print("Nhap tong tien cong (dich vu): ");
+                this.totalLaborCost = Double.parseDouble(sc.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Nhap so hop le!");
+            }
+        }
+        calculateTotal();
     }
 
     @Override
     public String toString() {
-        String paymentStr = paymentDate != null ? sdf.format(paymentDate) : "N/A";
-        return "Invoice [ID: " + invoiceId + ", Order ID: " + orderId + ", Payment Date: " + paymentStr +
-               ", Part Cost: " + String.format("%,.0f", totalPartCost) + " VND" +
-               ", Labor Cost: " + String.format("%,.0f", totalLaborCost) + " VND" +
-               ", VAT Rate: " + (vatRate * 100) + "%" +
+        return "Invoice [ID: " + invoiceId + ", OrderID: " + (repairOrder != null ? repairOrder.getOrderId() : "N/A") + 
+               ", Payment Date: " + (paymentDate != null ? sdf.format(paymentDate) : "N/A") + 
                ", Total Amount: " + String.format("%,.0f", totalAmount) + " VND]";
     }
 }

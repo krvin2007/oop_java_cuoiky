@@ -28,7 +28,7 @@ Dự án thể hiện rõ nét 4 nguyên lý thiết kế hướng đối tượ
 1. **Tính Đóng gói (Encapsulation)**: Các thuộc tính của mọi lớp thực thể đều được bảo vệ bằng phạm vi truy cập `private` hoặc `protected`. Dữ liệu chỉ được thay đổi hoặc truy xuất thông qua các phương thức `getter` và `setter` hợp lệ, đảm bảo tính toàn vẹn.
 2. **Tính Kế thừa (Inheritance)**: Thiết kế các phân cấp lớp hợp lý. Các lớp `Mechanic` và `Owner` kế thừa từ lớp cha `Person`, tái sử dụng các thuộc tính chung (như tên, số điện thoại, địa chỉ) và chỉ định nghĩa thêm các đặc tả riêng. Lớp `DichVu` và `LinhKien` kế thừa từ `HangMuc`.
 3. **Tính Đa hình (Polymorphism)**: Hỗ trợ nạp chồng (Overloading) phương thức và ghi đè (Overriding) các phương thức tiêu chuẩn như `toString()`. Khả năng đa hình cũng được sử dụng trong việc tính toán chi phí linh hoạt tùy thuộc vào loại đối tượng dịch vụ hay linh kiện.
-4. **Tính Trừu tượng (Abstraction)**: Ẩn đi những xử lý nghiệp vụ phức tạp. Người dùng hoặc các thành phần khác của hệ thống chỉ cần tương tác thông qua các public interface hoặc phương thức được định nghĩa sẵn. Ngoài ra, ngoại lệ tùy chỉnh (`DuplicateMaException`) được tạo ra để trừu tượng hóa và xử lý lỗi hệ thống một cách tinh gọn.
+4. **Tính Trừu tượng (Abstraction)**: Thể hiện rõ nét qua việc sử dụng các lớp abstract (như `Person`, `HangMuc`). Lớp `Person` có định nghĩa phương thức trừu tượng `getRoleDescription()`, ép buộc các lớp con (`Owner`, `Mechanic`) phải tự triển khai chi tiết vai trò của mình. Ngoài ra, ngoại lệ tùy chỉnh (`DuplicateMaException`) được tạo ra để trừu tượng hóa và xử lý lỗi hệ thống tinh gọn.
 
 ## Cài Đặt Và Chạy Ứng Dụng
 ### 1. Yêu cầu hệ thống
