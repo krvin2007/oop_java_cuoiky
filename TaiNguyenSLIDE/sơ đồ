@@ -1,0 +1,174 @@
++-------------------------------------------------+
+|                 <<interface>>                   |
+|                 IRepository<T>                  |
++-------------------------------------------------+
+| + themMoi(item: T): void                        |
+| + capNhat(item: T): void                        |
+| + xoa(id: int): void                            |
+| + timKiem(id: int): T                           |
+| + layTatCa(): List<T>                           |
++-------------------------------------------------+
+                        ^
+                        | (implements)
+                        |
++-------------------------------------------------+
+|  Các lớp DAO (XeDAO, ChuXeDAO, HoaDonDAO,       |
+|  EmployeeDAO, LinhKienDAO, DichVuDAO, ...)      |
++-------------------------------------------------+
+
+
++-------------------------------------------------+
+|                  <<abstract>>                   |
+|                     Person                      |
++-------------------------------------------------+
+| - id: int                                       |
+| - name: String                                  |
+| - phone: String                                 |
+| - address: String                               |
++-------------------------------------------------+
+| + Person()                                      |
+| + Person(id: int, name, phone, address)         |
+| + getId() / setId()                             |
+| + getName() / setName()                         |
+| + getPhone() / setPhone()                       |
+| + getAddress() / setAddress()                   |
+| + getRoleDescription(): String                  |
+| + nhapInfo(sc: Scanner): void                   |
++-------------------------------------------------+
+                        ^
+                        | (extends - kế thừa)
+       +----------------+----------------+
+       |                                 |
++--------------------+         +----------------------------------+
+|       Owner        |         |           <<abstract>>           |
++--------------------+         |             Employee             |
+| + Owner()          |         +----------------------------------+
+| + Owner(...)       |         | - username: String               |
+| + getRoleDesc()    |         | - password: String               |
+| + nhapInfo(sc)     |         | - role: String                   |
++--------------------+         | - salary: double                 |
+                               | - status: String                 |
+                               +----------------------------------+
+                               | + Employee()                     |
+                               | + Employee(...)                  |
+                               | + getUsername() / setUsername()  |
+                               | + getPassword() / setPassword()  |
+                               | + getRole() / setRole()          |
+                               | + getSalary() / setSalary()      |
+                               | + getStatus() / setStatus()      |
+                               +----------------------------------+
+                                                ^
+                                                | (extends - kế thừa)
+       +--------------------+-------------------+--------------------+
+       |                    |                   |                    |
++--------------+     +--------------+     +--------------+     +--------------+
+|   Mechanic   |     |   Manager    |     |  Accountant  |     | Storekeeper  |
++--------------+     +--------------+     +--------------+     +--------------+
+| - spec: Str  |     | (Chức năng   |     | (Chức năng   |     | (Chức năng   |
++--------------+     |  quản lý)    |     |  kế toán)    |     |  thủ kho)    |
+| + getSpec()  |     +--------------+     +--------------+     +--------------+
+| + setSpec()  |     | + Manager()  |     | + Accountant |     | + Storekeeper|
+| + getRole... |     | + getRole... |     | + getRole... |     | + getRole... |
+| + nhapInfo() |     +--------------+     +--------------+     +--------------+
++--------------+
+
+
++-------------------------------------------------+
+|                  <<abstract>>                   |
+|                    HangMuc                      |
++-------------------------------------------------+
+| - id: int                                       |
+| - ten: String                                   |
+| - donGia: double                                |
++-------------------------------------------------+
+| + getId() / setId()                             |
+| + getTen() / setTen()                           |
+| + getDonGia() / setDonGia()                     |
+| + tinhThanhTien(soLuong: int): double           |
+| + nhapInfo(sc: Scanner): void                   |
++-------------------------------------------------+
+                        ^
+                        | (extends - kế thừa)
+       +----------------+----------------+
+       |                                 |
++--------------------+         +--------------------+
+|      LinhKien      |         |       DichVu       |
++--------------------+         +--------------------+
+| - soLuongTon: int  |         |                    |
++--------------------+         +--------------------+
+| + getSoLuongTon()  |         | + tinhThanhTien... |
+| + setSoLuongTon()  |         |                    |
+| + tinhThanhTien... |         |                    |
+| + nhapInfo(sc)     |         | + nhapInfo(sc)     |
++--------------------+         +--------------------+
+
+
++-------------------------------------------------+
+|                     Vehicle                     |
++-------------------------------------------------+
+| - licensePlate: String                          |
+| - brand: String                                 |
+| - model: String                                 |
+| - owner: Owner                                  |
++-------------------------------------------------+
+| + getLicensePlate() / setLicensePlate()         |
+| + getBrand() / setBrand()                       |
+| + getModel() / setModel()                       |
+| + getOwner() / setOwner()                       |
+| + nhapInfo(sc: Scanner): void                   |
++-------------------------------------------------+
+
+
++-------------------------------------------------+
+|                   RepairOrder                   |
++-------------------------------------------------+
+| - orderId: int                                  |
+| - vehicle: Vehicle                              |
+| - mechanic: Mechanic                            |
+| - details: List<RepairOrderDetail>              |
+| - status: String                                |
++-------------------------------------------------+
+| + getOrderId() / setOrderId()                   |
+| + getVehicle() / setVehicle()                   |
+| + getMechanic() / setMechanic()                 |
+| + getDetails() / setDetails()                   |
+| + getStatus() / setStatus()                     |
+| + addDetail(item: HangMuc, qty: int): void      |
+| + calculateTotal(): double                      |
++-------------------------------------------------+
+
+
++-------------------------------------------------+
+|                RepairOrderDetail                |
++-------------------------------------------------+
+| - item: HangMuc                                 |
+| - quantity: int                                 |
++-------------------------------------------------+
+| + getItem() / setItem()                         |
+| + getQuantity() / setQuantity()                 |
+| + getSubTotal(): double                         |
++-------------------------------------------------+
+
+
++-------------------------------------------------+
+|                     Invoice                     |
++-------------------------------------------------+
+| - invoiceId: int                                |
+| - order: RepairOrder                            |
+| - totalAmount: double                           |
+| - createdAt: Date                               |
++-------------------------------------------------+
+| + getInvoiceId() / setInvoiceId()               |
+| + getOrder() / setOrder()                       |
+| + getTotalAmount() / setTotalAmount()           |
+| + getCreatedAt() / setCreatedAt()               |
+| + printInvoice(): void                          |
++-------------------------------------------------+
+
+
++-------------------------------------------------+
+|                 <<Exception>>                   |
+|              DuplicateMaException               |
++-------------------------------------------------+
+| + DuplicateMaException(message: String)         |
++-------------------------------------------------+
