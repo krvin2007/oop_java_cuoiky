@@ -44,4 +44,18 @@ public class EmployeeDAO {
         }
         return null;
     }
+
+    public boolean updatePassword(String username, String newPassword) {
+        String sql = "UPDATE employees SET password = ? WHERE username = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newPassword);
+            ps.setString(2, username);
+            int affected = ps.executeUpdate();
+            return affected > 0;
+        } catch (SQLException e) {
+            System.out.println("Loi khi doi mat khau: " + e.getMessage());
+            return false;
+        }
+    }
 }

@@ -62,7 +62,33 @@ public class LinhKien extends HangMuc {
      */
     @Override
     public void nhapInfo(Scanner sc) {
-        super.nhapInfo(sc);
+        System.out.print("Nhap ma linh kien (de trong de tu dong tao): ");
+        String maInput = sc.nextLine().trim();
+        this.setMa(maInput); // can be empty for auto-generation
+
+        System.out.print("Nhap ten linh kien: ");
+        String tenInput = sc.nextLine().trim();
+        while (tenInput.isEmpty()) {
+            System.out.print("Ten linh kien khong duoc de trong! Moi nhap lai: ");
+            tenInput = sc.nextLine().trim();
+        }
+        this.setTen(tenInput);
+
+        while (true) {
+            try {
+                System.out.print("Nhap don gia (VND): ");
+                double gia = Double.parseDouble(sc.nextLine());
+                if (gia < 0) {
+                    System.out.println("Don gia phai >= 0!");
+                    continue;
+                }
+                this.setDonGia(gia);
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Vui long nhap so thuc hop le!");
+            }
+        }
+
         while (true) {
             try {
                 System.out.print("Nhap so luong ton kho: ");
