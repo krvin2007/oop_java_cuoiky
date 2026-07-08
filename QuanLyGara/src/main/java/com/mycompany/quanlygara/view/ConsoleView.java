@@ -68,7 +68,7 @@ public class ConsoleView {
         do {
             showMainMenu();
             try {
-                System.out.print("Nhap lua chon cua ban (0-7): ");
+                System.out.print("Nhap lua chon cua ban (0-8): ");
                 choice = Integer.parseInt(sc.nextLine());
                 System.out.println();
                 if (choice == 0) {
@@ -78,7 +78,7 @@ public class ConsoleView {
                 
                 boolean hasPermission = false;
                 String role = currentUser.getRole();
-                if (choice == 0) {
+                if (choice == 0 || choice == 8) {
                     hasPermission = true;
                 } else if (role.equals("QuanLy")) {
                     hasPermission = true;
@@ -119,11 +119,14 @@ public class ConsoleView {
                     case 7:
                         menuDichVu();
                         break;
+                    case 8:
+                        changePassword();
+                        break;
                     case 0:
                         System.out.println("Cam on ban da su dung chuong trinh!");
                         break;
                     default:
-                        System.out.println("Lua chon khong hop le! Vui long nhap tu 0 den 7.");
+                        System.out.println("Lua chon khong hop le! Vui long nhap tu 0 den 8.");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Loi: Vui long nhap so nguyen hop le!");
@@ -132,6 +135,36 @@ public class ConsoleView {
             }
             System.out.println();
         } while (choice != 0);
+    }
+
+    private void changePassword() {
+        System.out.println("--- DOI MAT KHAU ---");
+        System.out.print("Nhap mat khau hien tai: ");
+        String currentPwd = sc.nextLine().trim();
+        if (!currentPwd.equals(currentUser.getPassword())) {
+            System.out.println("Mat khau hien tai khong dung!");
+            return;
+        }
+        System.out.print("Nhap mat khau moi: ");
+        String newPwd = sc.nextLine().trim();
+        if (newPwd.isEmpty()) {
+            System.out.println("Mat khau moi khong duoc de trong!");
+            return;
+        }
+        System.out.print("Xac nhan mat khau moi: ");
+        String confirmPwd = sc.nextLine().trim();
+        if (!newPwd.equals(confirmPwd)) {
+            System.out.println("Xac nhan mat khau khong khop!");
+            return;
+        }
+        
+        boolean success = employeeDAO.updatePassword(currentUser.getUsername(), newPwd);
+        if (success) {
+            currentUser.setPassword(newPwd);
+            System.out.println("Doi mat khau thanh cong!");
+        } else {
+            System.out.println("Doi mat khau that bai!");
+        }
     }
 
     private void showMainMenu() {
@@ -159,6 +192,7 @@ public class ConsoleView {
         if (role.equals("QuanLy") || role.equals("ThuKho")) {
             System.out.println("7. Quan ly Danh muc Dich vu (DichVu)");
         }
+        System.out.println("8. Doi mat khau");
         System.out.println("0. Thoat chuong trinh");
         System.out.println("====================================================");
     }
@@ -195,6 +229,12 @@ public class ConsoleView {
                         }
                         break;
                     case 2:
+                        System.out.println("--- Danh sach Chu xe hien co ---");
+                        List<Owner> availableOwners = ownerController.layTatCa();
+                        for (Owner o : availableOwners) {
+                            System.out.println(o.getId() + " - " + o.getName() + " - " + o.getPhone());
+                        }
+                        System.out.println("--------------------------------");
                         Vehicle newVehicle = new Vehicle();
                         newVehicle.nhapInfo(sc);
                         int oId = newVehicle.getOwner() != null ? newVehicle.getOwner().getId() : 0;
@@ -481,6 +521,19 @@ public class ConsoleView {
                 choice = Integer.parseInt(sc.nextLine());
                 switch (choice) {
                     case 1:
+                        System.out.println("--- Danh sach Xe hien co ---");
+                        List<Vehicle> availableVehicles = vehicleController.layTatCa();
+                        for (Vehicle v : availableVehicles) {
+                            System.out.println(v.getLicensePlate() + " - " + v.getBrand() + " " + v.getModel());
+                        }
+                        System.out.println("--- Danh sach Ky thuat vien dang ranh ---");
+                        List<Mechanic> availableMechs = mechanicController.layTatCa();
+                        for (Mechanic m : availableMechs) {
+                            if ("Đang rảnh".equalsIgnoreCase(m.getStatus())) {
+                                System.out.println(m.getId() + " - " + m.getName() + " - " + m.getSpec());
+                            }
+                        }
+                        System.out.println("--------------------------------");
                         RepairOrder order = new RepairOrder();
                         order.nhapInfo(sc);
                         String lp = order.getVehicle() != null ? order.getVehicle().getLicensePlate() : "";
@@ -528,6 +581,10 @@ public class ConsoleView {
                         detail.setOrderId(orderId);
                         
                         if (typeChoice == 1) {
+                            System.out.println("--- Danh sach Linh kien ---");
+                            for (LinhKien p : partController.layTatCa()) {
+                                System.out.println(p.getMa() + " - " + p.getTen() + " - Ton kho: " + p.getSoLuongTon() + " - Gia: " + String.format("%,.0f", p.getDonGia()));
+                            }
                             System.out.print("Nhap Ma Linh kien: ");
                             String maLK = sc.nextLine().trim();
                             LinhKien lk = partController.layTheoId(maLK);
@@ -542,8 +599,14 @@ public class ConsoleView {
                                 break;
                             }
                             detail.setMaHangMuc(maLK);
+                            detail.setLoaiHangMuc("LINHKIEN");
+                            detail.setDonGiaThucTe(lk.getDonGia());
                             detail.setSoLuong(qty);
                         } else if (typeChoice == 2) {
+                            System.out.println("--- Danh sach Dich vu ---");
+                            for (DichVu d : dichVuDAO.layTatCa()) {
+                                System.out.println(d.getMa() + " - " + d.getTen() + " - Gia: " + String.format("%,.0f", d.getDonGia()));
+                            }
                             System.out.print("Nhap Ma Dich vu: ");
                             String maDV = sc.nextLine().trim();
                             DichVu dv = dichVuDAO.layTheoId(maDV);
@@ -552,6 +615,8 @@ public class ConsoleView {
                                 break;
                             }
                             detail.setMaHangMuc(maDV);
+                            detail.setLoaiHangMuc("DICHVU");
+                            detail.setDonGiaThucTe(dv.getDonGia());
                             detail.setSoLuong(1); // quantity is always 1 for service
                         } else {
                             System.out.println("Lua chon loai khong hop le!");

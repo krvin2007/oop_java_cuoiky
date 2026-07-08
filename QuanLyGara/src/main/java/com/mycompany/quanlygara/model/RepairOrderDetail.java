@@ -13,14 +13,18 @@ import java.util.Scanner;
 public class RepairOrderDetail {
     private int orderId;
     private String maHangMuc;
+    private String loaiHangMuc;
+    private double donGiaThucTe;
     private int soLuong;
 
     public RepairOrderDetail() {
     }
 
-    public RepairOrderDetail(int orderId, String maHangMuc, int soLuong) {
+    public RepairOrderDetail(int orderId, String maHangMuc, String loaiHangMuc, double donGiaThucTe, int soLuong) {
         this.orderId = orderId;
         this.maHangMuc = maHangMuc;
+        this.loaiHangMuc = loaiHangMuc;
+        this.donGiaThucTe = donGiaThucTe;
         this.soLuong = soLuong;
     }
 
@@ -38,6 +42,22 @@ public class RepairOrderDetail {
 
     public void setMaHangMuc(String maHangMuc) {
         this.maHangMuc = maHangMuc;
+    }
+
+    public String getLoaiHangMuc() {
+        return loaiHangMuc;
+    }
+
+    public void setLoaiHangMuc(String loaiHangMuc) {
+        this.loaiHangMuc = loaiHangMuc;
+    }
+
+    public double getDonGiaThucTe() {
+        return donGiaThucTe;
+    }
+
+    public void setDonGiaThucTe(double donGiaThucTe) {
+        this.donGiaThucTe = donGiaThucTe;
     }
 
     public int getSoLuong() {
@@ -69,6 +89,7 @@ public class RepairOrderDetail {
     @Override
     public String toString() {
         return "RepairOrderDetail [Order ID: " + orderId + ", Ma Hang Muc: " + maHangMuc + 
+               ", Loai Hang Muc: " + loaiHangMuc + ", Don Gia Thuc Te: " + donGiaThucTe + 
                ", So Luong: " + soLuong + "]";
     }
 }

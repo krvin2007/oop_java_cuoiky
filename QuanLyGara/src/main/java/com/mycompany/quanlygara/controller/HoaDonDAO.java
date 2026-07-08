@@ -121,16 +121,10 @@ public class HoaDonDAO implements IRepository<Invoice> {
 
         for (int i = 0; i < details.size(); i++) {
             RepairOrderDetail d = details.get(i);
-            LinhKien lk = lkDAO.layTheoId(d.getMaHangMuc());
-            if (lk != null) {
-                totalPartCost += lk.tinhThanhTien(d.getSoLuong());
-            } else {
-                DichVu dv = dvDAO.layTheoId(d.getMaHangMuc());
-                if (dv != null) {
-                    totalLaborCost += dv.tinhThanhTien(d.getSoLuong());
-                } else {
-                    throw new Exception("Loi: Khong tim thay hang muc co ma = " + d.getMaHangMuc());
-                }
+            if ("LINHKIEN".equalsIgnoreCase(d.getLoaiHangMuc())) {
+                totalPartCost += d.getDonGiaThucTe() * d.getSoLuong();
+            } else if ("DICHVU".equalsIgnoreCase(d.getLoaiHangMuc())) {
+                totalLaborCost += d.getDonGiaThucTe() * d.getSoLuong();
             }
         }
 
