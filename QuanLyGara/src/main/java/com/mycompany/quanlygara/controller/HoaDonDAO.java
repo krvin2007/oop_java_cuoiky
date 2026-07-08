@@ -5,8 +5,6 @@
 package com.mycompany.quanlygara.controller;
 
 import com.mycompany.quanlygara.model.Invoice;
-import com.mycompany.quanlygara.model.LinhKien;
-import com.mycompany.quanlygara.model.DichVu;
 import com.mycompany.quanlygara.model.RepairOrderDetail;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,7 +38,8 @@ public class HoaDonDAO implements IRepository<Invoice> {
                     "INSERT INTO invoices (order_id, payment_date, total_part_cost, total_labor_cost, vat_rate, total_amount) VALUES (?, ?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS)) {
                 ps.setInt(1, invoice.getRepairOrder() != null ? invoice.getRepairOrder().getOrderId() : 0);
-                ps.setTimestamp(2, invoice.getPaymentDate() != null ? new Timestamp(invoice.getPaymentDate().getTime()) : null);
+                ps.setTimestamp(2,
+                        invoice.getPaymentDate() != null ? new Timestamp(invoice.getPaymentDate().getTime()) : null);
                 ps.setDouble(3, invoice.getTotalPartCost());
                 ps.setDouble(4, invoice.getTotalLaborCost());
                 ps.setDouble(5, invoice.getVatRate());
@@ -59,9 +58,10 @@ public class HoaDonDAO implements IRepository<Invoice> {
     public void capNhat(Invoice invoice) throws Exception {
         String sql = "UPDATE invoices SET order_id = ?, payment_date = ?, total_part_cost = ?, total_labor_cost = ?, vat_rate = ?, total_amount = ? WHERE invoice_id = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, invoice.getRepairOrder() != null ? invoice.getRepairOrder().getOrderId() : 0);
-            ps.setTimestamp(2, invoice.getPaymentDate() != null ? new Timestamp(invoice.getPaymentDate().getTime()) : null);
+            ps.setTimestamp(2,
+                    invoice.getPaymentDate() != null ? new Timestamp(invoice.getPaymentDate().getTime()) : null);
             ps.setDouble(3, invoice.getTotalPartCost());
             ps.setDouble(4, invoice.getTotalLaborCost());
             ps.setDouble(5, invoice.getVatRate());
@@ -78,7 +78,7 @@ public class HoaDonDAO implements IRepository<Invoice> {
     public void xoa(Object id) throws Exception {
         int targetId = (Integer) id;
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement("DELETE FROM invoices WHERE invoice_id = ?")) {
+                PreparedStatement ps = conn.prepareStatement("DELETE FROM invoices WHERE invoice_id = ?")) {
             ps.setInt(1, targetId);
             int rows = ps.executeUpdate();
             if (rows == 0) {
@@ -112,8 +112,6 @@ public class HoaDonDAO implements IRepository<Invoice> {
 
     public Invoice generateInvoice(int orderId) throws Exception {
         PhieuSuaChuaDAO roDAO = new PhieuSuaChuaDAO();
-        LinhKienDAO lkDAO = new LinhKienDAO();
-        DichVuDAO dvDAO = new DichVuDAO();
 
         List<RepairOrderDetail> details = roDAO.getDetailsByOrderId(orderId);
         double totalPartCost = 0;
@@ -142,7 +140,7 @@ public class HoaDonDAO implements IRepository<Invoice> {
     private List<Invoice> querySql(String sql, Integer idParam) throws Exception {
         List<Invoice> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             if (idParam != null) {
                 ps.setInt(1, idParam);
             }
@@ -173,7 +171,6 @@ public class HoaDonDAO implements IRepository<Invoice> {
                 rs.getDouble("total_part_cost"),
                 rs.getDouble("total_labor_cost"),
                 rs.getDouble("vat_rate"),
-                rs.getDouble("total_amount")
-        );
+                rs.getDouble("total_amount"));
     }
 }
