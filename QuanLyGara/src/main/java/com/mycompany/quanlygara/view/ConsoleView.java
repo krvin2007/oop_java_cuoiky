@@ -10,7 +10,7 @@ import java.util.*;
 
 /**
  *
- * @author ManhQuynh | rieng TAI khong lam gi
+ * @author ManhQuynh | Tài làm nhiều nhất 
  */
 public class ConsoleView {
     private final Scanner sc;

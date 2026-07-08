@@ -114,7 +114,7 @@ public class ReportController implements IReportService {
         Map<String, Integer> result = new LinkedHashMap<>();
         String sql = "SELECT ro.mechanic_id, m.name, COUNT(ro.order_id) as active_count " +
                 "FROM repair_orders ro " +
-                "LEFT JOIN mechanics m ON ro.mechanic_id = m.id " +
+                "LEFT JOIN employees m ON ro.mechanic_id = m.id " +
                 "GROUP BY ro.mechanic_id, m.name " +
                 "ORDER BY active_count DESC " +
                 "LIMIT ?";
