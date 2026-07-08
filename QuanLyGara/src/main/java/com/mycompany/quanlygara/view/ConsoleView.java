@@ -10,7 +10,7 @@ import java.util.*;
 
 /**
  *
- * @author ManhQuynh
+ * @author ManhQuynh | rieng TAI khong lam gi
  */
 public class ConsoleView {
     private final Scanner sc;
@@ -64,7 +64,8 @@ public class ConsoleView {
                 currentUser = employeeDAO.login(username, password);
                 if (currentUser != null) {
                     System.out.println(
-                            "Dang nhap thanh cong! Xin chao " + currentUser.getRole() + " " + currentUser.getUsername());
+                            "Dang nhap thanh cong! Xin chao " + currentUser.getRole() + " "
+                                    + currentUser.getUsername());
                 } else {
                     System.out.println("Sai tai khoan hoac mat khau. Vui long thu lai!");
                 }
