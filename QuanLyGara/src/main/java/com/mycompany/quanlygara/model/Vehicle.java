@@ -15,19 +15,39 @@ public class Vehicle {
     private String brand;
     private String model;
     private int productionYear;
-    private Owner owner;
+    private Customer Customer;
+    private String color;
+    private String condition;
     private boolean isDeleted;
 
     public Vehicle() {
     }
 
-    public Vehicle(String licensePlate, String brand, String model, int productionYear, Owner owner) {
+    public Vehicle(String licensePlate, String brand, String model, int productionYear, Customer Customer, String color, String condition) {
         this.licensePlate = licensePlate;
         this.brand = brand;
         this.model = model;
         this.productionYear = productionYear;
-        this.owner = owner;
+        this.Customer = Customer;
+        this.color = color;
+        this.condition = condition;
         this.isDeleted = false;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
     }
 
     public boolean isDeleted() {
@@ -70,12 +90,12 @@ public class Vehicle {
         this.productionYear = productionYear;
     }
 
-    public Owner getOwner() {
-        return owner;
+    public Customer getOwner() {
+        return Customer;
     }
 
-    public void setOwner(Owner owner) {
-        this.owner = owner;
+    public void setOwner(Customer Customer) {
+        this.Customer = Customer;
     }
 
     public static String getProvinceName(String code) {
@@ -287,18 +307,32 @@ public class Vehicle {
                 System.out.println("Vui long nhap so nguyen hop le!");
             }
         }
-        // Note: Owner should be set by the caller fetching from DAO based on input ID.
+        System.out.print("Nhap mau sac xe (color): ");
+        this.color = sc.nextLine().trim();
+        while (this.color.isEmpty()) {
+            System.out.print("Mau sac khong duoc de trong! Moi nhap lai: ");
+            this.color = sc.nextLine().trim();
+        }
+
+        System.out.print("Nhap tinh trang xe luc tiep nhan: ");
+        this.condition = sc.nextLine().trim();
+        while (this.condition.isEmpty()) {
+            System.out.print("Tinh trang xe khong duoc de trong! Moi nhap lai: ");
+            this.condition = sc.nextLine().trim();
+        }
+
+        // Note: Customer should be set by the caller fetching from DAO based on input ID.
         System.out.print("Nhap ID chu xe: ");
         int inputOwnerId = 0;
         try {
             inputOwnerId = Integer.parseInt(sc.nextLine());
         } catch (Exception e) {}
-        this.owner = new Owner();
-        this.owner.setId(inputOwnerId); // Temporary ID wrapper
+        this.Customer = new Customer();
+        this.Customer.setId(inputOwnerId); // Temporary ID wrapper
     }
 
     @Override
     public String toString() {
-        return "Vehicle [License Plate: " + licensePlate + ", Brand: " + brand + ", Model: " + model + ", Production Year: " + productionYear + ", Owner: " + (owner != null ? owner.getName() : "null") + "]";
+        return "Vehicle [License Plate: " + licensePlate + ", Brand: " + brand + ", Model: " + model + ", Production Year: " + productionYear + ", Color: " + color + ", Condition: " + condition + ", Customer: " + (Customer != null ? Customer.getName() : "null") + "]";
     }
 }

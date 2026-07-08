@@ -10,6 +10,7 @@ import com.mycompany.quanlygara.model.DichVu;
 import com.mycompany.quanlygara.model.RepairOrder;
 import com.mycompany.quanlygara.model.RepairOrderDetail;
 import com.mycompany.quanlygara.model.Mechanic;
+import com.mycompany.quanlygara.exception.PartOutOfStockException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,13 +31,14 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
     public void themMoi(RepairOrder order) throws Exception {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                     "INSERT INTO repair_orders (license_plate, entry_date, exit_date, mechanic_id, status) VALUES (?, ?, ?, ?, ?)",
+                     "INSERT INTO repair_orders (license_plate, entry_date, exit_date, mechanic_id, status, visual_condition) VALUES (?, ?, ?, ?, ?, ?)",
                      Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, order.getVehicle() != null ? order.getVehicle().getLicensePlate() : null);
             ps.setTimestamp(2, order.getEntryDate() != null ? new Timestamp(order.getEntryDate().getTime()) : null);
             ps.setTimestamp(3, order.getExitDate() != null ? new Timestamp(order.getExitDate().getTime()) : null);
             ps.setInt(4, order.getMechanic() != null ? order.getMechanic().getId() : 0);
             ps.setString(5, order.getStatus());
+            ps.setString(6, order.getVisualCondition());
             ps.executeUpdate();
             try (ResultSet keys = ps.getGeneratedKeys()) {
                 if (keys.next()) {
@@ -66,13 +68,14 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                     "UPDATE repair_orders SET license_plate = ?, entry_date = ?, exit_date = ?, mechanic_id = ?, status = ? WHERE order_id = ?")) {
+                     "UPDATE repair_orders SET license_plate = ?, entry_date = ?, exit_date = ?, mechanic_id = ?, status = ?, visual_condition = ? WHERE order_id = ?")) {
             ps.setString(1, order.getVehicle() != null ? order.getVehicle().getLicensePlate() : null);
             ps.setTimestamp(2, order.getEntryDate() != null ? new Timestamp(order.getEntryDate().getTime()) : null);
             ps.setTimestamp(3, order.getExitDate() != null ? new Timestamp(order.getExitDate().getTime()) : null);
             ps.setInt(4, newMechanicId);
             ps.setString(5, order.getStatus());
-            ps.setInt(6, order.getOrderId());
+            ps.setString(6, order.getVisualCondition());
+            ps.setInt(7, order.getOrderId());
             ps.executeUpdate();
         }
 
@@ -151,7 +154,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
     @Override
     public List<RepairOrder> layTatCa() throws Exception {
         List<RepairOrder> list = new ArrayList<>();
-        String sql = "SELECT order_id, license_plate, entry_date, exit_date, mechanic_id, status FROM repair_orders ORDER BY order_id";
+        String sql = "SELECT order_id, license_plate, entry_date, exit_date, mechanic_id, status, visual_condition FROM repair_orders ORDER BY order_id";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -165,7 +168,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
     @Override
     public RepairOrder layTheoId(Object id) throws Exception {
         int targetId = (Integer) id;
-        String sql = "SELECT order_id, license_plate, entry_date, exit_date, mechanic_id, status FROM repair_orders WHERE order_id = ?";
+        String sql = "SELECT order_id, license_plate, entry_date, exit_date, mechanic_id, status, visual_condition FROM repair_orders WHERE order_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, targetId);
@@ -238,7 +241,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
                         psUpdate.setInt(3, detail.getSoLuong());
                         int rows = psUpdate.executeUpdate();
                         if (rows == 0) {
-                            throw new Exception("Linh kiện không tồn tại hoặc kho không đủ hàng!");
+                            throw new PartOutOfStockException("Linh kiện không tồn tại hoặc kho không đủ hàng!");
                         }
                     }
                 }
@@ -355,6 +358,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         String licensePlate = rs.getString("license_plate");
         int mechanicId = rs.getInt("mechanic_id");
         String status = rs.getString("status");
+        String visualCondition = rs.getString("visual_condition");
 
         com.mycompany.quanlygara.model.Vehicle vehicle = null;
         com.mycompany.quanlygara.model.Mechanic mechanic = null;
@@ -378,7 +382,8 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
                 entry != null ? new Date(entry.getTime()) : null,
                 exit != null ? new Date(exit.getTime()) : null,
                 mechanic,
-                status
+                status,
+                visualCondition
         );
         ro.setDetails(detailList);
         return ro;

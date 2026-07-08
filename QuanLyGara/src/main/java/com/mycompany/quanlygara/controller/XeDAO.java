@@ -5,6 +5,8 @@
 package com.mycompany.quanlygara.controller;
 
 import com.mycompany.quanlygara.model.Vehicle;
+import com.mycompany.quanlygara.exception.InvalidPlateNumberException;
+import com.mycompany.quanlygara.exception.VehicleNotFoundException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,17 +30,19 @@ public class XeDAO implements IRepository<Vehicle> {
                 ps.setString(1, vehicle.getLicensePlate());
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        throw new Exception("Bien so xe '" + vehicle.getLicensePlate() + "' da ton tai!");
+                        throw new InvalidPlateNumberException("Bien so xe '" + vehicle.getLicensePlate() + "' da ton tai!");
                     }
                 }
             }
             try (PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO vehicles (license_plate, brand, model, production_year, owner_id) VALUES (?, ?, ?, ?, ?)")) {
+                    "INSERT INTO vehicles (license_plate, brand, model, production_year, owner_id, color, condition_receipt) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
                 ps.setString(1, vehicle.getLicensePlate());
                 ps.setString(2, vehicle.getBrand());
                 ps.setString(3, vehicle.getModel());
                 ps.setInt(4, vehicle.getProductionYear());
                 ps.setInt(5, vehicle.getOwner() != null ? vehicle.getOwner().getId() : 0);
+                ps.setString(6, vehicle.getColor());
+                ps.setString(7, vehicle.getCondition());
                 ps.executeUpdate();
             }
         }
@@ -46,17 +50,19 @@ public class XeDAO implements IRepository<Vehicle> {
 
     @Override
     public void capNhat(Vehicle vehicle) throws Exception {
-        String sql = "UPDATE vehicles SET brand = ?, model = ?, production_year = ?, owner_id = ? WHERE LOWER(license_plate) = LOWER(?)";
+        String sql = "UPDATE vehicles SET brand = ?, model = ?, production_year = ?, owner_id = ?, color = ?, condition_receipt = ? WHERE LOWER(license_plate) = LOWER(?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, vehicle.getBrand());
             ps.setString(2, vehicle.getModel());
             ps.setInt(3, vehicle.getProductionYear());
             ps.setInt(4, vehicle.getOwner() != null ? vehicle.getOwner().getId() : 0);
-            ps.setString(5, vehicle.getLicensePlate());
+            ps.setString(5, vehicle.getColor());
+            ps.setString(6, vehicle.getCondition());
+            ps.setString(7, vehicle.getLicensePlate());
             int rows = ps.executeUpdate();
             if (rows == 0) {
-                throw new Exception("Xe can cap nhat khong ton tai!");
+                throw new VehicleNotFoundException("Xe can cap nhat khong ton tai!");
             }
         }
     }
@@ -70,7 +76,7 @@ public class XeDAO implements IRepository<Vehicle> {
             ps.setString(1, lp);
             int rows = ps.executeUpdate();
             if (rows == 0) {
-                throw new Exception("Khong tim thay xe co bien so '" + lp + "' de xoa!");
+                throw new VehicleNotFoundException("Khong tim thay xe co bien so '" + lp + "' de xoa!");
             }
         }
     }
@@ -78,7 +84,7 @@ public class XeDAO implements IRepository<Vehicle> {
     @Override
     public List<Vehicle> layTatCa() throws Exception {
         List<Vehicle> list = new ArrayList<>();
-        String sql = "SELECT license_plate, brand, model, production_year, owner_id, is_deleted FROM vehicles WHERE is_deleted = FALSE ORDER BY license_plate";
+        String sql = "SELECT license_plate, brand, model, production_year, owner_id, color, condition_receipt, is_deleted FROM vehicles WHERE is_deleted = FALSE ORDER BY license_plate";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -92,7 +98,7 @@ public class XeDAO implements IRepository<Vehicle> {
     @Override
     public Vehicle layTheoId(Object id) throws Exception {
         String lp = (String) id;
-        String sql = "SELECT license_plate, brand, model, production_year, owner_id, is_deleted FROM vehicles WHERE LOWER(license_plate) = LOWER(?) AND is_deleted = FALSE";
+        String sql = "SELECT license_plate, brand, model, production_year, owner_id, color, condition_receipt, is_deleted FROM vehicles WHERE LOWER(license_plate) = LOWER(?) AND is_deleted = FALSE";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, lp);
@@ -107,7 +113,7 @@ public class XeDAO implements IRepository<Vehicle> {
 
     public List<Vehicle> searchByLicensePlate(String lp) throws Exception {
         List<Vehicle> result = new ArrayList<>();
-        String sql = "SELECT license_plate, brand, model, production_year, owner_id, is_deleted FROM vehicles WHERE LOWER(license_plate) LIKE ? AND is_deleted = FALSE ORDER BY license_plate";
+        String sql = "SELECT license_plate, brand, model, production_year, owner_id, color, condition_receipt, is_deleted FROM vehicles WHERE LOWER(license_plate) LIKE ? AND is_deleted = FALSE ORDER BY license_plate";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + lp.toLowerCase() + "%");
@@ -122,7 +128,7 @@ public class XeDAO implements IRepository<Vehicle> {
 
     public List<Vehicle> searchByOwnerName(String ownerName) throws Exception {
         List<Vehicle> result = new ArrayList<>();
-        String sql = "SELECT v.license_plate, v.brand, v.model, v.production_year, v.owner_id, v.is_deleted "
+        String sql = "SELECT v.license_plate, v.brand, v.model, v.production_year, v.owner_id, v.color, v.condition_receipt, v.is_deleted "
                 + "FROM vehicles v JOIN owners o ON v.owner_id = o.id "
                 + "WHERE LOWER(o.name) LIKE ? AND v.is_deleted = FALSE ORDER BY v.license_plate";
         try (Connection conn = DBConnection.getConnection();
@@ -139,16 +145,16 @@ public class XeDAO implements IRepository<Vehicle> {
 
     private Vehicle mapRow(ResultSet rs) throws SQLException {
         int ownerId = rs.getInt("owner_id");
-        com.mycompany.quanlygara.model.Owner owner = null;
+        com.mycompany.quanlygara.model.Customer Customer = null;
         try {
             ChuXeDAO chuXeDAO = new ChuXeDAO();
-            owner = chuXeDAO.layTheoId(ownerId);
+            Customer = chuXeDAO.layTheoId(ownerId);
         } catch (Exception e) {
             System.out.println("Loi khi lay thong tin chu xe: " + e.getMessage());
         }
         
         Vehicle vehicle = new Vehicle(rs.getString("license_plate"), rs.getString("brand"), rs.getString("model"),
-                rs.getInt("production_year"), owner);
+                rs.getInt("production_year"), Customer, rs.getString("color"), rs.getString("condition_receipt"));
         vehicle.setDeleted(rs.getBoolean("is_deleted"));
         return vehicle;
     }

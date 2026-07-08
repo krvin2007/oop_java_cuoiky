@@ -59,7 +59,8 @@ CREATE TABLE `linh_kien` (
   `ma` varchar(20) NOT NULL,
   `ten` varchar(255) NOT NULL,
   `don_gia` double NOT NULL DEFAULT 0,
-  `so_luong_ton` int(11) NOT NULL DEFAULT 0
+  `so_luong_ton` int(11) NOT NULL DEFAULT 0,
+  `location` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -103,6 +104,7 @@ CREATE TABLE `owners` (
   `name` varchar(255) NOT NULL,
   `phone` varchar(20) NOT NULL,
   `address` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
   `is_deleted` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -125,7 +127,8 @@ CREATE TABLE `repair_orders` (
   `entry_date` datetime DEFAULT NULL,
   `exit_date` datetime DEFAULT NULL,
   `mechanic_id` int(11) NOT NULL,
-  `status` varchar(50) NOT NULL DEFAULT 'RECEIVING'
+  `status` varchar(50) NOT NULL DEFAULT 'RECEIVING',
+  `visual_condition` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -155,6 +158,8 @@ CREATE TABLE `vehicles` (
   `model` varchar(100) DEFAULT NULL,
   `production_year` int(11) DEFAULT NULL,
   `owner_id` int(11) NOT NULL,
+  `color` varchar(50) DEFAULT NULL,
+  `condition_receipt` varchar(255) DEFAULT NULL,
   `is_deleted` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

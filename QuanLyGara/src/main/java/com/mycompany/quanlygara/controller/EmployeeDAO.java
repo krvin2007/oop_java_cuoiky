@@ -29,7 +29,7 @@ public class EmployeeDAO {
                     String spec = rs.getString("specialization");
                     
                     if (role.equals("QuanLy")) {
-                        return new Manager(id, n, p, a, u, pw, sal, st);
+                        return new Owner(id, n, p, a, u, pw, sal, st);
                     } else if (role.equals("KeToan")) {
                         return new Accountant(id, n, p, a, u, pw, sal, st);
                     } else if (role.equals("ThuKho")) {

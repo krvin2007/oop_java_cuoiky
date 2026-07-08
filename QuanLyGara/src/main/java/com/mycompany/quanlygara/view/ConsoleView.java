@@ -208,7 +208,7 @@ public class ConsoleView {
         int choice = -1;
         do {
             System.out.println("--- MENU QUAN LY XE & CHU XE ---");
-            System.out.println("1. Them Chu xe moi (Owner)");
+            System.out.println("1. Them Chu xe moi (Customer)");
             System.out.println("2. Them Xe moi (Vehicle)");
             System.out.println("3. Xem danh sach Chu xe");
             System.out.println("4. Xem danh sach Xe");
@@ -223,7 +223,7 @@ public class ConsoleView {
                 choice = Integer.parseInt(sc.nextLine());
                 switch (choice) {
                     case 1:
-                        Owner newOwner = new Owner();
+                        Customer newOwner = new Customer();
                         newOwner.nhapInfo(sc);
                         try {
                             ownerController.themMoi(newOwner);
@@ -236,16 +236,16 @@ public class ConsoleView {
                         break;
                     case 2:
                         System.out.println("--- Danh sach Chu xe hien co ---");
-                        List<Owner> availableOwners = ownerController.layTatCa();
-                        for (Owner o : availableOwners) {
+                        List<Customer> availableOwners = ownerController.layTatCa();
+                        for (Customer o : availableOwners) {
                             System.out.println(o.getId() + " - " + o.getName() + " - " + o.getPhone());
                         }
                         System.out.println("--------------------------------");
                         Vehicle newVehicle = new Vehicle();
                         newVehicle.nhapInfo(sc);
                         int oId = newVehicle.getOwner() != null ? newVehicle.getOwner().getId() : 0;
-                        Owner owner = ownerController.layTheoId(oId);
-                        if (owner == null) {
+                        Customer Customer = ownerController.layTheoId(oId);
+                        if (Customer == null) {
                             System.out.println(
                                     "Loi: Khong tim thay chu xe co ID = " + oId + ". Vui long tao chu xe truoc!");
                             break;
@@ -260,9 +260,9 @@ public class ConsoleView {
                         System.out.println("Them xe thanh cong!");
                         break;
                     case 3:
-                        List<Owner> owners = ownerController.layTatCa();
+                        List<Customer> owners = ownerController.layTatCa();
                         System.out.println("Danh sach chu xe:");
-                        for (Owner o : owners) {
+                        for (Customer o : owners) {
                             System.out.println(o.toString());
                         }
                         break;
@@ -300,7 +300,7 @@ public class ConsoleView {
                     case 7:
                         System.out.print("Nhap ID Chu xe can cap nhat: ");
                         int editOwnerId = Integer.parseInt(sc.nextLine());
-                        Owner editOwner = ownerController.layTheoId(editOwnerId);
+                        Customer editOwner = ownerController.layTheoId(editOwnerId);
                         if (editOwner == null) {
                             System.out.println("Khong tim thay chu xe!");
                         } else {
@@ -431,9 +431,10 @@ public class ConsoleView {
             System.out.println("5. Tim kiem linh kien theo Ten");
             System.out.println("6. Cap nhat Linh kien");
             System.out.println("7. Xoa Linh kien");
+            System.out.println("8. Tim kiem linh kien theo khoang gia");
             System.out.println("0. Quay lai Menu chinh");
             System.out.println("---------------------------------");
-            System.out.print("Nhap lua chon (0-7): ");
+            System.out.print("Nhap lua chon (0-8): ");
             try {
                 choice = Integer.parseInt(sc.nextLine());
                 switch (choice) {
@@ -498,6 +499,20 @@ public class ConsoleView {
                         } else {
                             partController.xoa(deletePartId);
                             System.out.println("Da xoa linh kien thanh cong.");
+                        }
+                        break;
+                    case 8:
+                        System.out.print("Nhap gia thap nhat: ");
+                        double minPrice = Double.parseDouble(sc.nextLine());
+                        System.out.print("Nhap gia cao nhat: ");
+                        double maxPrice = Double.parseDouble(sc.nextLine());
+                        List<LinhKien> partsByPrice = partController.searchByPriceRange(minPrice, maxPrice);
+                        if (partsByPrice.isEmpty()) {
+                            System.out.println("Khong tim thay linh kien nao trong khoang gia nay.");
+                        } else {
+                            for (LinhKien p : partsByPrice) {
+                                System.out.println(p.toString());
+                            }
                         }
                         break;
                     case 0:

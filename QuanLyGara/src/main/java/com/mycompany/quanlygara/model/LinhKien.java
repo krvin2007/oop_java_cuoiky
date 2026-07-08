@@ -23,6 +23,7 @@ import java.util.Scanner;
 public class LinhKien extends HangMuc {
     // Thuộc tính riêng của LinhKien (Đóng gói)
     private int soLuongTon;
+    private String location;
 
     // Constructor mặc định
     public LinhKien() {
@@ -30,9 +31,18 @@ public class LinhKien extends HangMuc {
     }
 
     // Constructor đầy đủ tham số (bao gồm tham số lớp cha và lớp con)
-    public LinhKien(String ma, String ten, double donGia, int soLuongTon) {
+    public LinhKien(String ma, String ten, double donGia, int soLuongTon, String location) {
         super(ma, ten, donGia); // Gọi constructor lớp cha
         this.soLuongTon = soLuongTon;
+        this.location = location;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     // --- GETTER VÀ SETTER CHO THUỘC TÍNH RIÊNG (Đóng gói) ---
@@ -102,6 +112,9 @@ public class LinhKien extends HangMuc {
                 System.out.println("Vui long nhap so nguyen hop le!");
             }
         }
+
+        System.out.print("Nhap vi tri luu tru trong kho: ");
+        this.location = sc.nextLine().trim();
     }
 
     /**
@@ -109,6 +122,6 @@ public class LinhKien extends HangMuc {
      */
     @Override
     public String toString() {
-        return "LinhKien [" + super.toString() + ", So luong ton: " + soLuongTon + "]";
+        return "LinhKien [" + super.toString() + ", So luong ton: " + soLuongTon + ", Vi tri: " + location + "]";
     }
 }

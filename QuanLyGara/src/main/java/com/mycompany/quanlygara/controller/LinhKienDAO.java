@@ -5,6 +5,7 @@
 package com.mycompany.quanlygara.controller;
 
 import com.mycompany.quanlygara.model.LinhKien;
+import com.mycompany.quanlygara.exception.PartOutOfStockException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -48,11 +49,12 @@ public class LinhKienDAO implements IRepository<LinhKien> {
                 }
             }
             try (PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO linh_kien (ma, ten, don_gia, so_luong_ton) VALUES (?, ?, ?, ?)")) {
+                    "INSERT INTO linh_kien (ma, ten, don_gia, so_luong_ton, location) VALUES (?, ?, ?, ?, ?)")) {
                 ps.setString(1, lk.getMa());
                 ps.setString(2, lk.getTen());
                 ps.setDouble(3, lk.getDonGia());
                 ps.setInt(4, lk.getSoLuongTon());
+                ps.setString(5, lk.getLocation());
                 ps.executeUpdate();
             }
         }
@@ -60,13 +62,14 @@ public class LinhKienDAO implements IRepository<LinhKien> {
 
     @Override
     public void capNhat(LinhKien lk) throws Exception {
-        String sql = "UPDATE linh_kien SET ten = ?, don_gia = ?, so_luong_ton = ? WHERE LOWER(ma) = LOWER(?)";
+        String sql = "UPDATE linh_kien SET ten = ?, don_gia = ?, so_luong_ton = ?, location = ? WHERE LOWER(ma) = LOWER(?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, lk.getTen());
             ps.setDouble(2, lk.getDonGia());
             ps.setInt(3, lk.getSoLuongTon());
-            ps.setString(4, lk.getMa());
+            ps.setString(4, lk.getLocation());
+            ps.setString(5, lk.getMa());
             int rows = ps.executeUpdate();
             if (rows == 0) {
                 throw new Exception("Linh kien can cap nhat khong ton tai!");
@@ -89,19 +92,35 @@ public class LinhKienDAO implements IRepository<LinhKien> {
 
     @Override
     public List<LinhKien> layTatCa() throws Exception {
-        return querySql("SELECT ma, ten, don_gia, so_luong_ton FROM linh_kien ORDER BY ma", null);
+        return querySql("SELECT ma, ten, don_gia, so_luong_ton, location FROM linh_kien ORDER BY ma", null);
     }
 
     @Override
     public LinhKien layTheoId(Object id) throws Exception {
         String ma = (String) id;
-        List<LinhKien> list = querySql("SELECT ma, ten, don_gia, so_luong_ton FROM linh_kien WHERE LOWER(ma) = LOWER(?)", ma);
+        List<LinhKien> list = querySql("SELECT ma, ten, don_gia, so_luong_ton, location FROM linh_kien WHERE LOWER(ma) = LOWER(?)", ma);
         return list.isEmpty() ? null : list.get(0);
     }
 
     public List<LinhKien> searchByName(String keyword) throws Exception {
-        return querySql("SELECT ma, ten, don_gia, so_luong_ton FROM linh_kien WHERE LOWER(ten) LIKE ? ORDER BY ma",
+        return querySql("SELECT ma, ten, don_gia, so_luong_ton, location FROM linh_kien WHERE LOWER(ten) LIKE ? ORDER BY ma",
                 "%" + keyword.toLowerCase() + "%");
+    }
+
+    public List<LinhKien> searchByPriceRange(double minPrice, double maxPrice) throws Exception {
+        List<LinhKien> list = new ArrayList<>();
+        String sql = "SELECT ma, ten, don_gia, so_luong_ton, location FROM linh_kien WHERE don_gia >= ? AND don_gia <= ? ORDER BY don_gia ASC";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDouble(1, minPrice);
+            ps.setDouble(2, maxPrice);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        }
+        return list;
     }
 
     public void deductQuantity(String ma, int qtyToDeduct) throws Exception {
@@ -113,7 +132,7 @@ public class LinhKienDAO implements IRepository<LinhKien> {
                 ps.setInt(3, qtyToDeduct);
                 int rows = ps.executeUpdate();
                 if (rows == 0) {
-                    throw new Exception("Linh kiện với mã " + ma + " không tồn tại hoặc không đủ số lượng tồn kho!");
+                    throw new PartOutOfStockException("Linh kiện với mã " + ma + " không tồn tại hoặc không đủ số lượng tồn kho!");
                 }
             }
         }
@@ -121,12 +140,12 @@ public class LinhKienDAO implements IRepository<LinhKien> {
 
     public List<LinhKien> sortByPrice(boolean ascending) throws Exception {
         String order = ascending ? "ASC" : "DESC";
-        return querySql("SELECT ma, ten, don_gia, so_luong_ton FROM linh_kien ORDER BY don_gia " + order, null);
+        return querySql("SELECT ma, ten, don_gia, so_luong_ton, location FROM linh_kien ORDER BY don_gia " + order, null);
     }
 
     public List<LinhKien> sortByQuantity(boolean ascending) throws Exception {
         String order = ascending ? "ASC" : "DESC";
-        return querySql("SELECT ma, ten, don_gia, so_luong_ton FROM linh_kien ORDER BY so_luong_ton " + order, null);
+        return querySql("SELECT ma, ten, don_gia, so_luong_ton, location FROM linh_kien ORDER BY so_luong_ton " + order, null);
     }
 
     private List<LinhKien> querySql(String sql, String param) throws Exception {
@@ -146,6 +165,6 @@ public class LinhKienDAO implements IRepository<LinhKien> {
     }
 
     private LinhKien mapRow(ResultSet rs) throws SQLException {
-        return new LinhKien(rs.getString("ma"), rs.getString("ten"), rs.getDouble("don_gia"), rs.getInt("so_luong_ton"));
+        return new LinhKien(rs.getString("ma"), rs.getString("ten"), rs.getDouble("don_gia"), rs.getInt("so_luong_ton"), rs.getString("location"));
     }
 }

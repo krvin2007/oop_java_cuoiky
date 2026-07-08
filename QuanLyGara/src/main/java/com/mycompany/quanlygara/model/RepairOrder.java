@@ -20,6 +20,7 @@ public class RepairOrder {
     private Date exitDate;
     private Mechanic mechanic;
     private String status; // RECEIVING, REPAIRING, COMPLETED
+    private String visualCondition;
     private java.util.List<RepairOrderDetail> details;
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -30,14 +31,23 @@ public class RepairOrder {
         this.details = new java.util.ArrayList<>();
     }
 
-    public RepairOrder(int orderId, Vehicle vehicle, Date entryDate, Date exitDate, Mechanic mechanic, String status) {
+    public RepairOrder(int orderId, Vehicle vehicle, Date entryDate, Date exitDate, Mechanic mechanic, String status, String visualCondition) {
         this.orderId = orderId;
         this.vehicle = vehicle;
         this.entryDate = entryDate;
         this.exitDate = exitDate;
         this.mechanic = mechanic;
         this.status = status;
+        this.visualCondition = visualCondition;
         this.details = new java.util.ArrayList<>();
+    }
+
+    public String getVisualCondition() {
+        return visualCondition;
+    }
+
+    public void setVisualCondition(String visualCondition) {
+        this.visualCondition = visualCondition;
     }
 
     public int getOrderId() {
@@ -133,6 +143,9 @@ public class RepairOrder {
                 this.entryDate = new Date();
             }
         }
+        
+        System.out.print("Nhap mo ta hien trang ngoai quan xe luc tiep nhan: ");
+        this.visualCondition = sc.nextLine().trim();
         this.status = "RECEIVING";
     }
 
@@ -144,6 +157,7 @@ public class RepairOrder {
         String mechName = mechanic != null ? mechanic.getName() : "null";
         return "RepairOrder [ID: " + orderId + ", Vehicle: " + lp + 
                ", Entry: " + entryStr + ", Exit: " + exitStr + 
-               ", Mechanic: " + mechName + ", Status: " + status + ", Details: " + details.size() + " items]";
+               ", Mechanic: " + mechName + ", Status: " + status + 
+               ", Visual Condition: " + visualCondition + ", Details: " + details.size() + " items]";
     }
 }

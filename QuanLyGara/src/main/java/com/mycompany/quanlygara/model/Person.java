@@ -12,7 +12,7 @@ import java.util.Scanner;
  * 1. TÍNH TRỪU TƯỢNG (ABSTRACTION):
  * - Khai báo lớp với từ khóa 'abstract'. 
  * - Đây là một lớp trừu tượng, nghĩa là ta KHÔNG THỂ khởi tạo đối tượng trực tiếp từ lớp này (ví dụ: 'new Person()' sẽ báo lỗi).
- * - Lớp này chỉ dùng làm khuôn mẫu (template) định nghĩa các thuộc tính và hành vi chung cho các lớp con kế thừa (như Owner, Mechanic).
+ * - Lớp này chỉ dùng làm khuôn mẫu (template) định nghĩa các thuộc tính và hành vi chung cho các lớp con kế thừa (như Customer, Mechanic).
  * 
  * 2. TÍNH ĐÓNG GÓI (ENCAPSULATION):
  * - Các thuộc tính (id, name, phone, address) đều được đặt phạm vi truy cập là 'private'.
