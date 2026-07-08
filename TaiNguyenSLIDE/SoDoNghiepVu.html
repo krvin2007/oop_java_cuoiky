@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luồng Nghiệp Vụ Thực Tế (Business Flow)</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .mermaid-container {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e293b;
+            font-size: 28px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            color: #334155;
+            font-size: 20px;
+            margin-top: 30px;
+            border-left: 4px solid #3b82f6;
+            padding-left: 10px;
+        }
+
+        ul {
+            line-height: 1.6;
+            color: #475569;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .alert-tip, .alert-important, .alert-note {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .alert-tip {
+            background-color: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            color: #166534;
+        }
+
+        .alert-important {
+            background-color: #fff1f2;
+            border-left: 4px solid #e11d48;
+            color: #9f1239;
+        }
+
+        .alert-note {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            color: #1e40af;
+        }
+        
+        strong {
+            color: #1e293b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>LUỒNG NGHIỆP VỤ THỰC TẾ (BUSINESS FLOW)<br><small style="font-size: 16px; color: #64748b; font-weight: normal;">HỆ THỐNG QUẢN LÝ GARA Ô TÔ</small></h1>
+
+        <div class="mermaid-container">
+            <div class="mermaid">
+                graph TD
+                    Start(["Khách hàng mang xe đến Gara"]) --> CheckKhach{"Khách hàng cũ?"}
+                    CheckKhach -- Mới --> TaoChuXe["Thêm mới thông tin Chủ Xe"]
+                    CheckKhach -- Cũ --> ChonChuXe["Truy xuất thông tin Chủ Xe"]
+                    
+                    TaoChuXe --> DangKyXe["Đăng ký/Chọn thông tin Xe"]
+                    ChonChuXe --> DangKyXe
+                    
+                    DangKyXe --> LapPhieu["Lập Phiếu Sửa Chữa<br>Trạng thái: RECEIVING"]
+                    LapPhieu --> PhanCong["Phân công Kỹ thuật viên"]
+                    PhanCong --> ThoBan[("Cập nhật hệ thống:<br>Thợ chuyển sang 'Đang bận'")]
+                    
+                    ThoBan --> TienHanh["Tiến hành sửa chữa<br>Trạng thái: REPAIRING"]
+                    
+                    TienHanh --> ThemVatTu["Thêm Hạng mục Sửa chữa<br>(Dịch vụ & Linh kiện)"]
+                    ThemVatTu --> CheckKho{"Linh kiện<br>đủ tồn kho?"}
+                    
+                    CheckKho -- Không đủ --> LoiKho["Báo lỗi / Yêu cầu nhập thêm hàng"]
+                    CheckKho -- Đủ --> TruKho[("Transaction CSDL:<br>Trừ tồn kho & Ghi vào Phiếu")]
+                    
+                    TruKho --> CheckXong{"Hoàn tất các<br>hạng mục?"}
+                    CheckXong -- Chưa --> ThemVatTu
+                    CheckXong -- Xong --> HoanThanh["Hoàn tất Phiếu Sửa Chữa<br>Trạng thái: COMPLETED"]
+                    
+                    HoanThanh --> ThoRanh[("Cập nhật hệ thống:<br>Thợ chuyển sang 'Đang rảnh'")]
+                    ThoRanh --> ThanhToan["Xuất Hóa Đơn Invoice<br>Tính tổng tiền & VAT"]
+                    ThanhToan --> End(["Khách hàng thanh toán & Ra về"])
+                    
+                    %% Style adjustments
+                    classDef process fill:#e1f5fe,stroke:#03a9f4,stroke-width:2px;
+                    classDef db fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
+                    classDef decision fill:#e8f5e9,stroke:#4caf50,stroke-width:2px;
+                    classDef terminal fill:#fce4ec,stroke:#e91e63,stroke-width:2px;
+                    
+                    class TaoChuXe,ChonChuXe,DangKyXe,LapPhieu,PhanCong,TienHanh,ThemVatTu,HoanThanh,ThanhToan,LoiKho process;
+                    class ThoBan,TruKho,ThoRanh db;
+                    class CheckKhach,CheckKho,CheckXong decision;
+                    class Start,End terminal;
+            </div>
+        </div>
+
+        <h2>1. Tiếp nhận Khách hàng & Đăng ký Xe</h2>
+        <p>Khi một khách hàng mang xe đến gara, Quản trị viên (Admin) sẽ làm thủ tục tiếp nhận:</p>
+        <ul>
+            <li><strong>Kiểm tra thông tin Chủ xe (Owner):</strong> Nếu đây là khách hàng mới, Admin sẽ thêm thông tin Chủ xe (Tên, SĐT, Địa chỉ) vào hệ thống thông qua <code>ChuXeDAO</code>. SĐT sẽ được kiểm tra không trùng lặp và đúng định dạng.</li>
+            <li><strong>Đăng ký Xe (Vehicle):</strong> Admin tiếp tục đăng ký xe vào hệ thống (Biển số, Hãng xe, Mẫu xe, Năm sản xuất) và liên kết chiếc xe này với Chủ xe vừa tạo thông qua ID. Khâu này đảm bảo một chủ xe có thể sở hữu nhiều xe.</li>
+        </ul>
+
+        <h2>2. Lập Phiếu Sửa Chữa (Repair Order) - Nhận Xe</h2>
+        <p>Sau khi thông tin xe đã có trong hệ thống, xe bắt đầu được đưa vào khu vực sửa chữa:</p>
+        <ul>
+            <li><strong>Tạo phiếu:</strong> Admin lập <code>RepairOrder</code> mới. Hệ thống sẽ ghi nhận <code>entryDate</code> (thời gian vào xưởng) và chuyển trạng thái phiếu thành <strong>RECEIVING</strong> (Đang tiếp nhận).</li>
+            <li><strong>Phân công thợ (Mechanic):</strong> Hệ thống yêu cầu chỉ định một Kỹ thuật viên phụ trách sửa chiếc xe này.</li>
+        </ul>
+        <div class="alert-tip">
+            <strong>💡 Mẹo:</strong> Hệ thống có cơ chế kiểm tra tự động trạng thái thợ. Kỹ thuật viên khi được giao việc sẽ tự động chuyển trạng thái từ "Đang rảnh" sang "Đang bận" (Working).
+        </div>
+
+        <h2>3. Quá trình Sửa Chữa & Quản lý Vật tư (Chi tiết phiếu)</h2>
+        <p>Đây là giai đoạn xe đang nằm trong khu vực thi công:</p>
+        <ul>
+            <li>Trạng thái phiếu được cập nhật sang <strong>REPAIRING</strong> (Đang sửa chữa).</li>
+            <li><strong>Thêm dịch vụ & linh kiện:</strong> Thợ máy kiểm tra và Admin sẽ nhập các hạng mục (<code>HangMuc</code>) vào chi tiết phiếu sửa chữa (<code>RepairOrderDetail</code>), bao gồm:
+                <ul>
+                    <li><strong>Dịch vụ (DichVu):</strong> Rửa xe, cân chỉnh, sơn dặm (Tính tiền công).</li>
+                    <li><strong>Linh kiện/Phụ tùng (LinhKien):</strong> Nhớt, lọc gió, má phanh...</li>
+                </ul>
+            </li>
+        </ul>
+        <div class="alert-important">
+            <strong>⚠️ Quan trọng - Ràng buộc Kho an toàn:</strong> Khi xuất linh kiện, hệ thống (<code>LinhKienDAO</code>) sẽ kiểm tra số lượng tồn kho. Nếu đủ, nó sẽ dùng Database Transaction để thực hiện đồng thời 2 việc: trừ tồn kho linh kiện và ghi nhận chi tiết vào phiếu. Nếu 1 trong 2 bước lỗi, hệ thống sẽ Rollback (hoàn tác) để không bị hụt kho ảo.
+        </div>
+
+        <h2>4. Hoàn Thành & Xuất Hóa Đơn (Invoice)</h2>
+        <p>Khi thợ máy báo cáo đã sửa xong:</p>
+        <ul>
+            <li><strong>Hoàn tất phiếu:</strong> Admin chuyển trạng thái phiếu sửa chữa sang <strong>COMPLETED</strong> (Hoàn thành) và ghi nhận thời gian xe ra xưởng (<code>exitDate</code>).</li>
+            <li><strong>Giải phóng thợ:</strong> Trạng thái của Kỹ thuật viên phụ trách được hệ thống tự động trả về "Đang rảnh".</li>
+            <li><strong>Thanh toán:</strong> Hệ thống tạo ra Hóa đơn (<code>Invoice</code>) dựa trên Phiếu sửa chữa đã hoàn thành. Hệ thống tính tổng tiền bằng cách cộng dồn <code>(Đơn giá * Số lượng)</code> của tất cả dịch vụ và phụ tùng sử dụng trong <code>RepairOrderDetail</code>, cộng thêm thuế VAT nếu có.</li>
+        </ul>
+
+        <h2>5. Báo Cáo & Thống Kê Quản Trị</h2>
+        <p>Hàng ngày/tháng, quản lý Gara sẽ dùng tính năng báo cáo (<code>ReportController</code>) để xem:</p>
+        <ul>
+            <li>Tổng doanh thu theo khoảng thời gian.</li>
+            <li>Top linh kiện bán chạy (để có kế hoạch nhập thêm hàng).</li>
+            <li>Top xe sửa nhiều nhất (nhận diện khách hàng thân thiết/xe hay hỏng hóc).</li>
+            <li>Top thợ máy làm việc năng suất nhất.</li>
+        </ul>
+
+        <div class="alert-note">
+            <strong>📝 Lưu ý:</strong> Toàn bộ luồng nghiệp vụ trên đều được kiểm soát tính toàn vẹn ở tầng Database (Foreign Keys, Transaction) để ngăn chặn việc xóa nhầm khách hàng khi họ đang có xe sửa, hoặc xóa thợ khi họ đang vướng phiếu sửa chữa chưa xong.
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: false,
+                htmlLabels: true
+            }
+        });
+    </script>
+</body>
+
+</html>
