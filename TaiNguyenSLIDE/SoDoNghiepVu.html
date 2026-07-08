@@ -144,10 +144,10 @@
         </div>
 
         <h2>1. Tiếp nhận Khách hàng & Đăng ký Xe</h2>
-        <p>Khi một khách hàng mang xe đến gara, Quản trị viên (Admin) sẽ làm thủ tục tiếp nhận:</p>
+        <p>Khi một khách hàng mang xe đến gara, Quản trị viên (Admin/Owner) sẽ làm thủ tục tiếp nhận:</p>
         <ul>
-            <li><strong>Kiểm tra thông tin Chủ xe (Owner):</strong> Nếu đây là khách hàng mới, Admin sẽ thêm thông tin Chủ xe (Tên, SĐT, Địa chỉ) vào hệ thống thông qua <code>ChuXeDAO</code>. SĐT sẽ được kiểm tra không trùng lặp và đúng định dạng.</li>
-            <li><strong>Đăng ký Xe (Vehicle):</strong> Admin tiếp tục đăng ký xe vào hệ thống (Biển số, Hãng xe, Mẫu xe, Năm sản xuất) và liên kết chiếc xe này với Chủ xe vừa tạo thông qua ID. Khâu này đảm bảo một chủ xe có thể sở hữu nhiều xe.</li>
+            <li><strong>Kiểm tra thông tin Chủ xe (Customer):</strong> Nếu đây là khách hàng mới, Admin sẽ thêm thông tin Chủ xe (Tên, SĐT, Địa chỉ, Email) vào hệ thống thông qua <code>ChuXeDAO</code>. SĐT sẽ được kiểm tra không trùng lặp (duy nhất trong CSDL) và đúng định dạng số điện thoại Việt Nam.</li>
+            <li><strong>Đăng ký Xe (Vehicle):</strong> Admin tiếp tục đăng ký xe vào hệ thống (Biển số 5 loại, Hãng xe, Mẫu xe, Năm sản xuất, Màu sắc, Tình trạng tiếp nhận) và liên kết chiếc xe này với Khách hàng vừa tạo thông qua ID. Khâu này đảm bảo một chủ xe có thể sở hữu nhiều xe.</li>
         </ul>
 
         <h2>2. Lập Phiếu Sửa Chữa (Repair Order) - Nhận Xe</h2>
@@ -179,8 +179,8 @@
         <p>Khi thợ máy báo cáo đã sửa xong:</p>
         <ul>
             <li><strong>Hoàn tất phiếu:</strong> Admin chuyển trạng thái phiếu sửa chữa sang <strong>COMPLETED</strong> (Hoàn thành) và ghi nhận thời gian xe ra xưởng (<code>exitDate</code>).</li>
-            <li><strong>Giải phóng thợ:</strong> Trạng thái của Kỹ thuật viên phụ trách được hệ thống tự động trả về "Đang rảnh".</li>
-            <li><strong>Thanh toán:</strong> Hệ thống tạo ra Hóa đơn (<code>Invoice</code>) dựa trên Phiếu sửa chữa đã hoàn thành. Hệ thống tính tổng tiền bằng cách cộng dồn <code>(Đơn giá * Số lượng)</code> của tất cả dịch vụ và phụ tùng sử dụng trong <code>RepairOrderDetail</code>, cộng thêm thuế VAT nếu có.</li>
+            <li><strong>Giải phóng thợ:</strong> Trạng thái của Kỹ thuật viên phụ trách được hệ thống tự động trả về "Đang rảnh" (Có thể nhận xe mới).</li>
+            <li><strong>Thanh toán:</strong> Hệ thống tạo ra Hóa đơn (<code>Invoice</code>) dựa trên Phiếu sửa chữa đã hoàn thành, ghi nhận thời gian thanh toán (<code>paymentDate</code>). Hệ thống tính tổng tiền (<code>totalAmount</code>) bằng cách tách bạch Tổng tiền linh kiện (<code>totalPartCost</code>) và Tổng tiền dịch vụ (<code>totalLaborCost</code>), cộng thêm thuế VAT mặc định (<code>vatRate</code>).</li>
         </ul>
 
         <h2>5. Báo Cáo & Thống Kê Quản Trị</h2>

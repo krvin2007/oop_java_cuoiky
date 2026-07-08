@@ -232,7 +232,7 @@ ALTER TABLE `employees`
 -- AUTO_INCREMENT for table `owners`
 --
 ALTER TABLE `owners`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `repair_orders`

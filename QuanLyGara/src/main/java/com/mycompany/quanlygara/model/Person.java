@@ -107,8 +107,8 @@ public abstract class Person {
         // Nhập số điện thoại: Kiểm tra định dạng Regex (bắt đầu bằng 0, gồm 10 số)
         System.out.print("Nhap so dien thoai: ");
         this.phone = sc.nextLine().trim();
-        while (!this.phone.matches("^0\\d{9}$")) {
-            System.out.print("So dien thoai khong hop le (Phai gom 10 so, bat dau tu 0). Moi nhap lai: ");
+        while (!this.phone.matches("^(03|05|07|08|09)\\d{8}$")) {
+            System.out.print("So dien thoai khong hop le (Gom 10 so, bat dau bang 03,05,07,08,09). Moi nhap lai: ");
             this.phone = sc.nextLine().trim();
         }
 

@@ -5,7 +5,11 @@ Quản Lý Gara
 │
 ├── model/
 │   ├── Person (abstract)
+│   ├── Employee (abstract)
+│   ├── Customer
 │   ├── Owner
+│   ├── Accountant
+│   ├── Storekeeper
 │   ├── Mechanic
 │   ├── HangMuc (abstract)
 │   ├── LinhKien
@@ -22,6 +26,7 @@ Quản Lý Gara
 │   ├── DBConnection
 │   ├── ReportController
 │   ├── ChuXeDAO
+│   ├── EmployeeDAO
 │   ├── KyThuatVienDAO
 │   ├── XeDAO
 │   ├── PhieuSuaChuaDAO
@@ -30,7 +35,7 @@ Quản Lý Gara
 │   └── HoaDonDAO
 │
 └── view/
-    └── (Các lớp giao diện Menu Console / Giao diện người dùng / Main)
+    └── ConsoleView (Giao diện bảng điều khiển chính)
 
 
 ===========================================================================
@@ -51,9 +56,8 @@ Quản Lý Gara
      .                  .                   . (implements - hiện thực hóa)
      .                  .                   .
 +----------+      +------------+      +-----------+
-| ChuXeDAO |      | KyThuatVien|      |  XeDAO    | ... (và các DAO khác)
-+----------+      |    DAO     |      +-----------+
-                  +------------+
+| ChuXeDAO |      | EmployeeDAO|      |  XeDAO    | ... (và các DAO khác)
++----------+      +------------+      +-----------+
 
 
 ===========================================================================
@@ -68,15 +72,11 @@ Quản Lý Gara
 | - name: String                                                          |
 | - phone: String                                                         |
 | - address: String                                                       |
+| - isDeleted: boolean                                                    |
 +-------------------------------------------------------------------------+
 | + Person()                                                              |
 | + Person(id: int, name: String, phone: String, address: String)         |
-| + getId(): int / + setId(id: int): void                                 |
-| + getName(): String / + setName(name: String): void                     |
-| + getPhone(): String / + setPhone(phone: String): void                  |
-| + getAddress(): String / + setAddress(address: String): void            |
 | + nhapInfo(sc: Scanner): void                                           |
-| + toString(): String                                                    |
 | + getRoleDescription(): String <<abstract>>                             |
 +-------------------------------------------------------------------------+
                     ^                            ^
@@ -85,24 +85,27 @@ Quản Lý Gara
     +---------------+                            +---------------+
     |                                                            |
 +---------------------------------------+    +---------------------------------------+
-|                 Owner                 |    |               Mechanic                |
+|               Customer                |    |             Employee <<abstract>>     |
 +---------------------------------------+    +---------------------------------------+
-| (Kế thừa thuộc tính từ Person)        |    | - specialization: String              |
+| - email: String                       |    | - username: String                    |
+|                                       |    | - password: String                    |
+|                                       |    | - role: String                        |
 |                                       |    | - salary: double                      |
 |                                       |    | - status: String                      |
 +---------------------------------------+    +---------------------------------------+
-| + Owner()                             |    | + Mechanic()                          |
-| + Owner(id: int, name: String,        |    | + Mechanic(id: int, name: String,     |
-|         phone: String, address: String|    |            phone: String,             |
-| + nhapInfo(sc: Scanner): void         |    |            address: String,           |
-| + toString(): String                  |    |            specialization: String,    |
-| + getRoleDescription(): String        |    |            salary: double,            |
-|                                       |    |            status: String)            |
-|                                       |    | + getSpecialization(): String / ...   |
-|                                       |    | + nhapInfo(sc: Scanner): void         |
-|                                       |    | + toString(): String                  |
-|                                       |    | + getRoleDescription(): String        |
+| + Customer(...)                       |    | + Employee(...)                       |
+| + getEmail(): String / ...            |    | + getUsername(): String / ...         |
+| + nhapInfo(sc: Scanner): void         |    | + getRole(): String / ...             |
 +---------------------------------------+    +---------------------------------------+
+                                                                 ^
+                                                                 | Extends
+         +--------------------+--------------------+-------------+------+
+         |                    |                    |                    |
++--------+-------+   +--------+-------+   +--------+-------+   +--------+-------+
+|     Owner      |   |   Accountant   |   |  Storekeeper   |   |    Mechanic    |
++----------------+   +----------------+   +----------------+   +----------------+
+| (Role: QuanLy) |   | (Role: KeToan) |   | (Role: ThuKho) |   | - spec: String |
++----------------+   +----------------+   +----------------+   +----------------+
 
 
 ---------------------------------------------------------------------------
@@ -112,13 +115,12 @@ Quản Lý Gara
 |                               <<abstract>>                              |
 |                                 HangMuc                                 |
 +-------------------------------------------------------------------------+
-| - maHangMuc: String                                                     |
-| - tenHangMuc: String                                                    |
+| - ma: String                                                            |
+| - ten: String                                                           |
+| - donGia: double                                                        |
 +-------------------------------------------------------------------------+
 | + HangMuc()                                                             |
-| + HangMuc(maHangMuc: String, tenHangMuc: String)                        |
-| + getMaHangMuc(): String / + setMaHangMuc(maHangMuc: String): void      |
-| + getTenHangMuc(): String / + setTenHangMuc(tenHangMuc: String): void   |
+| + HangMuc(ma: String, ten: String, donGia: double)                      |
 | + tinhThanhTien(soLuong: int): double <<abstract>>                      |
 +-------------------------------------------------------------------------+
                     ^                            ^
@@ -129,13 +131,10 @@ Quản Lý Gara
 +---------------------------------------+    +---------------------------------------+
 |               LinhKien                |    |                DichVu                 |
 +---------------------------------------+    +---------------------------------------+
-| - donGia: double                      |    | - giaDichVu: double                   |
 | - soLuongTon: int                     |    |                                       |
+| - location: String                    |    |                                       |
 +---------------------------------------+    +---------------------------------------+
-| + LinhKien()                          |    | + DichVu()                            |
-| + LinhKien(maHangMuc, tenHangMuc,     |    | + DichVu(maHangMuc, tenHangMuc,       |
-|            donGia, soLuongTon)        |    |          giaDichVu)                   |
-| + getDonGia(): double / ...           |    | + getGiaDichVu(): double / ...        |
+| + LinhKien(...)                       |    | + DichVu(...)                         |
 | + tinhThanhTien(soLuong: int): double |    | + tinhThanhTien(soLuong: int): double |
 +---------------------------------------+    +---------------------------------------+
 
@@ -147,15 +146,17 @@ Quản Lý Gara
 |                Vehicle                |    |              RepairOrder              |
 +---------------------------------------+    +---------------------------------------+
 | - licensePlate: String                |    | - orderId: int                        |
-| - brand: String                       |    | - licensePlate: String                |
-| - model: String                       |    | - mechanicId: int                     |
-| - ownerId: int                        |    | - orderDate: Date                     |
-+---------------------------------------+    | - status: String                      |
-| + Vehicle()                           |    +---------------------------------------+
-| + getLicensePlate(): String / ...     |    | + RepairOrder()                       |
-| + nhapInfo(sc: Scanner): void         |    | + getOrderId(): int / ...             |
-+---------------------------------------+    | + nhapInfo(sc: Scanner): void         |
-                                             +---------------------------------------+
+| - brand: String                       |    | - vehicle: Vehicle                    |
+| - model: String                       |    | - mechanic: Employee                  |
+| - productionYear: int                 |    | - orderDate: LocalDateTime            |
+| - color: String                       |    | - status: String                      |
+| - condition: String                   |    | - visualCondition: String             |
+| - Customer: Customer                  |    | - isDeleted: boolean                  |
+| - isDeleted: boolean                  |    |                                       |
++---------------------------------------+    +---------------------------------------+
+| + Vehicle()                           |    | + RepairOrder()                       |
+| + nhapInfo(sc: Scanner): void         |    | + nhapInfo(sc: Scanner): void         |
++---------------------------------------+    +---------------------------------------+
 
 
 ===========================================================================
@@ -163,10 +164,16 @@ Quản Lý Gara
 ===========================================================================
 
 +-------------------------------------------------------------------------+
-|                                 MainUI                                  |
+|                               ConsoleView                               |
 |                             (Menu Console)                              |
 +-------------------------------------------------------------------------+
-| + main(args: String[]): void                                            |
-| + showMenu(): void                                                      |
-| + handleUserInput(): void                                               |
+| + start(): void                                                         |
+| + login(): void                                                         |
+| + showMainMenu(): void                                                  |
+| - menuVehicleAndOwner(): void                                           |
+| - menuMechanic(): void                                                  |
+| - menuPart(): void                                                      |
+| - menuRepairOrder(): void                                               |
+| - menuInvoice(): void                                                   |
+| - menuReport(): void                                                    |
 +-------------------------------------------------------------------------+

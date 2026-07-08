@@ -322,11 +322,20 @@ public class Vehicle {
         }
 
         // Note: Customer should be set by the caller fetching from DAO based on input ID.
-        System.out.print("Nhap ID chu xe: ");
         int inputOwnerId = 0;
-        try {
-            inputOwnerId = Integer.parseInt(sc.nextLine());
-        } catch (Exception e) {}
+        while (true) {
+            System.out.print("Nhap ID chu xe: ");
+            try {
+                inputOwnerId = Integer.parseInt(sc.nextLine());
+                if (inputOwnerId <= 0) {
+                    System.out.println("ID chu xe phai la so nguyen duong. Vui long nhap lai!");
+                    continue;
+                }
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Vui long nhap so nguyen hop le!");
+            }
+        }
         this.Customer = new Customer();
         this.Customer.setId(inputOwnerId); // Temporary ID wrapper
     }

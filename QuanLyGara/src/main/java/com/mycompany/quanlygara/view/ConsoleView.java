@@ -45,9 +45,9 @@ public class ConsoleView {
     }
 
     public void start() {
-        System.out.println("====================================================");
-        System.out.println("       CHAO MUNG DEN HE THONG QUAN LY GARA          ");
-        System.out.println("====================================================");
+        System.out.println("===============================================================");
+        System.out.println("              CHAO MUNG DEN HE THONG QUAN LY GARA              ");
+        System.out.println("===============================================================");
 
         while (true) {
             while (currentUser == null) {
@@ -64,8 +64,8 @@ public class ConsoleView {
                 currentUser = employeeDAO.login(username, password);
                 if (currentUser != null) {
                     System.out.println(
-                            "Dang nhap thanh cong! Xin chao " + currentUser.getRole() + " "
-                                    + currentUser.getUsername());
+                            "Dang nhap thanh cong! Xin chao " + currentUser.getName() + " (Chuc vu: "
+                                    + currentUser.getRole() + ")");
                 } else {
                     System.out.println("Sai tai khoan hoac mat khau. Vui long thu lai!");
                 }
@@ -144,7 +144,9 @@ public class ConsoleView {
     }
 
     private void changePassword() {
-        System.out.println("--- DOI MAT KHAU ---");
+        System.out.println("===============================================================");
+        System.out.println("                        DOI MAT KHAU                           ");
+        System.out.println("===============================================================");
         System.out.print("Nhap mat khau hien tai: ");
         String currentPwd = sc.nextLine().trim();
         if (!currentPwd.equals(currentUser.getPassword())) {
@@ -176,38 +178,28 @@ public class ConsoleView {
     private void showMainMenu() {
         String role = currentUser != null ? currentUser.getRole() : "";
 
-        System.out.println("====================================================");
-        System.out.println("        HE THONG QUAN LY GARA SUA CHUA O TO         ");
-        System.out.println("====================================================");
-        if (role.equals("QuanLy") || role.equals("KyThuat")) {
-            System.out.println("1. Quan ly Xe va Chu xe");
-        }
-        if (role.equals("QuanLy")) {
-            System.out.println("2. Quan ly Ky thuat vien (Mechanic)");
-        }
-        if (role.equals("QuanLy") || role.equals("ThuKho")) {
-            System.out.println("3. Quan ly Kho linh kien (LinhKien)");
-        }
-        if (role.equals("QuanLy") || role.equals("KyThuat")) {
-            System.out.println("4. Quan ly Phieu sua chua (Repair Order)");
-        }
-        if (role.equals("QuanLy") || role.equals("KeToan")) {
-            System.out.println("5. Thanh toan & Hoa don (Invoice)");
-            System.out.println("6. Bao cao thong ke doanh thu & hieu suat");
-        }
-        if (role.equals("QuanLy") || role.equals("ThuKho")) {
-            System.out.println("7. Quan ly Danh muc Dich vu (DichVu)");
-        }
-        System.out.println("8. Doi mat khau");
-        System.out.println("0. Dang xuat (Logout)");
-        System.out.println("====================================================");
+        System.out.println("===============================================================");
+        System.out.println("              HE THONG QUAN LY GARA SUA CHUA O TO              ");
+        System.out.println("===============================================================");
+        System.out.println("1. Quan ly Xe va Chu xe .................... " + ((role.equals("QuanLy") || role.equals("KyThuat")) ? "[    CO QUYEN    ]" : "[ KHONG CO QUYEN ]"));
+        System.out.println("2. Quan ly Ky thuat vien (Mechanic) ........ " + (role.equals("QuanLy") ? "[    CO QUYEN    ]" : "[ KHONG CO QUYEN ]"));
+        System.out.println("3. Quan ly Kho linh kien (LinhKien) ........ " + ((role.equals("QuanLy") || role.equals("ThuKho")) ? "[    CO QUYEN    ]" : "[ KHONG CO QUYEN ]"));
+        System.out.println("4. Quan ly Phieu sua chua (Repair Order) ... " + ((role.equals("QuanLy") || role.equals("KyThuat")) ? "[    CO QUYEN    ]" : "[ KHONG CO QUYEN ]"));
+        System.out.println("5. Thanh toan & Hoa don (Invoice) .......... " + ((role.equals("QuanLy") || role.equals("KeToan")) ? "[    CO QUYEN    ]" : "[ KHONG CO QUYEN ]"));
+        System.out.println("6. Bao cao thong ke doanh thu & hieu suat .. " + ((role.equals("QuanLy") || role.equals("KeToan")) ? "[    CO QUYEN    ]" : "[ KHONG CO QUYEN ]"));
+        System.out.println("7. Quan ly Danh muc Dich vu (DichVu) ....... " + ((role.equals("QuanLy") || role.equals("ThuKho")) ? "[    CO QUYEN    ]" : "[ KHONG CO QUYEN ]"));
+        System.out.println("8. Doi mat khau ............................ [    CO QUYEN    ]");
+        System.out.println("0. Dang xuat (Logout) ...................... [    CO QUYEN    ]");
+        System.out.println("===============================================================");
     }
 
     // --- 1. QUAN LY XE VA CHU XE ---
     private void menuVehicleAndOwner() throws Exception {
         int choice = -1;
         do {
-            System.out.println("--- MENU QUAN LY XE & CHU XE ---");
+            System.out.println("===============================================================");
+            System.out.println("                   MENU QUAN LY XE & CHU XE                    ");
+            System.out.println("===============================================================");
             System.out.println("1. Them Chu xe moi (Customer)");
             System.out.println("2. Them Xe moi (Vehicle)");
             System.out.println("3. Xem danh sach Chu xe");
@@ -217,47 +209,67 @@ public class ConsoleView {
             System.out.println("7. Cap nhat thong tin Chu xe");
             System.out.println("8. Xoa Xe");
             System.out.println("0. Quay lai Menu chinh");
-            System.out.println("--------------------------------");
+            System.out.println("===============================================================");
             System.out.print("Nhap lua chon (0-8): ");
             try {
                 choice = Integer.parseInt(sc.nextLine());
                 switch (choice) {
                     case 1:
-                        Customer newOwner = new Customer();
-                        newOwner.nhapInfo(sc);
-                        try {
-                            ownerController.themMoi(newOwner);
-                            System.out.println("Them chu xe thanh cong! ID duoc cap: " + newOwner.getId());
-                        } catch (DuplicateMaException e) {
-                            System.out.println("Loi trung ma: " + e.getMessage());
-                        } catch (Exception e) {
-                            System.out.println("Loi: " + e.getMessage());
+                        System.out.println("Ban muon them bao nhieu Chu xe?");
+                        System.out.print("=> So luong: ");
+                        int countCustomer = Integer.parseInt(sc.nextLine());
+                        for (int i = 0; i < countCustomer; i++) {
+                            System.out.println("--- Nhap thong tin Chu xe thu " + (i + 1) + " ---");
+                            Customer newOwner = new Customer();
+                            newOwner.nhapInfo(sc);
+                            try {
+                                ownerController.themMoi(newOwner);
+                                System.out.println("Them chu xe thanh cong! ID duoc cap: " + newOwner.getId());
+                            } catch (DuplicateMaException e) {
+                                System.out.println("Loi trung ma: " + e.getMessage());
+                                System.out.println("Vui long nhap lai thong tin cho chu xe nay!");
+                                i--;
+                            } catch (Exception e) {
+                                System.out.println("Loi: " + e.getMessage());
+                                System.out.println("Vui long nhap lai thong tin cho chu xe nay!");
+                                i--;
+                            }
                         }
                         break;
                     case 2:
-                        System.out.println("--- Danh sach Chu xe hien co ---");
-                        List<Customer> availableOwners = ownerController.layTatCa();
-                        for (Customer o : availableOwners) {
-                            System.out.println(o.getId() + " - " + o.getName() + " - " + o.getPhone());
+                        System.out.println("Ban muon them bao nhieu Xe?");
+                        System.out.print("=> So luong: ");
+                        int countVeh = Integer.parseInt(sc.nextLine());
+                        for (int i = 0; i < countVeh; i++) {
+                            System.out.println("--- Nhap thong tin Xe thu " + (i + 1) + " ---");
+                            System.out.println("--- Danh sach Chu xe hien co ---");
+                            List<Customer> availableOwners = ownerController.layTatCa();
+                            for (Customer o : availableOwners) {
+                                System.out.println(o.getId() + " - " + o.getName() + " - " + o.getPhone());
+                            }
+                            System.out.println("--------------------------------");
+                            Vehicle newVehicle = new Vehicle();
+                            newVehicle.nhapInfo(sc);
+                            int oId = newVehicle.getOwner() != null ? newVehicle.getOwner().getId() : 0;
+                            Customer Customer = ownerController.layTheoId(oId);
+                            if (Customer == null) {
+                                System.out.println(
+                                        "Loi: Khong tim thay chu xe co ID = " + oId + ". Vui long tao chu xe truoc!");
+                                System.out.println("Vui long nhap lai thong tin cho xe nay!");
+                                i--;
+                                continue;
+                            }
+                            Vehicle existing = vehicleController.layTheoId(newVehicle.getLicensePlate());
+                            if (existing != null) {
+                                System.out.println("Loi: Bien so xe '" + newVehicle.getLicensePlate()
+                                        + "' da ton tai trong he thong!");
+                                System.out.println("Vui long nhap lai thong tin cho xe nay!");
+                                i--;
+                                continue;
+                            }
+                            vehicleController.themMoi(newVehicle);
+                            System.out.println("Them xe thanh cong!");
                         }
-                        System.out.println("--------------------------------");
-                        Vehicle newVehicle = new Vehicle();
-                        newVehicle.nhapInfo(sc);
-                        int oId = newVehicle.getOwner() != null ? newVehicle.getOwner().getId() : 0;
-                        Customer Customer = ownerController.layTheoId(oId);
-                        if (Customer == null) {
-                            System.out.println(
-                                    "Loi: Khong tim thay chu xe co ID = " + oId + ". Vui long tao chu xe truoc!");
-                            break;
-                        }
-                        Vehicle existing = vehicleController.layTheoId(newVehicle.getLicensePlate());
-                        if (existing != null) {
-                            System.out.println("Loi: Bien so xe '" + newVehicle.getLicensePlate()
-                                    + "' da ton tai trong he thong!");
-                            break;
-                        }
-                        vehicleController.themMoi(newVehicle);
-                        System.out.println("Them xe thanh cong!");
                         break;
                     case 3:
                         List<Customer> owners = ownerController.layTatCa();
@@ -337,7 +349,9 @@ public class ConsoleView {
     private void menuMechanic() throws Exception {
         int choice = -1;
         do {
-            System.out.println("--- MENU QUAN LY KY THUAT VIEN ---");
+            System.out.println("===============================================================");
+            System.out.println("                  MENU QUAN LY KY THUAT VIEN                   ");
+            System.out.println("===============================================================");
             System.out.println("1. Them Ky thuat vien");
             System.out.println("2. Xem danh sach Ky thuat vien (Sap xep theo ten)");
             System.out.println("3. Xem danh sach Ky thuat vien (Sap xep theo luong tang dan)");
@@ -345,21 +359,31 @@ public class ConsoleView {
             System.out.println("5. Cap nhat thong tin Ky thuat vien");
             System.out.println("6. Xoa Ky thuat vien");
             System.out.println("0. Quay lai Menu chinh");
-            System.out.println("---------------------------------");
+            System.out.println("===============================================================");
             System.out.print("Nhap lua chon (0-6): ");
             try {
                 choice = Integer.parseInt(sc.nextLine());
                 switch (choice) {
                     case 1:
-                        Mechanic newMechanic = new Mechanic();
-                        newMechanic.nhapInfo(sc);
-                        try {
-                            mechanicController.themMoi(newMechanic);
-                            System.out.println("Them ky thuat vien thanh cong! ID duoc cap: " + newMechanic.getId());
-                        } catch (DuplicateMaException e) {
-                            System.out.println("Loi trung ma: " + e.getMessage());
-                        } catch (Exception e) {
-                            System.out.println("Loi: " + e.getMessage());
+                        System.out.println("Ban muon them bao nhieu Ky thuat vien?");
+                        System.out.print("=> So luong: ");
+                        int countMechanic = Integer.parseInt(sc.nextLine());
+                        for (int i = 0; i < countMechanic; i++) {
+                            System.out.println("--- Nhap thong tin Ky thuat vien thu " + (i + 1) + " ---");
+                            Mechanic newMechanic = new Mechanic();
+                            newMechanic.nhapInfo(sc);
+                            try {
+                                mechanicController.themMoi(newMechanic);
+                                System.out.println("Them ky thuat vien thanh cong! ID duoc cap: " + newMechanic.getId());
+                            } catch (DuplicateMaException e) {
+                                System.out.println("Loi trung ma: " + e.getMessage());
+                                System.out.println("Vui long nhap lai thong tin cho ky thuat vien nay!");
+                                i--;
+                            } catch (Exception e) {
+                                System.out.println("Loi: " + e.getMessage());
+                                System.out.println("Vui long nhap lai thong tin cho ky thuat vien nay!");
+                                i--;
+                            }
                         }
                         break;
                     case 2:
@@ -423,7 +447,9 @@ public class ConsoleView {
     private void menuPart() throws Exception {
         int choice = -1;
         do {
-            System.out.println("--- MENU QUAN LY KHO LINH KIEN ---");
+            System.out.println("===============================================================");
+            System.out.println("                  MENU QUAN LY KHO LINH KIEN                   ");
+            System.out.println("===============================================================");
             System.out.println("1. Them Linh kien moi");
             System.out.println("2. Xem danh sach linh kien (Sap xep theo gia ban tang dan)");
             System.out.println("3. Xem danh sach linh kien (Sap xep theo gia ban giam dan)");
@@ -433,16 +459,28 @@ public class ConsoleView {
             System.out.println("7. Xoa Linh kien");
             System.out.println("8. Tim kiem linh kien theo khoang gia");
             System.out.println("0. Quay lai Menu chinh");
-            System.out.println("---------------------------------");
+            System.out.println("===============================================================");
             System.out.print("Nhap lua chon (0-8): ");
             try {
                 choice = Integer.parseInt(sc.nextLine());
                 switch (choice) {
                     case 1:
-                        LinhKien newPart = new LinhKien();
-                        newPart.nhapInfo(sc);
-                        partController.themMoi(newPart);
-                        System.out.println("Them linh kien vao kho thanh cong! Ma duoc cap: " + newPart.getMa());
+                        System.out.println("Ban muon them bao nhieu Linh kien?");
+                        System.out.print("=> So luong: ");
+                        int countPart = Integer.parseInt(sc.nextLine());
+                        for (int i = 0; i < countPart; i++) {
+                            System.out.println("--- Nhap thong tin Linh kien thu " + (i + 1) + " ---");
+                            LinhKien newPart = new LinhKien();
+                            newPart.nhapInfo(sc);
+                            try {
+                                partController.themMoi(newPart);
+                                System.out.println("Them linh kien vao kho thanh cong! Ma duoc cap: " + newPart.getMa());
+                            } catch (Exception e) {
+                                System.out.println("Loi: " + e.getMessage());
+                                System.out.println("Vui long nhap lai thong tin linh kien nay!");
+                                i--;
+                            }
+                        }
                         break;
                     case 2:
                         List<LinhKien> partsPriceAsc = partController.sortByPrice(true);
@@ -531,14 +569,16 @@ public class ConsoleView {
     private void menuRepairOrder() throws Exception {
         int choice = -1;
         do {
-            System.out.println("--- MENU PHIEU SUA CHUA ---");
+            System.out.println("===============================================================");
+            System.out.println("                      MENU PHIEU SUA CHUA                      ");
+            System.out.println("===============================================================");
             System.out.println("1. Lap Phieu sua chua moi (Tiep nhan xe)");
             System.out.println("2. Xem danh sach tat ca Phieu sua chua");
             System.out.println("3. Them Linh kien / Dich vu sua chua (Cho xe)");
             System.out.println("4. Xem chi tiet cong viec cua Phieu sua chua");
             System.out.println("5. Cap nhat trang thai Phieu (RECEIVING -> REPAIRING -> COMPLETED)");
             System.out.println("0. Quay lai Menu chinh");
-            System.out.println("---------------------------");
+            System.out.println("===============================================================");
             System.out.print("Nhap lua chon (0-5): ");
             try {
                 choice = Integer.parseInt(sc.nextLine());
@@ -759,11 +799,13 @@ public class ConsoleView {
     private void menuInvoice() throws Exception {
         int choice = -1;
         do {
-            System.out.println("--- MENU QUAN LY THANH TOAN & HOA DON ---");
+            System.out.println("===============================================================");
+            System.out.println("               MENU QUAN LY THANH TOAN & HOA DON               ");
+            System.out.println("===============================================================");
             System.out.println("1. Thanh toan va Xuat hoa don cho xe");
             System.out.println("2. Xem danh sach tat ca hoa don da thanh toan");
             System.out.println("0. Quay lai Menu chinh");
-            System.out.println("-----------------------------------------");
+            System.out.println("===============================================================");
             System.out.print("Nhap lua chon (0-2): ");
             try {
                 choice = Integer.parseInt(sc.nextLine());
@@ -840,13 +882,15 @@ public class ConsoleView {
     private void menuReport() throws Exception {
         int choice = -1;
         do {
-            System.out.println("--- MENU BAO CAO THONG KE ---");
+            System.out.println("===============================================================");
+            System.out.println("                     MENU BAO CAO THONG KE                     ");
+            System.out.println("===============================================================");
             System.out.println("1. Thong ke doanh thu theo khoang thoi gian");
             System.out.println("2. Thong ke Top linh kien ban nhieu nhat");
             System.out.println("3. Thong ke Top xe sua chua nhieu nhat");
             System.out.println("4. Thong ke Top ky thuat vien lam viec nhieu nhat");
             System.out.println("0. Quay lai Menu chinh");
-            System.out.println("-----------------------------");
+            System.out.println("===============================================================");
             System.out.print("Nhap lua chon (0-4): ");
             try {
                 choice = Integer.parseInt(sc.nextLine());
@@ -908,23 +952,37 @@ public class ConsoleView {
     private void menuDichVu() throws Exception {
         int choice = -1;
         do {
-            System.out.println("--- MENU QUAN LY DANH MUC DICH VU ---");
+            System.out.println("===============================================================");
+            System.out.println("                 MENU QUAN LY DANH MUC DICH VU                 ");
+            System.out.println("===============================================================");
             System.out.println("1. Them Dich vu moi");
             System.out.println("2. Xem danh sach Dich vu");
             System.out.println("3. Tim kiem dich vu theo Ten");
             System.out.println("4. Cap nhat thong tin Dich vu");
             System.out.println("5. Xoa Dich vu");
             System.out.println("0. Quay lai Menu chinh");
-            System.out.println("-------------------------------------");
+            System.out.println("===============================================================");
             System.out.print("Nhap lua chon (0-5): ");
             try {
                 choice = Integer.parseInt(sc.nextLine());
                 switch (choice) {
                     case 1:
-                        DichVu newDV = new DichVu();
-                        newDV.nhapInfo(sc);
-                        dichVuDAO.themMoi(newDV);
-                        System.out.println("Them dich vu moi thanh cong! Ma duoc cap: " + newDV.getMa());
+                        System.out.println("Ban muon them bao nhieu Dich vu?");
+                        System.out.print("=> So luong: ");
+                        int countDichVu = Integer.parseInt(sc.nextLine());
+                        for (int i = 0; i < countDichVu; i++) {
+                            System.out.println("--- Nhap thong tin Dich vu thu " + (i + 1) + " ---");
+                            DichVu newDV = new DichVu();
+                            newDV.nhapInfo(sc);
+                            try {
+                                dichVuDAO.themMoi(newDV);
+                                System.out.println("Them dich vu moi thanh cong! Ma duoc cap: " + newDV.getMa());
+                            } catch (Exception e) {
+                                System.out.println("Loi: " + e.getMessage());
+                                System.out.println("Vui long nhap lai thong tin dich vu nay!");
+                                i--;
+                            }
+                        }
                         break;
                     case 2:
                         List<DichVu> list = dichVuDAO.layTatCa();

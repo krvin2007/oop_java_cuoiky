@@ -33,8 +33,17 @@ public class Mechanic extends Employee {
         super.nhapInfo(sc);
         System.out.print("Nhap username: ");
         this.setUsername(sc.nextLine().trim());
+        while (this.getUsername().isEmpty()) {
+            System.out.print("Username khong duoc de trong! Moi nhap lai: ");
+            this.setUsername(sc.nextLine().trim());
+        }
+
         System.out.print("Nhap password: ");
         this.setPassword(sc.nextLine().trim());
+        while (this.getPassword().isEmpty()) {
+            System.out.print("Password khong duoc de trong! Moi nhap lai: ");
+            this.setPassword(sc.nextLine().trim());
+        }
         System.out.print("Nhap chuyen mon (spec): ");
         this.spec = sc.nextLine().trim();
         

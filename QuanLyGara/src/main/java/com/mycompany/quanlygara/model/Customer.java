@@ -52,6 +52,10 @@ public class Customer extends Person {
         super.nhapInfo(sc);
         System.out.print("Nhap email: ");
         this.email = sc.nextLine().trim();
+        while (!this.email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            System.out.print("Email khong hop le (Phai chua @ va dung dinh dang)! Moi nhap lai: ");
+            this.email = sc.nextLine().trim();
+        }
     }
 
     /**
