@@ -157,17 +157,6 @@ CREATE TABLE `vehicles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `vehicles`
---
-
-INSERT INTO `vehicles` (`license_plate`, `brand`, `model`, `production_year`, `owner_id`) VALUES
-('12345', 'BMW', 'Bugatti Chiron', 2017, 1);
-
---
--- Indexes for dumped tables
---
-
---
 -- Indexes for table `dich_vu`
 --
 ALTER TABLE `dich_vu`
