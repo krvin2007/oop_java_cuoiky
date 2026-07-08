@@ -49,93 +49,97 @@ public class ConsoleView {
         System.out.println("       CHAO MUNG DEN HE THONG QUAN LY GARA          ");
         System.out.println("====================================================");
 
-        while (currentUser == null) {
-            System.out.println("\n--- VUI LONG DANG NHAP ---");
-            System.out.print("Username: ");
-            String username = sc.nextLine().trim();
-            System.out.print("Password: ");
-            String password = sc.nextLine().trim();
-
-            currentUser = employeeDAO.login(username, password);
-            if (currentUser != null) {
-                System.out.println(
-                        "Dang nhap thanh cong! Xin chao " + currentUser.getRole() + " " + currentUser.getUsername());
-            } else {
-                System.out.println("Sai tai khoan hoac mat khau. Vui long thu lai!");
-            }
-        }
-
-        int choice = -1;
-        do {
-            showMainMenu();
-            try {
-                System.out.print("Nhap lua chon cua ban (0-8): ");
-                choice = Integer.parseInt(sc.nextLine());
-                System.out.println();
-                if (choice == 0) {
+        while (true) {
+            while (currentUser == null) {
+                System.out.println("\n--- VUI LONG DANG NHAP ---");
+                System.out.print("Username (nhap 'exit' de thoat): ");
+                String username = sc.nextLine().trim();
+                if (username.equalsIgnoreCase("exit")) {
                     System.out.println("Cam on ban da su dung chuong trinh!");
-                    break;
+                    return;
                 }
+                System.out.print("Password: ");
+                String password = sc.nextLine().trim();
 
-                boolean hasPermission = false;
-                String role = currentUser.getRole();
-                if (choice == 0 || choice == 8) {
-                    hasPermission = true;
-                } else if (role.equals("QuanLy")) {
-                    hasPermission = true;
-                } else if (role.equals("KeToan") && (choice == 5 || choice == 6)) {
-                    hasPermission = true;
-                } else if (role.equals("ThuKho") && (choice == 3 || choice == 7)) {
-                    hasPermission = true;
-                } else if (role.equals("KyThuat") && (choice == 1 || choice == 4)) {
-                    hasPermission = true;
+                currentUser = employeeDAO.login(username, password);
+                if (currentUser != null) {
+                    System.out.println(
+                            "Dang nhap thanh cong! Xin chao " + currentUser.getRole() + " " + currentUser.getUsername());
+                } else {
+                    System.out.println("Sai tai khoan hoac mat khau. Vui long thu lai!");
                 }
-
-                if (!hasPermission) {
-                    System.out.println("----------------------------------------------------");
-                    System.out.println("LOI: Ban (" + role + ") khong co quyen truy cap chuc nang nay!");
-                    System.out.println("----------------------------------------------------");
-                    continue;
-                }
-
-                switch (choice) {
-                    case 1:
-                        menuVehicleAndOwner();
-                        break;
-                    case 2:
-                        menuMechanic();
-                        break;
-                    case 3:
-                        menuPart();
-                        break;
-                    case 4:
-                        menuRepairOrder();
-                        break;
-                    case 5:
-                        menuInvoice();
-                        break;
-                    case 6:
-                        menuReport();
-                        break;
-                    case 7:
-                        menuDichVu();
-                        break;
-                    case 8:
-                        changePassword();
-                        break;
-                    case 0:
-                        System.out.println("Cam on ban da su dung chuong trinh!");
-                        break;
-                    default:
-                        System.out.println("Lua chon khong hop le! Vui long nhap tu 0 den 8.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Loi: Vui long nhap so nguyen hop le!");
-            } catch (Exception e) {
-                System.out.println("Da xay ra loi: " + e.getMessage());
             }
-            System.out.println();
-        } while (choice != 0);
+
+            int choice = -1;
+            do {
+                showMainMenu();
+                try {
+                    System.out.print("Nhap lua chon cua ban (0-8): ");
+                    choice = Integer.parseInt(sc.nextLine());
+                    System.out.println();
+                    if (choice == 0) {
+                        System.out.println("Da dang xuat thanh cong!");
+                        currentUser = null;
+                        break;
+                    }
+
+                    boolean hasPermission = false;
+                    String role = currentUser.getRole();
+                    if (choice == 0 || choice == 8) {
+                        hasPermission = true;
+                    } else if (role.equals("QuanLy")) {
+                        hasPermission = true;
+                    } else if (role.equals("KeToan") && (choice == 5 || choice == 6)) {
+                        hasPermission = true;
+                    } else if (role.equals("ThuKho") && (choice == 3 || choice == 7)) {
+                        hasPermission = true;
+                    } else if (role.equals("KyThuat") && (choice == 1 || choice == 4)) {
+                        hasPermission = true;
+                    }
+
+                    if (!hasPermission) {
+                        System.out.println("----------------------------------------------------");
+                        System.out.println("LOI: Ban (" + role + ") khong co quyen truy cap chuc nang nay!");
+                        System.out.println("----------------------------------------------------");
+                        continue;
+                    }
+
+                    switch (choice) {
+                        case 1:
+                            menuVehicleAndOwner();
+                            break;
+                        case 2:
+                            menuMechanic();
+                            break;
+                        case 3:
+                            menuPart();
+                            break;
+                        case 4:
+                            menuRepairOrder();
+                            break;
+                        case 5:
+                            menuInvoice();
+                            break;
+                        case 6:
+                            menuReport();
+                            break;
+                        case 7:
+                            menuDichVu();
+                            break;
+                        case 8:
+                            changePassword();
+                            break;
+                        default:
+                            System.out.println("Lua chon khong hop le! Vui long nhap tu 0 den 8.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Loi: Vui long nhap so nguyen hop le!");
+                } catch (Exception e) {
+                    System.out.println("Da xay ra loi: " + e.getMessage());
+                }
+                System.out.println();
+            } while (currentUser != null);
+        }
     }
 
     private void changePassword() {
@@ -194,7 +198,7 @@ public class ConsoleView {
             System.out.println("7. Quan ly Danh muc Dich vu (DichVu)");
         }
         System.out.println("8. Doi mat khau");
-        System.out.println("0. Thoat chuong trinh");
+        System.out.println("0. Dang xuat (Logout)");
         System.out.println("====================================================");
     }
 
