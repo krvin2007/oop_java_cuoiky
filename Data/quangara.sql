@@ -108,13 +108,6 @@ CREATE TABLE `owners` (
   `is_deleted` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `owners`
---
-
-INSERT INTO `owners` (`id`, `name`, `phone`, `address`) VALUES
-(1, 'Manh Quynh', '0987654321', 'HCM');
-
 -- --------------------------------------------------------
 
 --
