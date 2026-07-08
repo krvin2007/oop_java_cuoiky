@@ -13,7 +13,8 @@
                         |
 +-------------------------------------------------+
 |  Các lớp DAO (XeDAO, ChuXeDAO, HoaDonDAO,       |
-|  EmployeeDAO, LinhKienDAO, DichVuDAO, ...)      |
+|  EmployeeDAO, LinhKienDAO, DichVuDAO,           |
+|  KyThuatVienDAO, PhieuSuaChuaDAO, ...)          |
 +-------------------------------------------------+
 
 
@@ -25,6 +26,7 @@
 | - name: String                                  |
 | - phone: String                                 |
 | - address: String                               |
+| - isDeleted: boolean                            |
 +-------------------------------------------------+
 | + Person()                                      |
 | + Person(id: int, name, phone, address)         |
@@ -109,7 +111,9 @@
 | - licensePlate: String                          |
 | - brand: String                                 |
 | - model: String                                 |
+| - productionYear: int                           |
 | - owner: Owner                                  |
+| - isDeleted: boolean                            |
 +-------------------------------------------------+
 | + getLicensePlate() / setLicensePlate()         |
 | + getBrand() / setBrand()                       |
@@ -124,9 +128,11 @@
 +-------------------------------------------------+
 | - orderId: int                                  |
 | - vehicle: Vehicle                              |
+| - entryDate: Date                               |
+| - exitDate: Date                                |
 | - mechanic: Mechanic                            |
-| - details: List<RepairOrderDetail>              |
 | - status: String                                |
+| - details: List<RepairOrderDetail>              |
 +-------------------------------------------------+
 | + getOrderId() / setOrderId()                   |
 | + getVehicle() / setVehicle()                   |

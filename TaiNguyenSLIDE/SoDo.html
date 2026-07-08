@@ -94,7 +94,8 @@
             }
 
             class EmployeeDAO {
-            %% Đại diện cho Các lớp DAO (XeDAO, ChuXeDAO, HoaDonDAO, EmployeeDAO, LinhKienDAO, DichVuDAO, ...)
+            %% Đại diện cho Các lớp DAO (XeDAO, ChuXeDAO, HoaDonDAO, EmployeeDAO, LinhKienDAO, DichVuDAO,
+            KyThuatVienDAO, PhieuSuaChuaDAO, ...)
             +login(user: String, pass: String) Employee
             }
 
@@ -114,6 +115,7 @@
             -name: String
             -phone: String
             -address: String
+            -isDeleted: boolean
             +Person()
             +Person(id: int, name: String, phone: String, address: String)
             +getId() int
@@ -212,7 +214,9 @@
             -licensePlate: String
             -brand: String
             -model: String
+            -productionYear: int
             -owner: Owner
+            -isDeleted: boolean
             +getLicensePlate() String
             +setLicensePlate(lp: String) void
             +getBrand() String
@@ -227,9 +231,11 @@
             class RepairOrder {
             -orderId: int
             -vehicle: Vehicle
+            -entryDate: Date
+            -exitDate: Date
             -mechanic: Mechanic
-            -details: List~RepairOrderDetail~
             -status: String
+            -details: List~RepairOrderDetail~
             +getOrderId() int
             +setOrderId(id: int) void
             +getVehicle() Vehicle
