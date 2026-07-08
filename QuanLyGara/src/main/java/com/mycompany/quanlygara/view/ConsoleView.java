@@ -48,22 +48,23 @@ public class ConsoleView {
         System.out.println("====================================================");
         System.out.println("       CHAO MUNG DEN HE THONG QUAN LY GARA          ");
         System.out.println("====================================================");
-        
+
         while (currentUser == null) {
             System.out.println("\n--- VUI LONG DANG NHAP ---");
             System.out.print("Username: ");
             String username = sc.nextLine().trim();
             System.out.print("Password: ");
             String password = sc.nextLine().trim();
-            
+
             currentUser = employeeDAO.login(username, password);
             if (currentUser != null) {
-                System.out.println("Dang nhap thanh cong! Xin chao " + currentUser.getRole() + " " + currentUser.getUsername());
+                System.out.println(
+                        "Dang nhap thanh cong! Xin chao " + currentUser.getRole() + " " + currentUser.getUsername());
             } else {
                 System.out.println("Sai tai khoan hoac mat khau. Vui long thu lai!");
             }
         }
-        
+
         int choice = -1;
         do {
             showMainMenu();
@@ -75,7 +76,7 @@ public class ConsoleView {
                     System.out.println("Cam on ban da su dung chuong trinh!");
                     break;
                 }
-                
+
                 boolean hasPermission = false;
                 String role = currentUser.getRole();
                 if (choice == 0 || choice == 8) {
@@ -89,7 +90,7 @@ public class ConsoleView {
                 } else if (role.equals("KyThuat") && (choice == 1 || choice == 4)) {
                     hasPermission = true;
                 }
-                
+
                 if (!hasPermission) {
                     System.out.println("----------------------------------------------------");
                     System.out.println("LOI: Ban (" + role + ") khong co quyen truy cap chuc nang nay!");
@@ -157,7 +158,7 @@ public class ConsoleView {
             System.out.println("Xac nhan mat khau khong khop!");
             return;
         }
-        
+
         boolean success = employeeDAO.updatePassword(currentUser.getUsername(), newPwd);
         if (success) {
             currentUser.setPassword(newPwd);
@@ -169,7 +170,7 @@ public class ConsoleView {
 
     private void showMainMenu() {
         String role = currentUser != null ? currentUser.getRole() : "";
-        
+
         System.out.println("====================================================");
         System.out.println("        HE THONG QUAN LY GARA SUA CHUA O TO         ");
         System.out.println("====================================================");
@@ -240,12 +241,14 @@ public class ConsoleView {
                         int oId = newVehicle.getOwner() != null ? newVehicle.getOwner().getId() : 0;
                         Owner owner = ownerController.layTheoId(oId);
                         if (owner == null) {
-                            System.out.println("Loi: Khong tim thay chu xe co ID = " + oId + ". Vui long tao chu xe truoc!");
+                            System.out.println(
+                                    "Loi: Khong tim thay chu xe co ID = " + oId + ". Vui long tao chu xe truoc!");
                             break;
                         }
                         Vehicle existing = vehicleController.layTheoId(newVehicle.getLicensePlate());
                         if (existing != null) {
-                            System.out.println("Loi: Bien so xe '" + newVehicle.getLicensePlate() + "' da ton tai trong he thong!");
+                            System.out.println("Loi: Bien so xe '" + newVehicle.getLicensePlate()
+                                    + "' da ton tai trong he thong!");
                             break;
                         }
                         vehicleController.themMoi(newVehicle);
@@ -539,7 +542,8 @@ public class ConsoleView {
                         String lp = order.getVehicle() != null ? order.getVehicle().getLicensePlate() : "";
                         Vehicle v = vehicleController.layTheoId(lp);
                         if (v == null) {
-                            System.out.println("Loi: Xe co bien so '" + lp + "' chua duoc dang ky tiep nhan! Vui long them xe truoc.");
+                            System.out.println("Loi: Xe co bien so '" + lp
+                                    + "' chua duoc dang ky tiep nhan! Vui long them xe truoc.");
                             break;
                         }
                         int mId = order.getMechanic() != null ? order.getMechanic().getId() : 0;
@@ -570,20 +574,21 @@ public class ConsoleView {
                             System.out.println("Loi: Phieu sua chua nay da hoan thanh va chot don, khong the sua doi!");
                             break;
                         }
-                        
+
                         System.out.println("Chon loai hang muc can them:");
                         System.out.println("1. Linh kien (Phu tung)");
                         System.out.println("2. Dich vu (Cong tho)");
                         System.out.print("Nhap lua chon (1-2): ");
                         int typeChoice = Integer.parseInt(sc.nextLine());
-                        
+
                         RepairOrderDetail detail = new RepairOrderDetail();
                         detail.setOrderId(orderId);
-                        
+
                         if (typeChoice == 1) {
                             System.out.println("--- Danh sach Linh kien ---");
                             for (LinhKien p : partController.layTatCa()) {
-                                System.out.println(p.getMa() + " - " + p.getTen() + " - Ton kho: " + p.getSoLuongTon() + " - Gia: " + String.format("%,.0f", p.getDonGia()));
+                                System.out.println(p.getMa() + " - " + p.getTen() + " - Ton kho: " + p.getSoLuongTon()
+                                        + " - Gia: " + String.format("%,.0f", p.getDonGia()));
                             }
                             System.out.print("Nhap Ma Linh kien: ");
                             String maLK = sc.nextLine().trim();
@@ -605,7 +610,8 @@ public class ConsoleView {
                         } else if (typeChoice == 2) {
                             System.out.println("--- Danh sach Dich vu ---");
                             for (DichVu d : dichVuDAO.layTatCa()) {
-                                System.out.println(d.getMa() + " - " + d.getTen() + " - Gia: " + String.format("%,.0f", d.getDonGia()));
+                                System.out.println(d.getMa() + " - " + d.getTen() + " - Gia: "
+                                        + String.format("%,.0f", d.getDonGia()));
                             }
                             System.out.print("Nhap Ma Dich vu: ");
                             String maDV = sc.nextLine().trim();
@@ -622,7 +628,7 @@ public class ConsoleView {
                             System.out.println("Lua chon loai khong hop le!");
                             break;
                         }
-                        
+
                         // Add detail using transaction method
                         try {
                             repairOrderController.themMoiChiTietVaTruKho(detail);
@@ -631,7 +637,7 @@ public class ConsoleView {
                             System.out.println(e.getMessage());
                             break;
                         }
-                        
+
                         // Automatically update status to REPAIRING if it was RECEIVING
                         if (oObj.getStatus().equals("RECEIVING")) {
                             oObj.setStatus("REPAIRING");
@@ -649,35 +655,37 @@ public class ConsoleView {
                             System.out.println("=== THONG TIN PHIEU SUA CHUA ===");
                             System.out.println(ro);
                             System.out.println("--- CHI TIET LINH KIEN & CONG VIEC (SU DUNG TINH DA HINH) ---");
-                            
+
                             List<HangMuc> listChiTiet = repairOrderController.getDanhSachChiTiet(showOrderId);
                             List<RepairOrderDetail> rawDetails = repairOrderController.getDetailsByOrderId(showOrderId);
-                            
+
                             if (listChiTiet.isEmpty()) {
                                 System.out.println("Chua co linh kien hay cong viec nao duoc ghi nhan.");
                             } else {
                                 double totalParts = 0;
                                 double totalLabor = 0;
-                                
+
                                 for (int i = 0; i < listChiTiet.size(); i++) {
                                     HangMuc hm = listChiTiet.get(i);
                                     int qty = rawDetails.get(i).getSoLuong();
                                     double thanhTien = hm.tinhThanhTien(qty); // polymorphic call
-                                    
+
                                     if (hm instanceof LinhKien) {
                                         System.out.println("- [Linh Kien] " + hm.getTen() + " | Ma: " + hm.getMa() +
-                                                           " | So luong: " + qty + " | Don gia: " + String.format("%,.0f", hm.getDonGia()) + 
-                                                           " VND | Thanh tien: " + String.format("%,.0f", thanhTien) + " VND");
+                                                " | So luong: " + qty + " | Don gia: "
+                                                + String.format("%,.0f", hm.getDonGia()) +
+                                                " VND | Thanh tien: " + String.format("%,.0f", thanhTien) + " VND");
                                         totalParts += thanhTien;
                                     } else if (hm instanceof DichVu) {
                                         System.out.println("- [Dich Vu] " + hm.getTen() + " | Ma: " + hm.getMa() +
-                                                           " | Don gia (Tron goi): " + String.format("%,.0f", hm.getDonGia()) + 
-                                                           " VND | Thanh tien: " + String.format("%,.0f", thanhTien) + " VND");
+                                                " | Don gia (Tron goi): " + String.format("%,.0f", hm.getDonGia()) +
+                                                " VND | Thanh tien: " + String.format("%,.0f", thanhTien) + " VND");
                                         totalLabor += thanhTien;
                                     }
                                 }
                                 System.out.println("--------------------------------------");
-                                System.out.println("Tong tien linh kien: " + String.format("%,.0f", totalParts) + " VND");
+                                System.out
+                                        .println("Tong tien linh kien: " + String.format("%,.0f", totalParts) + " VND");
                                 System.out.println("Tong tien cong: " + String.format("%,.0f", totalLabor) + " VND");
                             }
                         }
@@ -694,21 +702,24 @@ public class ConsoleView {
                         System.out.print("Nhap trang thai moi (1 - RECEIVING, 2 - REPAIRING, 3 - COMPLETED): ");
                         int stChoice = Integer.parseInt(sc.nextLine());
                         String newStatus = "";
-                        if (stChoice == 1) newStatus = "RECEIVING";
-                        else if (stChoice == 2) newStatus = "REPAIRING";
-                        else if (stChoice == 3) newStatus = "COMPLETED";
+                        if (stChoice == 1)
+                            newStatus = "RECEIVING";
+                        else if (stChoice == 2)
+                            newStatus = "REPAIRING";
+                        else if (stChoice == 3)
+                            newStatus = "COMPLETED";
                         else {
                             System.out.println("Lua chon khong hop le!");
                             break;
                         }
-                        
+
                         orderStatus.setStatus(newStatus);
                         if (newStatus.equals("COMPLETED")) {
                             orderStatus.setExitDate(new Date());
                         } else {
                             orderStatus.setExitDate(null);
                         }
-                        
+
                         repairOrderController.capNhat(orderStatus);
                         System.out.println("Cap nhat trang thai phieu sua chua thanh cong!");
                         break;
@@ -745,35 +756,45 @@ public class ConsoleView {
                             System.out.println("Phieu sua chua khong ton tai!");
                             break;
                         }
-                        
+
                         if (!ro.getStatus().equals("COMPLETED")) {
-                            System.out.println("Loi: Phieu sua chua phai co trang thai 'COMPLETED' (Da hoan thanh sua chua) moi co the thanh toan!");
+                            System.out.println(
+                                    "Loi: Phieu sua chua phai co trang thai 'COMPLETED' (Da hoan thanh sua chua) moi co the thanh toan!");
                             System.out.println("Vui long vao muc 4, cap nhat trang thai phieu sang COMPLETED truoc.");
                             break;
                         }
-                        
+
                         Invoice existingInv = invoiceController.getByOrderId(orderId);
                         if (existingInv != null) {
                             System.out.println("Phieu sua chua nay da duoc thanh toan truoc do!");
                             System.out.println("Chi tiet hoa don: " + existingInv);
                             break;
                         }
-                        
+
                         Invoice generated = invoiceController.generateInvoice(orderId);
                         invoiceController.themMoi(generated);
-                        
+
                         System.out.println("====================================================");
                         System.out.println("          HOA DON THANH TOAN GARA O TO              ");
                         System.out.println("====================================================");
                         System.out.println("Ma hoa don: " + generated.getInvoiceId());
-                        System.out.println("Ma phieu sua chua: " + (generated.getRepairOrder() != null ? generated.getRepairOrder().getOrderId() : "N/A"));
+                        System.out.println("Ma phieu sua chua: "
+                                + (generated.getRepairOrder() != null ? generated.getRepairOrder().getOrderId()
+                                        : "N/A"));
                         System.out.println("Ngay thanh toan: " + generated.getPaymentDate());
-                        System.out.println("Bien so xe: " + (ro.getVehicle() != null ? ro.getVehicle().getLicensePlate() : "N/A"));
-                        System.out.println("Tong tien linh kien: " + String.format("%,.0f", generated.getTotalPartCost()) + " VND");
-                        System.out.println("Tong tien cong: " + String.format("%,.0f", generated.getTotalLaborCost()) + " VND");
-                        System.out.println("Thue VAT (10%): " + String.format("%,.0f", (generated.getTotalPartCost() + generated.getTotalLaborCost()) * 0.10) + " VND");
+                        System.out.println(
+                                "Bien so xe: " + (ro.getVehicle() != null ? ro.getVehicle().getLicensePlate() : "N/A"));
+                        System.out.println("Tong tien linh kien: "
+                                + String.format("%,.0f", generated.getTotalPartCost()) + " VND");
+                        System.out.println(
+                                "Tong tien cong: " + String.format("%,.0f", generated.getTotalLaborCost()) + " VND");
+                        System.out.println("Thue VAT (10%): "
+                                + String.format("%,.0f",
+                                        (generated.getTotalPartCost() + generated.getTotalLaborCost()) * 0.10)
+                                + " VND");
                         System.out.println("----------------------------------------------------");
-                        System.out.println("TONG TIEN THANH TOAN (Gom VAT): " + String.format("%,.0f", generated.getTotalAmount()) + " VND");
+                        System.out.println("TONG TIEN THANH TOAN (Gom VAT): "
+                                + String.format("%,.0f", generated.getTotalAmount()) + " VND");
                         System.out.println("====================================================");
                         break;
                     case 2:
@@ -847,7 +868,8 @@ public class ConsoleView {
                         System.out.println("=== TOP KY THUAT VIEN DUOC GIAO NHIEU VIEC ===");
                         int idx3 = 1;
                         for (Map.Entry<String, Integer> entry : mechsReport.entrySet()) {
-                            System.out.println(idx3++ + ". " + entry.getKey() + " | So phieu dam nhan: " + entry.getValue());
+                            System.out.println(
+                                    idx3++ + ". " + entry.getKey() + " | So phieu dam nhan: " + entry.getValue());
                         }
                         break;
                     case 0:
