@@ -229,6 +229,12 @@ public class ConsoleView {
                         }
                         break;
                     case 2:
+                        System.out.println("--- Danh sach Chu xe hien co ---");
+                        List<Owner> availableOwners = ownerController.layTatCa();
+                        for (Owner o : availableOwners) {
+                            System.out.println(o.getId() + " - " + o.getName() + " - " + o.getPhone());
+                        }
+                        System.out.println("--------------------------------");
                         Vehicle newVehicle = new Vehicle();
                         newVehicle.nhapInfo(sc);
                         int oId = newVehicle.getOwner() != null ? newVehicle.getOwner().getId() : 0;
@@ -515,6 +521,19 @@ public class ConsoleView {
                 choice = Integer.parseInt(sc.nextLine());
                 switch (choice) {
                     case 1:
+                        System.out.println("--- Danh sach Xe hien co ---");
+                        List<Vehicle> availableVehicles = vehicleController.layTatCa();
+                        for (Vehicle v : availableVehicles) {
+                            System.out.println(v.getLicensePlate() + " - " + v.getBrand() + " " + v.getModel());
+                        }
+                        System.out.println("--- Danh sach Ky thuat vien dang ranh ---");
+                        List<Mechanic> availableMechs = mechanicController.layTatCa();
+                        for (Mechanic m : availableMechs) {
+                            if ("Đang rảnh".equalsIgnoreCase(m.getStatus())) {
+                                System.out.println(m.getId() + " - " + m.getName() + " - " + m.getSpec());
+                            }
+                        }
+                        System.out.println("--------------------------------");
                         RepairOrder order = new RepairOrder();
                         order.nhapInfo(sc);
                         String lp = order.getVehicle() != null ? order.getVehicle().getLicensePlate() : "";
@@ -562,6 +581,10 @@ public class ConsoleView {
                         detail.setOrderId(orderId);
                         
                         if (typeChoice == 1) {
+                            System.out.println("--- Danh sach Linh kien ---");
+                            for (LinhKien p : partController.layTatCa()) {
+                                System.out.println(p.getMa() + " - " + p.getTen() + " - Ton kho: " + p.getSoLuongTon() + " - Gia: " + String.format("%,.0f", p.getDonGia()));
+                            }
                             System.out.print("Nhap Ma Linh kien: ");
                             String maLK = sc.nextLine().trim();
                             LinhKien lk = partController.layTheoId(maLK);
@@ -576,8 +599,14 @@ public class ConsoleView {
                                 break;
                             }
                             detail.setMaHangMuc(maLK);
+                            detail.setLoaiHangMuc("LINHKIEN");
+                            detail.setDonGiaThucTe(lk.getDonGia());
                             detail.setSoLuong(qty);
                         } else if (typeChoice == 2) {
+                            System.out.println("--- Danh sach Dich vu ---");
+                            for (DichVu d : dichVuDAO.layTatCa()) {
+                                System.out.println(d.getMa() + " - " + d.getTen() + " - Gia: " + String.format("%,.0f", d.getDonGia()));
+                            }
                             System.out.print("Nhap Ma Dich vu: ");
                             String maDV = sc.nextLine().trim();
                             DichVu dv = dichVuDAO.layTheoId(maDV);
@@ -586,6 +615,8 @@ public class ConsoleView {
                                 break;
                             }
                             detail.setMaHangMuc(maDV);
+                            detail.setLoaiHangMuc("DICHVU");
+                            detail.setDonGiaThucTe(dv.getDonGia());
                             detail.setSoLuong(1); // quantity is always 1 for service
                         } else {
                             System.out.println("Lua chon loai khong hop le!");

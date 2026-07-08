@@ -107,7 +107,7 @@ public class ChuXeDAO implements IRepository<Owner> {
                     }
                 }
             }
-            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM owners WHERE id = ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("UPDATE owners SET is_deleted = TRUE WHERE id = ?")) {
                 ps.setInt(1, targetId);
                 int rows = ps.executeUpdate();
                 if (rows == 0) {
@@ -120,7 +120,7 @@ public class ChuXeDAO implements IRepository<Owner> {
     @Override
     public List<Owner> layTatCa() throws Exception {
         List<Owner> list = new ArrayList<>();
-        String sql = "SELECT id, name, phone, address FROM owners ORDER BY id";
+        String sql = "SELECT id, name, phone, address, is_deleted FROM owners WHERE is_deleted = FALSE ORDER BY id";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -134,7 +134,7 @@ public class ChuXeDAO implements IRepository<Owner> {
     @Override
     public Owner layTheoId(Object id) throws Exception {
         int targetId = (Integer) id;
-        String sql = "SELECT id, name, phone, address FROM owners WHERE id = ?";
+        String sql = "SELECT id, name, phone, address, is_deleted FROM owners WHERE id = ? AND is_deleted = FALSE";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, targetId);
@@ -149,7 +149,7 @@ public class ChuXeDAO implements IRepository<Owner> {
 
     public List<Owner> searchByName(String keyword) throws Exception {
         List<Owner> result = new ArrayList<>();
-        String sql = "SELECT id, name, phone, address FROM owners WHERE LOWER(name) LIKE ? ORDER BY id";
+        String sql = "SELECT id, name, phone, address, is_deleted FROM owners WHERE LOWER(name) LIKE ? AND is_deleted = FALSE ORDER BY id";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword.toLowerCase() + "%");
@@ -163,6 +163,8 @@ public class ChuXeDAO implements IRepository<Owner> {
     }
 
     private Owner mapRow(ResultSet rs) throws SQLException {
-        return new Owner(rs.getInt("id"), rs.getString("name"), rs.getString("phone"), rs.getString("address"));
+        Owner owner = new Owner(rs.getInt("id"), rs.getString("name"), rs.getString("phone"), rs.getString("address"));
+        owner.setDeleted(rs.getBoolean("is_deleted"));
+        return owner;
     }
 }

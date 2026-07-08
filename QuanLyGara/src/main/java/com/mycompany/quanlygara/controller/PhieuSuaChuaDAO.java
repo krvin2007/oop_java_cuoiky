@@ -187,9 +187,10 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         try (Connection conn = DBConnection.getConnection()) {
             Integer existingQty = null;
             try (PreparedStatement ps = conn.prepareStatement(
-                    "SELECT so_luong FROM repair_order_details WHERE order_id = ? AND LOWER(ma_hang_muc) = LOWER(?)")) {
+                    "SELECT so_luong FROM repair_order_details WHERE order_id = ? AND LOWER(ma_hang_muc) = LOWER(?) AND loai_hang_muc = ?")) {
                 ps.setInt(1, detail.getOrderId());
                 ps.setString(2, detail.getMaHangMuc());
+                ps.setString(3, detail.getLoaiHangMuc());
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         existingQty = rs.getInt("so_luong");
@@ -198,18 +199,22 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
             }
             if (existingQty != null) {
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "UPDATE repair_order_details SET so_luong = ? WHERE order_id = ? AND LOWER(ma_hang_muc) = LOWER(?)")) {
+                        "UPDATE repair_order_details SET so_luong = ?, don_gia_thuc_te = ? WHERE order_id = ? AND LOWER(ma_hang_muc) = LOWER(?) AND loai_hang_muc = ?")) {
                     ps.setInt(1, existingQty + detail.getSoLuong());
-                    ps.setInt(2, detail.getOrderId());
-                    ps.setString(3, detail.getMaHangMuc());
+                    ps.setDouble(2, detail.getDonGiaThucTe());
+                    ps.setInt(3, detail.getOrderId());
+                    ps.setString(4, detail.getMaHangMuc());
+                    ps.setString(5, detail.getLoaiHangMuc());
                     ps.executeUpdate();
                 }
             } else {
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "INSERT INTO repair_order_details (order_id, ma_hang_muc, so_luong) VALUES (?, ?, ?)")) {
+                        "INSERT INTO repair_order_details (order_id, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong) VALUES (?, ?, ?, ?, ?)")) {
                     ps.setInt(1, detail.getOrderId());
                     ps.setString(2, detail.getMaHangMuc());
-                    ps.setInt(3, detail.getSoLuong());
+                    ps.setString(3, detail.getLoaiHangMuc());
+                    ps.setDouble(4, detail.getDonGiaThucTe());
+                    ps.setInt(5, detail.getSoLuong());
                     ps.executeUpdate();
                 }
             }
@@ -240,9 +245,10 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
                 
                 Integer existingQty = null;
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "SELECT so_luong FROM repair_order_details WHERE order_id = ? AND LOWER(ma_hang_muc) = LOWER(?)")) {
+                        "SELECT so_luong FROM repair_order_details WHERE order_id = ? AND LOWER(ma_hang_muc) = LOWER(?) AND loai_hang_muc = ?")) {
                     ps.setInt(1, detail.getOrderId());
                     ps.setString(2, detail.getMaHangMuc());
+                    ps.setString(3, detail.getLoaiHangMuc());
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
                             existingQty = rs.getInt("so_luong");
@@ -251,18 +257,22 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
                 }
                 if (existingQty != null) {
                     try (PreparedStatement ps = conn.prepareStatement(
-                            "UPDATE repair_order_details SET so_luong = ? WHERE order_id = ? AND LOWER(ma_hang_muc) = LOWER(?)")) {
+                            "UPDATE repair_order_details SET so_luong = ?, don_gia_thuc_te = ? WHERE order_id = ? AND LOWER(ma_hang_muc) = LOWER(?) AND loai_hang_muc = ?")) {
                         ps.setInt(1, existingQty + detail.getSoLuong());
-                        ps.setInt(2, detail.getOrderId());
-                        ps.setString(3, detail.getMaHangMuc());
+                        ps.setDouble(2, detail.getDonGiaThucTe());
+                        ps.setInt(3, detail.getOrderId());
+                        ps.setString(4, detail.getMaHangMuc());
+                        ps.setString(5, detail.getLoaiHangMuc());
                         ps.executeUpdate();
                     }
                 } else {
                     try (PreparedStatement ps = conn.prepareStatement(
-                            "INSERT INTO repair_order_details (order_id, ma_hang_muc, so_luong) VALUES (?, ?, ?)")) {
+                            "INSERT INTO repair_order_details (order_id, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong) VALUES (?, ?, ?, ?, ?)")) {
                         ps.setInt(1, detail.getOrderId());
                         ps.setString(2, detail.getMaHangMuc());
-                        ps.setInt(3, detail.getSoLuong());
+                        ps.setString(3, detail.getLoaiHangMuc());
+                        ps.setDouble(4, detail.getDonGiaThucTe());
+                        ps.setInt(5, detail.getSoLuong());
                         ps.executeUpdate();
                     }
                 }
@@ -278,13 +288,13 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
 
     public List<RepairOrderDetail> getDetailsByOrderId(int orderId) throws Exception {
         List<RepairOrderDetail> result = new ArrayList<>();
-        String sql = "SELECT order_id, ma_hang_muc, so_luong FROM repair_order_details WHERE order_id = ?";
+        String sql = "SELECT order_id, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong FROM repair_order_details WHERE order_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    result.add(new RepairOrderDetail(rs.getInt("order_id"), rs.getString("ma_hang_muc"), rs.getInt("so_luong")));
+                    result.add(new RepairOrderDetail(rs.getInt("order_id"), rs.getString("ma_hang_muc"), rs.getString("loai_hang_muc"), rs.getDouble("don_gia_thuc_te"), rs.getInt("so_luong")));
                 }
             }
         }
@@ -297,12 +307,12 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
      */
     public List<RepairOrderDetail> getAllDetails() throws Exception {
         List<RepairOrderDetail> result = new ArrayList<>();
-        String sql = "SELECT order_id, ma_hang_muc, so_luong FROM repair_order_details";
+        String sql = "SELECT order_id, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong FROM repair_order_details";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                result.add(new RepairOrderDetail(rs.getInt("order_id"), rs.getString("ma_hang_muc"), rs.getInt("so_luong")));
+                result.add(new RepairOrderDetail(rs.getInt("order_id"), rs.getString("ma_hang_muc"), rs.getString("loai_hang_muc"), rs.getDouble("don_gia_thuc_te"), rs.getInt("so_luong")));
             }
         }
         return result;
@@ -315,14 +325,24 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         DichVuDAO dvDAO = new DichVuDAO();
         for (int i = 0; i < details.size(); i++) {
             RepairOrderDetail d = details.get(i);
-            LinhKien lk = lkDAO.layTheoId(d.getMaHangMuc());
-            if (lk != null) {
-                danhSachChiTiet.add(lk);
-            } else {
-                DichVu dv = dvDAO.layTheoId(d.getMaHangMuc());
-                if (dv != null) {
-                    danhSachChiTiet.add(dv);
+            if ("LINHKIEN".equalsIgnoreCase(d.getLoaiHangMuc())) {
+                LinhKien lk = lkDAO.layTheoId(d.getMaHangMuc());
+                if (lk == null) {
+                    lk = new LinhKien();
+                    lk.setMa(d.getMaHangMuc());
+                    lk.setTen("Linh kiện (Đã bị xóa khỏi kho)");
                 }
+                lk.setDonGia(d.getDonGiaThucTe()); // Override current price with recorded price
+                danhSachChiTiet.add(lk);
+            } else if ("DICHVU".equalsIgnoreCase(d.getLoaiHangMuc())) {
+                DichVu dv = dvDAO.layTheoId(d.getMaHangMuc());
+                if (dv == null) {
+                    dv = new DichVu();
+                    dv.setMa(d.getMaHangMuc());
+                    dv.setTen("Dịch vụ (Đã bị xóa)");
+                }
+                dv.setDonGia(d.getDonGiaThucTe());
+                danhSachChiTiet.add(dv);
             }
         }
         return danhSachChiTiet;

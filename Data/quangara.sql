@@ -78,7 +78,8 @@ CREATE TABLE `employees` (
   `role` varchar(50) NOT NULL,
   `specialization` varchar(255) DEFAULT NULL,
   `salary` double NOT NULL DEFAULT 0,
-  `status` varchar(50) NOT NULL DEFAULT 'Đang rảnh'
+  `status` varchar(50) NOT NULL DEFAULT 'Đang rảnh',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -101,7 +102,8 @@ CREATE TABLE `owners` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `phone` varchar(20) NOT NULL,
-  `address` varchar(255) DEFAULT NULL
+  `address` varchar(255) DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -136,6 +138,8 @@ CREATE TABLE `repair_order_details` (
   `id` int(11) NOT NULL,
   `order_id` int(11) NOT NULL,
   `ma_hang_muc` varchar(20) NOT NULL,
+  `loai_hang_muc` varchar(20) NOT NULL,
+  `don_gia_thuc_te` double NOT NULL DEFAULT 0,
   `so_luong` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -150,7 +154,8 @@ CREATE TABLE `vehicles` (
   `brand` varchar(100) DEFAULT NULL,
   `model` varchar(100) DEFAULT NULL,
   `production_year` int(11) DEFAULT NULL,
-  `owner_id` int(11) NOT NULL
+  `owner_id` int(11) NOT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -211,7 +216,7 @@ ALTER TABLE `repair_orders`
 --
 ALTER TABLE `repair_order_details`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uq_order_item` (`order_id`,`ma_hang_muc`);
+  ADD UNIQUE KEY `uq_order_item` (`order_id`,`ma_hang_muc`,`loai_hang_muc`);
 
 --
 -- Indexes for table `vehicles`
@@ -262,26 +267,26 @@ ALTER TABLE `repair_order_details`
 -- Constraints for table `invoices`
 --
 ALTER TABLE `invoices`
-  ADD CONSTRAINT `fk_invoice_order` FOREIGN KEY (`order_id`) REFERENCES `repair_orders` (`order_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_invoice_order` FOREIGN KEY (`order_id`) REFERENCES `repair_orders` (`order_id`) ON DELETE RESTRICT;
 
 --
 -- Constraints for table `repair_orders`
 --
 ALTER TABLE `repair_orders`
-  ADD CONSTRAINT `fk_order_mechanic` FOREIGN KEY (`mechanic_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_order_vehicle` FOREIGN KEY (`license_plate`) REFERENCES `vehicles` (`license_plate`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_order_mechanic` FOREIGN KEY (`mechanic_id`) REFERENCES `employees` (`id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `fk_order_vehicle` FOREIGN KEY (`license_plate`) REFERENCES `vehicles` (`license_plate`) ON DELETE RESTRICT;
 
 --
 -- Constraints for table `repair_order_details`
 --
 ALTER TABLE `repair_order_details`
-  ADD CONSTRAINT `fk_detail_order` FOREIGN KEY (`order_id`) REFERENCES `repair_orders` (`order_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_detail_order` FOREIGN KEY (`order_id`) REFERENCES `repair_orders` (`order_id`) ON DELETE RESTRICT;
 
 --
 -- Constraints for table `vehicles`
 --
 ALTER TABLE `vehicles`
-  ADD CONSTRAINT `fk_vehicle_owner` FOREIGN KEY (`owner_id`) REFERENCES `owners` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_vehicle_owner` FOREIGN KEY (`owner_id`) REFERENCES `owners` (`id`) ON DELETE RESTRICT;
 
 COMMIT;
 

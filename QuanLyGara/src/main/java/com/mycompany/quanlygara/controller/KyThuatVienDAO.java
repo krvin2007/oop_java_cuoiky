@@ -120,7 +120,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
                     }
                 }
             }
-            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM employees WHERE id = ? AND role = 'KyThuat'")) {
+            try (PreparedStatement ps = conn.prepareStatement("UPDATE employees SET is_deleted = TRUE WHERE id = ? AND role = 'KyThuat'")) {
                 ps.setInt(1, targetId);
                 int rows = ps.executeUpdate();
                 if (rows == 0) {
@@ -132,24 +132,24 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
 
     @Override
     public List<Mechanic> layTatCa() throws Exception {
-        return querySql("SELECT id, name, phone, address, username, password, specialization, salary, status FROM employees WHERE role = 'KyThuat' ORDER BY id", null);
+        return querySql("SELECT id, name, phone, address, username, password, specialization, salary, status, is_deleted FROM employees WHERE role = 'KyThuat' AND is_deleted = FALSE ORDER BY id", null);
     }
 
     @Override
     public Mechanic layTheoId(Object id) throws Exception {
         int targetId = (Integer) id;
         List<Mechanic> list = querySql(
-                "SELECT id, name, phone, address, username, password, specialization, salary, status FROM employees WHERE id = ? AND role = 'KyThuat'", targetId);
+                "SELECT id, name, phone, address, username, password, specialization, salary, status, is_deleted FROM employees WHERE id = ? AND role = 'KyThuat' AND is_deleted = FALSE", targetId);
         return list.isEmpty() ? null : list.get(0);
     }
 
     public List<Mechanic> sortBySalary(boolean ascending) throws Exception {
         String order = ascending ? "ASC" : "DESC";
-        return querySql("SELECT id, name, phone, address, username, password, specialization, salary, status FROM employees WHERE role = 'KyThuat' ORDER BY salary " + order, null);
+        return querySql("SELECT id, name, phone, address, username, password, specialization, salary, status, is_deleted FROM employees WHERE role = 'KyThuat' AND is_deleted = FALSE ORDER BY salary " + order, null);
     }
 
     public List<Mechanic> sortByName() throws Exception {
-        return querySql("SELECT id, name, phone, address, username, password, specialization, salary, status FROM employees WHERE role = 'KyThuat' ORDER BY name ASC", null);
+        return querySql("SELECT id, name, phone, address, username, password, specialization, salary, status, is_deleted FROM employees WHERE role = 'KyThuat' AND is_deleted = FALSE ORDER BY name ASC", null);
     }
 
     private List<Mechanic> querySql(String sql, Integer idParam) throws Exception {
@@ -169,7 +169,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
     }
 
     private Mechanic mapRow(ResultSet rs) throws SQLException {
-        return new Mechanic(
+        Mechanic mechanic = new Mechanic(
             rs.getInt("id"), 
             rs.getString("name"), 
             rs.getString("phone"), 
@@ -180,5 +180,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
             rs.getString("status"),
             rs.getString("specialization")
         );
+        mechanic.setDeleted(rs.getBoolean("is_deleted"));
+        return mechanic;
     }
 }

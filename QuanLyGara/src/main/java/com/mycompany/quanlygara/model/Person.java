@@ -25,6 +25,7 @@ public abstract class Person {
     private String name;
     private String phone;
     private String address;
+    private boolean isDeleted;
 
     // Constructor mặc định (Không tham số)
     // TÍNH ĐA HÌNH (POLYMORPHISM) - NẠP CHỒNG (OVERLOADING): Cho phép khởi tạo đối tượng bằng nhiều cách khác nhau.
@@ -37,6 +38,15 @@ public abstract class Person {
         this.name = name;
         this.phone = phone;
         this.address = address;
+        this.isDeleted = false;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
     // --- CÁC PHƯƠNG THỨC GETTER VÀ SETTER (Cung cấp cổng truy cập có kiểm soát) ---

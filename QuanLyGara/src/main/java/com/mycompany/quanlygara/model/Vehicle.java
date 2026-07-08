@@ -16,6 +16,7 @@ public class Vehicle {
     private String model;
     private int productionYear;
     private Owner owner;
+    private boolean isDeleted;
 
     public Vehicle() {
     }
@@ -26,6 +27,15 @@ public class Vehicle {
         this.model = model;
         this.productionYear = productionYear;
         this.owner = owner;
+        this.isDeleted = false;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
     public String getLicensePlate() {
