@@ -243,23 +243,46 @@ public class Vehicle {
         }
     }
 
+    // Kiểm tra cấu trúc biển số xe Việt Nam (Biển dân sự hoặc quân đội)
+    public static boolean isValidPlate(String inputPlate) {
+        if (inputPlate == null) return false;
+        String cleanPlate = inputPlate.trim().toUpperCase();
+        
+        // 1. Kiểm tra biển quân đội (2 chữ cái + dãy số)
+        if (cleanPlate.matches("^[A-Z]{2}[- ]?([0-9]{2}[- ]?[0-9]{2}|[0-9]{4,5})$")) {
+            return true;
+        }
+        
+        // 2. Kiểm tra biển dân sự (Mã tỉnh/thành gồm 2 chữ số + sêri + số thứ tự)
+        if (cleanPlate.matches("^([0-9]{2})([A-Z]{1,2}[0-9]?)[- ]?([0-9]{3,5}|[0-9]{3}\\.[0-9]{2})$")) {
+            String provCode = cleanPlate.substring(0, 2);
+            return getProvinceName(provCode) != null;
+        }
+        
+        return false;
+    }
+
     // Nhập thông tin cho đối tượng từ giao diện Console
     public void nhapInfo(Scanner sc) {
+        String plateTypeChoice = "";
         while (true) {
             System.out.println("--- Chon loai bien so xe ---");
-            System.out.println("1. Bien mau trang (Ca nhan, doanh nghiep)");
-            System.out.println("2. Bien mau vang (Kinh doanh van tai)");
-            System.out.println("3. Bien mau vang chu do (Khu kinh te dac biet/cua khau)");
-            System.out.println("4. Bien mau xanh (Co quan hanh chinh nha nuoc, chinh tri - xa hoi)");
-            System.out.println("5. Bien mau do (Quan doi nhan dan)");
-            System.out.print("Nhap lua chon cua ban (1-5): ");
-            String plateTypeChoice = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
-            if (!plateTypeChoice.matches("[1-5]")) {
-                System.out.println("Lua chon khong hop le! Vui long nhap tu 1 den 5.");
-                continue;
+            System.out.println("1. Bien dan su (Trang, Vang, Xanh...) - Vi du: 29A-123.45, 51F-999.99");
+            System.out.println("2. Bien quan su (Quan doi)           - Vi du: AA-12-34");
+            System.out.print("Nhap lua chon cua ban (1-2): ");
+            plateTypeChoice = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+            if (plateTypeChoice.matches("[1-2]")) {
+                break;
             }
-            
-            System.out.print("Nhap bien so xe (Vi du: 29A-123.45 hoac AA-12-34): ");
+            System.out.println("Lua chon khong hop le! Vui long nhap 1 hoac 2.");
+        }
+        
+        while (true) {
+            if (plateTypeChoice.equals("2")) {
+                System.out.print("Nhap bien so xe quan doi (Vi du: AA-12-34): ");
+            } else {
+                System.out.print("Nhap bien so xe dan su (Vi du: 29A-123.45): ");
+            }
             String inputPlate = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim()).toUpperCase();
             
             if (inputPlate.isEmpty()) {
@@ -271,28 +294,25 @@ public class Vehicle {
             String classification = "";
             String provinceOrUnit = "";
             
-            if (plateTypeChoice.equals("5")) {
+            if (plateTypeChoice.equals("2")) {
                 // Military plate constraint: must start with 2 uppercase letters followed by digits
                 if (inputPlate.matches("^[A-Z]{2}[- ]?([0-9]{2}[- ]?[0-9]{2}|[0-9]{4,5})$")) {
                     isValid = true;
-                    classification = "Bien do (Quan doi nhan dan)";
+                    classification = "Bien quan su (Quan doi)";
                     String prefix = inputPlate.substring(0, 2);
                     provinceOrUnit = getMilitaryUnit(prefix);
                 } else {
                     System.out.println("Loi: Bien so quan doi khong dung dinh dang! Vi du: AA-12-34.");
                 }
             } else {
-                // Civil plates (1, 2, 3, 4) constraint: starts with 2 digits of valid province
+                // Civil plates constraint: starts with 2 digits of valid province
                 if (inputPlate.matches("^([0-9]{2})([A-Z]{1,2}[0-9]?)[- ]?([0-9]{3,5}|[0-9]{3}\\.[0-9]{2})$")) {
                     String provCode = inputPlate.substring(0, 2);
                     String provName = getProvinceName(provCode);
                     if (provName != null) {
                         isValid = true;
                         provinceOrUnit = provName;
-                        if (plateTypeChoice.equals("1")) classification = "Bien trang (Ca nhan, doanh nghiep)";
-                        else if (plateTypeChoice.equals("2")) classification = "Bien vang (Kinh doanh van tai)";
-                        else if (plateTypeChoice.equals("3")) classification = "Bien vang chu do (Khu kinh te dac biet/cua khau)";
-                        else if (plateTypeChoice.equals("4")) classification = "Bien xanh (Co quan nha nuoc)";
+                        classification = "Bien dan su (Trang, Vang, Xanh...)";
                     } else {
                         System.out.println("Loi: Hai chu so dau tien '" + provCode + "' khong phai ma tinh/thanh pho hop le cua Viet Nam!");
                     }
