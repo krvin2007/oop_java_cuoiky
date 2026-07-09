@@ -92,7 +92,7 @@ public class ConsoleView {
                         hasPermission = true;
                     } else if (role.equals("KeToan") && (choice == 5 || choice == 6)) {
                         hasPermission = true;
-                    } else if (role.equals("ThuKho") && (choice == 3 || choice == 7)) {
+                    } else if (role.equals("ThuKho") && (choice == 3)) {
                         hasPermission = true;
                     } else if (role.equals("KyThuat") && (choice == 1 || choice == 4)) {
                         hasPermission = true;
@@ -187,7 +187,7 @@ public class ConsoleView {
         System.out.println("4. Quan ly Phieu sua chua (Repair Order) ... " + ((role.equals("QuanLy") || role.equals("KyThuat")) ? "[    CO QUYEN    ]" : "[ KHONG CO QUYEN ]"));
         System.out.println("5. Thanh toan & Hoa don (Invoice) .......... " + ((role.equals("QuanLy") || role.equals("KeToan")) ? "[    CO QUYEN    ]" : "[ KHONG CO QUYEN ]"));
         System.out.println("6. Bao cao thong ke doanh thu & hieu suat .. " + ((role.equals("QuanLy") || role.equals("KeToan")) ? "[    CO QUYEN    ]" : "[ KHONG CO QUYEN ]"));
-        System.out.println("7. Quan ly Danh muc Dich vu (DichVu) ....... " + ((role.equals("QuanLy") || role.equals("ThuKho")) ? "[    CO QUYEN    ]" : "[ KHONG CO QUYEN ]"));
+        System.out.println("7. Quan ly Danh muc Dich vu (DichVu) ....... " + (role.equals("QuanLy") ? "[    CO QUYEN    ]" : "[ KHONG CO QUYEN ]"));
         System.out.println("8. Doi mat khau ............................ [    CO QUYEN    ]");
         System.out.println("0. Dang xuat (Logout) ...................... [    CO QUYEN    ]");
         System.out.println("===============================================================");
@@ -213,6 +213,12 @@ public class ConsoleView {
             System.out.print("Nhap lua chon (0-8): ");
             try {
                 choice = Integer.parseInt(sc.nextLine());
+                
+                if (currentUser != null && currentUser.getRole().equals("KyThuat") && (choice == 7 || choice == 8)) {
+                    System.out.println("LOI: Ban la Ky thuat vien, khong co quyen Sua hoac Xoa thong tin Chu xe/Xe!");
+                    continue;
+                }
+                
                 switch (choice) {
                     case 1:
                         System.out.println("Ban muon them bao nhieu Chu xe?");
