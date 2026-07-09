@@ -94,3 +94,26 @@ Nằm trong package `controller/`. Các lớp DAO implement Interface `IReposito
 8. **View:** Xe sửa xong, chọn Menu 5 (Hóa Đơn), nhập mã phiếu vừa hoàn thành.
 9. **Controller:** `HoaDonDAO.themMoi()` quét toàn bộ chi tiết, phân tách tổng tiền linh kiện (totalPartCost) và tiền công dịch vụ (totalLaborCost), cộng thêm 10% VAT, lưu vào bảng `invoices`. Trả thợ máy về trạng thái "Đang rảnh". 
 10. **Kết thúc.** Dữ liệu đã an toàn trên CSDL MySQL.
+
+---
+
+## 6. PHÂN TÍCH GÓI NGOẠI LỆ (EXCEPTION PACKAGE)
+**Thư mục:** `com\mycompany\quanlygara\exception`
+
+Để nâng cao tính an toàn và khả năng kiểm soát lỗi của hệ thống, dự án không chỉ phụ thuộc vào `try-catch` phổ thông mà tự định nghĩa riêng một gói (package) chứa các Ngoại lệ tùy chỉnh (Custom Exceptions). Tất cả các lớp này đều kế thừa từ lớp `Exception` mặc định của Java (Tính kế thừa).
+
+1. **`InvalidPlateNumberException` (Ngoại lệ Sai Định dạng Biển số):**
+   - **Tác dụng:** Được kích hoạt (throw) ngay tại hàm nhập liệu `Vehicle.nhapInfo()` khi người dùng cố tình nhập một biển số không khớp với Regex chuẩn của Việt Nam (Ví dụ: phải có dấu gạch ngang, dấu chấm).
+   - **Ý nghĩa:** Chặn dữ liệu rác ngay từ lớp Model trước khi nó kịp đẩy xuống Database.
+
+2. **`PartOutOfStockException` (Ngoại lệ Hết Hàng Tồn Kho):**
+   - **Tác dụng:** Xảy ra ở tầng Controller (`PhieuSuaChuaDAO`) khi thợ máy thêm linh kiện vào phiếu sửa chữa nhưng số lượng yêu cầu vượt quá `so_luong_ton` hiện có trong bảng `linh_kien`.
+   - **Ý nghĩa:** Đảm bảo không xảy ra tình trạng "bán khống", quản lý chặt chẽ số lượng vật tư của kho Gara. Ngay khi ngoại lệ này ném ra, Transaction sẽ bị huỷ bỏ (Rollback).
+
+3. **`VehicleNotFoundException` (Ngoại lệ Không Tìm Thấy Xe):**
+   - **Tác dụng:** Báo lỗi chuyên biệt khi một logic cố gắng tìm kiếm, thanh toán hoặc gán phiếu sửa chữa cho một chiếc xe (Biển số) không tồn tại.
+   - **Ý nghĩa:** Giúp giao diện `ConsoleView` bắt chính xác lỗi thay vì nhận `NullPointerException`, từ đó in ra thông báo thân thiện "Xe không tồn tại" cho người sử dụng.
+
+4. **`DuplicateMaException` (Ngoại lệ Trùng Mã Dữ Liệu):**
+   - *(Nằm ở package model nhưng cùng bản chất)*
+   - **Tác dụng:** Được ném ra khi cố gắng tạo mới một Đối tượng (Nhân viên, Chủ xe, Linh kiện) có ID/Mã đã tồn tại trong Database. Tránh lỗi SQL sập chương trình.
