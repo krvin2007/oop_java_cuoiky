@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ Đồ Lớp (UML Class Diagram) - Đầy đủ mũi tên</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+        }
+
+        .mermaid-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            max-width: 95vw;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+
+        .legend {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #334155;
+        }
+
+        .legend-icon {
+            font-family: 'Consolas', monospace;
+            font-weight: bold;
+            color: #3b82f6;
+            background: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mermaid-container">
+        <h2>SƠ ĐỒ CẤU TRÚC LỚP GARA Ô TÔ</h2>
+
+        <!-- Chú thích mũi tên & Màu sắc -->
+        <div class="legend">
+            <div style="width: 100%; font-weight: bold; text-align: center; margin-bottom: -15px; color: #1e293b;">KÝ
+                HIỆU MŨI TÊN</div>
+            <div class="legend-item"><span class="legend-icon">◁──</span> Kế thừa (Extends)</div>
+            <div class="legend-item"><span class="legend-icon">◁- -</span> Hiện thực hóa (Implements)</div>
+            <div class="legend-item"><span class="legend-icon">◇──</span> Kết hợp (Aggregation - Có chứa)</div>
+            <div class="legend-item"><span class="legend-icon">◆──</span> Cấu thành (Composition - Phụ thuộc chặt)</div>
+            <div class="legend-item"><span class="legend-icon">&lt;──</span> Sinh ra / Quan hệ thường</div>
+        </div>
+
+        <div class="mermaid">
+            classDiagram
+            direction TB
+
+            %% Interface & Tầng DAO
+            class IRepository~T~ {
+            &lt;&lt;interface&gt;&gt;
+            +themMoi(item: T) void
+            +capNhat(item: T) void
+            +xoa(id: int) void
+            +timKiem(id: int) T
+            +layTatCa() List~T~
+            }
+
+            class EmployeeDAO {
+            %% Đại diện cho Các lớp DAO (XeDAO, ChuXeDAO, HoaDonDAO, EmployeeDAO, LinhKienDAO, DichVuDAO, ...)
+            +login(user: String, pass: String) Employee
+            }
+
+            %% Kế thừa (Inheritance / Extends)
+            Person &lt;|-- Customer : extends
+            Person &lt;|-- Employee : extends
+            Employee &lt;|-- Owner : extends
+            Employee &lt;|-- Accountant : extends
+            Employee &lt;|-- Storekeeper : extends
+            Employee &lt;|-- Mechanic : extends
+            HangMuc &lt;|-- LinhKien : extends
+            HangMuc &lt;|-- DichVu : extends
+
+            class Person {
+            &lt;&lt;abstract&gt;&gt;
+            -id: int
+            -name: String
+            -phone: String
+            -address: String
+            -isDeleted: boolean
+            +Person()
+            +Person(id: int, name: String, phone: String, address: String)
+            +getId() int
+            +setId(id: int) void
+            +getName() String
+            +setName(name: String) void
+            +getPhone() String
+            +setPhone(phone: String) void
+            +getAddress() String
+            +setAddress(address: String) void
+            +isDeleted() boolean
+            +setDeleted(isDeleted: boolean) void
+            +nhapInfo(sc: Scanner) void
+            +getRoleDescription() String
+            }
+
+            class Customer {
+            -email: String
+            +Customer()
+            +Customer(...)
+            +getEmail() String
+            +setEmail(email: String) void
+            +nhapInfo(sc: Scanner) void
+            +getRoleDescription() String
+            }
+
+            class Employee {
+            &lt;&lt;abstract&gt;&gt;
+            -username: String
+            -password: String
+            -role: String
+            -salary: double
+            -status: String
+            +Employee()
+            +Employee(...)
+            +getUsername() String
+            +setUsername(username: String) void
+            +getPassword() String
+            +setPassword(password: String) void
+            +getRole() String
+            +setRole(role: String) void
+            +getSalary() double
+            +setSalary(salary: double) void
+            +getStatus() String
+            +setStatus(status: String) void
+            +nhapInfo(sc: Scanner) void
+            +getRoleDescription() String
+            }
+
+            class Owner {
+            +Owner()
+            +Owner(...)
+            +getRoleDescription() String
+            }
+
+            class Accountant {
+            +Accountant()
+            +Accountant(...)
+            +getRoleDescription() String
+            +nhapInfo(sc: Scanner) void
+            }
+
+            class Storekeeper {
+            +Storekeeper()
+            +Storekeeper(...)
+            +getRoleDescription() String
+            }
+
+            class Mechanic {
+            -spec: String
+            +Mechanic()
+            +Mechanic(...)
+            +getSpec() String
+            +setSpec(spec: String) void
+            +getRoleDescription() String
+            +nhapInfo(sc: Scanner) void
+            }
+
+            class HangMuc {
+            &lt;&lt;abstract&gt;&gt;
+            -ma: String
+            -ten: String
+            -donGia: double
+            +HangMuc()
+            +HangMuc(ma: String, ten: String, donGia: double)
+            +getMa() String
+            +setMa(ma: String) void
+            +getTen() String
+            +setTen(ten: String) void
+            +getDonGia() double
+            +setDonGia(donGia: double) void
+            +tinhThanhTien(soLuong: int) double
+            }
+
+            class LinhKien {
+            -soLuongTon: int
+            +getSoLuongTon() int
+            +setSoLuongTon(soLuongTon: int) void
+            +tinhThanhTien(soLuong: int) double
+            +nhapInfo(sc: Scanner) void
+            }
+
+            class DichVu {
+            +tinhThanhTien(soLuong: int) double
+            +nhapInfo(sc: Scanner) void
+            }
+
+            class Vehicle {
+            -licensePlate: String
+            -brand: String
+            -model: String
+            -productionYear: int
+            -color: String
+            -condition: String
+            -Customer: Customer
+            -isDeleted: boolean
+            +Vehicle()
+            +getLicensePlate() String
+            +setLicensePlate(lp: String) void
+            +getBrand() String
+            +setBrand(brand: String) void
+            +getModel() String
+            +setModel(model: String) void
+            +getProductionYear() int
+            +setProductionYear(y: int) void
+            +getColor() String
+            +setColor(color: String) void
+            +getCondition() String
+            +setCondition(cond: String) void
+            +getOwner() Customer
+            +setOwner(c: Customer) void
+            +isDeleted() boolean
+            +setDeleted(del: boolean) void
+            +nhapInfo(sc: Scanner) void
+            }
+
+            class RepairOrder {
+            -orderId: int
+            -vehicle: Vehicle
+            -entryDate: Date
+            -exitDate: Date
+            -mechanic: Mechanic
+            -status: String
+            -visualCondition: String
+            -details: List~RepairOrderDetail~
+            +RepairOrder()
+            +getOrderId() int
+            +setOrderId(id: int) void
+            +getVehicle() Vehicle
+            +setVehicle(v: Vehicle) void
+            +getEntryDate() Date
+            +setEntryDate(d: Date) void
+            +getExitDate() Date
+            +setExitDate(d: Date) void
+            +getMechanic() Mechanic
+            +setMechanic(m: Mechanic) void
+            +getStatus() String
+            +setStatus(s: String) void
+            +getVisualCondition() String
+            +setVisualCondition(c: String) void
+            +getDetails() List~RepairOrderDetail~
+            +setDetails(d: List~RepairOrderDetail~) void
+            +nhapInfo(sc: Scanner) void
+            }
+
+            class RepairOrderDetail {
+            -item: HangMuc
+            -quantity: int
+            +getItem() HangMuc
+            +setItem(item: HangMuc) void
+            +getQuantity() int
+            +setQuantity(quantity: int) void
+            +getSubTotal() double
+            }
+
+            class Invoice {
+            -invoiceId: int
+            -order: RepairOrder
+            -totalAmount: double
+            -createdAt: Date
+            +getInvoiceId() int
+            +setInvoiceId(id: int) void
+            +getOrder() RepairOrder
+            +setOrder(order: RepairOrder) void
+            +getTotalAmount() double
+            +setTotalAmount(amount: double) void
+            +getCreatedAt() Date
+            +setCreatedAt(createdAt: Date) void
+            +printInvoice() void
+            }
+
+            class DuplicateMaException {
+            &lt;&lt;Exception&gt;&gt;
+            +DuplicateMaException(message: String)
+            }
+
+            %% Các mối quan hệ (Relationships)
+            IRepository~T~ &lt;|.. EmployeeDAO : implements
+            Customer "1" &lt;-- "*" Vehicle : owns
+            Vehicle "1" &lt;-- "*" RepairOrder : belongs to
+            Mechanic "1" &lt;-- "*" RepairOrder : assigned to
+            RepairOrder "1" *-- "*" RepairOrderDetail : contains (composition)
+            HangMuc "1" &lt;-- "*" RepairOrderDetail : refers to
+            RepairOrder "1" &lt;-- "1" Invoice : generates
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+    <script>
+        // Khởi tạo thư viện Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            class: {
+                useMaxWidth: false // Giữ nguyên kích thước gốc để không bị mờ/nhỏ
+            }
+        });
+
+        // Đợi Mermaid vẽ xong, sau đó thêm tính năng kéo thả & phóng to (Zoom & Pan)
+        setTimeout(function() {
+            var svgs = document.querySelectorAll('.mermaid svg');
+            if (svgs.length > 0) {
+                var svg = svgs[0];
+                svg.style.width = '100%';
+                svg.style.height = '80vh';
+                
+                svgPanZoom(svg, {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,
+                    minZoom: 0.1,
+                    maxZoom: 10
+                });
+            }
+        }, 1000);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slide Thuyết Trình: Hệ Thống Quản Lý Gara Ô Tô - ITC</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Mermaid.js for drawing diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: { useWidth: true, htmlLabels: true }
+        });
+    </script>
+    <style>
+        :root {
+            --uef-blue: #002d62;
+            --uef-red: #991b1b;
+            --uef-gold: #FFC72C;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-color: #cbd5e1;
+            --code-bg: #1e293b;
+            --code-text: #f8f8f2;
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        /* Presentation Container */
+        .presentation-wrapper {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            max-width: 1600px;
+            max-height: 900px;
+            aspect-ratio: 16 / 9;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        /* Header (School Brand) */
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 2px solid var(--uef-blue);
+            background: linear-gradient(90deg, var(--card-bg) 70%, rgba(0,86,145,0.05) 100%);
+            z-index: 10;
+        }
+
+        .school-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .school-info i {
+            color: var(--uef-red);
+            font-size: 24px;
+        }
+
+        .school-name {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: var(--uef-blue);
+            text-transform: uppercase;
+        }
+
+        .school-sub {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .school-logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Styled SVG logo representing UEF */
+        .uef-logo-svg {
+            height: 48px;
+            width: auto;
+        }
+
+        /* Slide Content Area */
+        .slide-container {
+            flex: 1;
+            position: relative;
+            padding: 40px 60px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        /* Footer */
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .project-title {
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 11px;
+            color: var(--uef-blue);
+            font-weight: 700;
+        }
+
+        .page-number {
+            background-color: var(--uef-blue);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        /* Slides styling */
+        .slide {
+            display: none;
+            height: 100%;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Titles */
+        .slide-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--uef-blue);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 3px solid var(--uef-gold);
+            padding-bottom: 10px;
+            width: fit-content;
+        }
+
+        .slide-title i {
+            color: var(--uef-red);
+        }
+
+        /* Title Slide Custom Layout */
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+            background: radial-gradient(circle at 10% 20%, rgba(0,86,145,0.03) 0%, rgba(208,30,39,0.01) 90%);
+        }
+
+        .cover-title {
+            font-size: 42px;
+            font-weight: 900;
+            color: var(--uef-blue);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .cover-subtitle {
+            font-size: 18px;
+            color: var(--uef-red);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 40px;
+        }
+
+        .cover-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 50px;
+            width: 100%;
+            max-width: 1100px;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .cover-info-card {
+            background-color: rgba(0, 86, 145, 0.05);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid var(--uef-blue);
+        }
+
+        .cover-info-card h4 {
+            font-size: 16px;
+            color: var(--uef-blue);
+            margin-bottom: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .cover-info-card p {
+            font-size: 15px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .cover-members-card {
+            background-color: rgba(208, 30, 39, 0.04);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid var(--uef-red);
+        }
+
+        .cover-members-card h4 {
+            font-size: 16px;
+            color: var(--uef-red);
+            margin-bottom: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .members-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .member-item {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--card-bg);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .member-id {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Avatar tròn cạnh tên sinh viên */
+        .member-item-with-avatar {
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .member-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 2px solid var(--uef-red);
+        }
+
+        .member-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Split Columns Layout */
+        .columns {
+            display: flex;
+            gap: 40px;
+            flex: 1;
+            align-items: stretch;
+        }
+
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Generic Content Card */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+            border-color: var(--uef-blue);
+        }
+
+        .card-header {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--uef-blue);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .card-header i {
+            color: var(--uef-red);
+        }
+
+        /* Bullet lists */
+        ul.styled-list {
+            list-style: none;
+        }
+
+        ul.styled-list li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 12px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        ul.styled-list li::before {
+            content: "\f058";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: var(--uef-red);
+        }
+
+        ul.styled-list li strong {
+            color: var(--uef-blue);
+        }
+
+        /* Code Block Styling */
+        .code-container {
+            background-color: var(--code-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-header {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #94a3b8;
+            font-size: 11px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .code-content {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+            color: var(--code-text);
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .keyword { color: #ff79c6; font-weight: 600; }
+        .type { color: #8be9fd; }
+        .string { color: #f1fa8c; }
+        .comment { color: #6272a4; font-style: italic; }
+        .method { color: #50fa7b; }
+        .regex { color: #ffb86c; }
+
+        /* DB Tables layout */
+        .db-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .db-table {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .db-table-name {
+            background-color: var(--uef-blue);
+            color: white;
+            padding: 6px 12px;
+            font-weight: 700;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .db-cols {
+            padding: 8px;
+            font-size: 11px;
+            font-family: 'Fira Code', monospace;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .db-col {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 2px;
+        }
+
+        .db-pk { color: var(--uef-red); font-weight: bold; }
+        .db-fk { color: #d97706; font-weight: bold; }
+
+        /* Interactive Business Flow on Slide 13 */
+        .flow-interactive {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .flow-diagram-container {
+            flex: 1;
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+
+        .flow-steps {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .flow-step-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .flow-step-card.active {
+            border-color: var(--uef-red);
+            background-color: rgba(208, 30, 39, 0.05);
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(208, 30, 39, 0.2);
+            transform: scale(1.03);
+        }
+
+        /* Navigation Controls */
+        .controls-overlay {
+            position: absolute;
+            bottom: 80px;
+            right: 40px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: var(--uef-blue);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: var(--transition);
+        }
+
+        .nav-btn:hover {
+            background-color: var(--uef-red);
+            transform: scale(1.1);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Sidebar Navigation index */
+        .sidebar-toggle {
+            position: absolute;
+            left: 20px;
+            bottom: 20px;
+            background-color: var(--uef-blue);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            opacity: 1;
+        }
+
+        .sidebar-index {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 320px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            z-index: 99;
+            transform: translateX(-100%);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.15);
+        }
+
+        .sidebar-index.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--uef-blue);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .sidebar-header h3 {
+            font-size: 16px;
+            color: var(--uef-blue);
+            font-weight: 800;
+        }
+
+        .sidebar-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+
+        .sidebar-list {
+            list-style: none;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .sidebar-item {
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid transparent;
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(0, 86, 145, 0.05);
+            color: var(--uef-blue);
+        }
+
+        .sidebar-item.active {
+            background-color: var(--uef-blue);
+            color: white;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="presentation-wrapper">
+    <!-- Slide Header (School Brand) -->
+    <div class="slide-header">
+        <div class="school-info">
+            <img src="img/LoGoITC.jpg" alt="ITC Logo" style="height: 48px; width: auto; border-radius: 50%; object-fit: cover;">
+            <div>
+                <div class="school-name">Trường Cao đẳng Công nghệ thông tin TPHCM</div>
+                <div class="school-sub">Khoa Công nghệ thông tin - Điện tử • Đồ án OOP Java</div>
+            </div>
+        </div>
+        <!-- Header right side empty now -->
+    </div>
+
+    <!-- Slide Content Container -->
+    <div class="slide-container" id="slide-container">
+        
+        <!-- SLIDE 1: TRANG BÌA -->
+        <div class="slide cover-slide active" id="slide-1">
+            <h1 class="cover-title">Hệ Thống Quản Lý Gara Sửa Chữa Ô Tô</h1>
+            <p class="cover-subtitle">Báo cáo Đồ án cuối kỳ môn Lập trình hướng đối tượng (Java MVC & OOP)</p>
+            
+            <div class="cover-grid">
+                <div class="cover-info-card">
+                    <h4><i class="fa-solid fa-chalkboard-user"></i> Giảng viên hướng dẫn</h4>
+                    <p><strong>ThS. Châu Trần Trúc Ly</strong></p>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-top: 10px;">
+                        Khoa Công nghệ Thông tin - Điện tử<br>
+                        Trường Cao đẳng Công nghệ thông tin TPHCM (ITC)
+                    </p>
+                </div>
+                <div class="cover-members-card">
+                    <h4><i class="fa-solid fa-users"></i> Sinh viên thực hiện</h4>
+                    <div class="members-list">
+                        <div class="member-item member-item-with-avatar">
+                            <img class="member-avatar" src="img/tuat.jpg">                          
+                            <div class="member-text">
+                                <span>Lê Thành Tài</span>
+                                <span class="member-id">501250471</span>
+                            </div>
+                        </div>
+                        <div class="member-item member-item-with-avatar">
+                            <img class="member-avatar" src="img/quynh.jpg">                          
+                            <div class="member-text">
+                                <span>Thượng Mạnh Quỳnh</span>
+                                <span class="member-id">501250118</span>
+                            </div>
+                        </div>
+                        <div class="member-item member-item-with-avatar">
+                            <img class="member-avatar" src="img/phong.jpg">                          
+                            <div class="member-text">
+                                <span>Đỗ Trung Phong</span>
+                                <span class="member-id">501250126</span>
+                            </div>
+                        </div>
+                        <div class="member-item member-item-with-avatar">
+                            <img class="member-avatar" src="img/kiet.jpg">                          
+                            <div class="member-text">
+                                <span>Châu Tuấn Kiệt</span>
+                                <span class="member-id">506250495</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE TỔNG QUAN: MỤC LỤC -->
+        <div class="slide" id="slide-toc">
+            <h2 class="slide-title"><i class="fa-solid fa-list-ul"></i> Mục Lục Báo Cáo</h2>
+            <div class="columns">
+                <div class="column">
+                    <div class="card" style="height: 100%;">
+                        <ul class="styled-list" style="line-height: 1.8;">
+                            <li><strong>Phần 1:</strong> Đặt vấn đề & Mục tiêu <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 3</span></li>
+                            <li><strong>Phần 2:</strong> Sơ đồ lớp (Class Diagram) <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 4</span></li>
+                            <li><strong>Phần 3:</strong> Thiết kế CSDL quan hệ <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 5</span></li>
+                            <li><strong>Phần 4:</strong> Áp dụng các nguyên lý OOP <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 6-9</span>
+                                <ul style="margin-top: 8px; margin-bottom: 0;">
+                                    <li>Tính Đóng gói (Encapsulation) <span style="float: right; font-size: 13px; color: var(--text-muted);">Trang 6</span></li>
+                                    <li>Tính Kế thừa (Inheritance) <span style="float: right; font-size: 13px; color: var(--text-muted);">Trang 7</span></li>
+                                    <li>Tính Đa hình (Polymorphism) <span style="float: right; font-size: 13px; color: var(--text-muted);">Trang 8</span></li>
+                                    <li>Tính Trừu tượng (Abstraction) <span style="float: right; font-size: 13px; color: var(--text-muted);">Trang 9</span></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card" style="height: 100%;">
+                        <ul class="styled-list" style="line-height: 1.8;">
+                            <li><strong>Phần 5:</strong> Cơ chế xử lý CSDL (JDBC) <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 10</span></li>
+                            <li><strong>Phần 6:</strong> Ràng buộc nghiệp vụ tự động <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 11</span></li>
+                            <li><strong>Phần 7:</strong> Giải thuật thống kê (Map) <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 12</span></li>
+                            <li><strong>Phần 8:</strong> Xử lý ngoại lệ tùy chỉnh <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 13</span></li>
+                            <li><strong>Phần 9:</strong> Sơ đồ nghiệp vụ <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 14</span></li>
+                            <li><strong>Phần 10:</strong> Demo chương trình <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 15</span></li>
+                            <li><strong>Phần 11:</strong> Tổng kết & Hướng phát triển <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 16</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: ĐẶT VẤN ĐỀ & MỤC TIÊU -->
+        <div class="slide" id="slide-2">
+            <h2 class="slide-title"><i class="fa-solid fa-circle-question"></i> Đặt Vấn Đề & Mục Tiêu Đề Tài</h2>
+            <div class="columns">
+                <div class="column">
+                    <div class="card" style="flex: 1;">
+                        <div class="card-header"><i class="fa-solid fa-triangle-exclamation"></i> Hiện trạng & Vấn Đề</div>
+                        <ul class="styled-list">
+                            <li><strong>Lỗi thao tác thủ công:</strong> Gara dễ nhầm lẫn thông tin chủ xe và xe, khó tìm kiếm lịch sử sửa chữa.</li>
+                            <li><strong>Thất thoát kho linh kiện:</strong> Không kiểm soát chặt chẽ hàng tồn, dẫn đến xuất kho ảo hoặc thiếu phụ tùng khi đang thi công.</li>
+                            <li><strong>Tính toán sai lệch:</strong> Việc cộng gộp chi phí linh kiện, đơn giá dịch vụ và 10% VAT dễ tính toán sai khi làm thủ công.</li>
+                            <li><strong>Phân công không rõ ràng:</strong> Khó theo dõi trạng thái rảnh/bận của thợ máy dẫn đến chồng chéo công việc.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card" style="flex: 1;">
+                        <div class="card-header"><i class="fa-solid fa-bullseye"></i> Mục Tiêu Giải Quyết</div>
+                        <ul class="styled-list">
+                            <li><strong>Số hóa 100% quy trình:</strong> Quản lý chủ xe, xe, phiếu sửa chữa, hóa đơn và kho linh kiện trên một hệ thống thống nhất.</li>
+                            <li><strong>Quản lý kho an toàn:</strong> Áp dụng trừ kho tự động bằng cơ chế transaction trong CSDL, chặn xuất kho khi hết hàng.</li>
+                            <li><strong>Tính tiền tự động chính xác:</strong> Hóa đơn được sinh tự động từ phiếu dịch vụ, tính toán chi phí linh kiện + tiền công + VAT.</li>
+                            <li><strong>Báo cáo tức thời:</strong> Hỗ trợ thống kê doanh thu theo thời gian, Top linh kiện, Top thợ máy năng suất cao.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: SƠ ĐỒ LỚP (CLASS DIAGRAM) -->
+        <div class="slide" id="slide-3">
+            <h2 class="slide-title"><i class="fa-solid fa-project-diagram"></i> Sơ Đồ Lớp (Class Diagram)</h2>
+            <div style="text-align: center; margin-top: 80px;">
+                <p style="font-size: 18px; margin-bottom: 40px; color: var(--text-muted); line-height: 1.6;">
+                    Sơ đồ lớp (Class Diagram) chi tiết của toàn bộ hệ thống quản lý gara ô tô,<br>
+                    được thiết kế bằng ngôn ngữ <strong>Mermaid.js</strong>. <br><br>
+                    Sơ đồ hiển thị đầy đủ các lớp thực thể (Entity), bộ điều khiển (DAO),<br>
+                    các thuộc tính, phương thức và các mối quan hệ (Kế thừa, Liên kết...).
+                </p>
+                
+                <a href="SoDo.html" target="_blank" style="display: inline-block; padding: 18px 40px; font-size: 20px; font-weight: bold; background-color: var(--uef-blue); color: white; border-radius: 50px; text-decoration: none; box-shadow: 0 10px 20px rgba(0,45,98,0.3); transition: all 0.3s ease; text-transform: uppercase;">
+                    <i class="fa-solid fa-up-right-from-square" style="margin-right: 10px;"></i> Bấm để xem Sơ Đồ Lớp Tương Tác
+                </a>
+                
+                <style>
+                    #slide-3 a:hover {
+                        transform: translateY(-5px);
+                        background-color: var(--uef-red);
+                        box-shadow: 0 15px 25px rgba(208,30,39,0.4);
+                    }
+                </style>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: THIẾT KẾ CƠ SỞ DỮ LIỆU QUAN HỆ -->
+        <div class="slide" id="slide-4">
+            <h2 class="slide-title"><i class="fa-solid fa-database"></i> Thiết Kế Cơ Sở Dữ Liệu Quan Hệ (Database Schema)</h2>
+            <p style="font-size: 14px; margin-bottom: 15px; color: var(--text-muted);">Sử dụng hệ quản trị CSDL <strong>MySQL / MariaDB</strong>, các thực thể liên kết chặt chẽ bằng ràng buộc khóa ngoại (Foreign Key) đảm bảo tính toàn vẹn.</p>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <img src="img/SoDoSQL.jpg" alt="Sơ Đồ CSDL Quan Hệ" style="max-width: 100%; max-height: 480px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); object-fit: contain;">
+            </div>
+        </div>
+
+        <!-- SLIDE 5: NGUYÊN LÝ OOP: TÍNH ĐÓNG GÓI -->
+        <div class="slide" id="slide-5">
+            <h2 class="slide-title"><i class="fa-solid fa-lock"></i> Nguyên Lý OOP: Tính Đóng Gói (Encapsulation)</h2>
+            <div class="columns">
+                <div class="column" style="flex: 0.8;">
+                    <div class="card" style="flex: 1;">
+                        <div class="card-header"><i class="fa-solid fa-shield-halved"></i> Che giấu thông tin</div>
+                        <p style="font-size: 14px; line-height: 1.6; color: var(--text-muted);">
+                            Mọi thuộc tính trong các lớp thực thể (như <code>Person</code>, <code>Vehicle</code>, <code>HangMuc</code>) đều được đặt phạm vi <code>private</code>. 
+                            Việc này ngăn chặn các tác động thay đổi trực tiếp từ bên ngoài làm sai lệch dữ liệu.
+                        </p>
+                        <p style="font-size: 14px; line-height: 1.6; color: var(--text-muted); margin-top: 10px;">
+                            Bắt buộc giao tiếp thông qua các hàm **Getter/Setter** công khai.
+                        </p>
+                    </div>
+                    <div class="card" style="flex: 1;">
+                        <div class="card-header"><i class="fa-solid fa-circle-check"></i> Kiểm duyệt dữ liệu (Validation)</div>
+                        <p style="font-size: 14px; line-height: 1.6; color: var(--text-muted);">
+                            Dữ liệu đầu vào được kiểm duyệt chặt chẽ ngay khi Setter hoạt động hoặc khi thực hiện hàm nhập <code>nhapInfo()</code>. Ví dụ: Họ tên không được rỗng, số điện thoại phải khớp regex 10 chữ số của nhà mạng VN.
+                        </p>
+                    </div>
+                </div>
+                <div class="column" style="flex: 1.2;">
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>Person.java (Trích nguồn thực tế)</span>
+                            <span>Java OOP</span>
+                        </div>
+                        <div class="code-content">
+<pre><span class="keyword">public abstract class</span> <span class="type">Person</span> {
+    <span class="comment">// Các thuộc tính được đóng gói private</span>
+    <span class="keyword">private</span> <span class="type">int</span> id;
+    <span class="keyword">private</span> <span class="type">String</span> name;
+    <span class="keyword">private</span> <span class="type">String</span> phone;
+    <span class="keyword">private</span> <span class="type">String</span> address;
+
+    <span class="comment">// Getter cung cấp quyền đọc có kiểm soát</span>
+    <span class="keyword">public</span> <span class="type">String</span> <span class="method">getPhone</span>() { <span class="keyword">return</span> <span class="keyword">this</span>.phone; }
+
+    <span class="comment">// Kiểm tra dữ liệu đầu vào bằng Regex trong hàm nhập</span>
+    <span class="keyword">public void</span> <span class="method">nhapInfo</span>(<span class="type">Scanner</span> sc) {
+        System.out.print(<span class="string">"Nhap so dien thoai: "</span>);
+        <span class="keyword">this</span>.phone = sc.nextLine().trim();
+        <span class="keyword">while</span> (!<span class="keyword">this</span>.phone.<span class="method">matches</span>(<span class="string">"^(03|05|07|08|09)\\d{8}$"</span>)) {
+            System.out.print(<span class="string">"SĐT khong hop le! Moi nhap lai: "</span>);
+            <span class="keyword">this</span>.phone = sc.nextLine().trim();
+        }
+    }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: NGUYÊN LÝ OOP: TÍNH KẾ THỪA -->
+        <div class="slide" id="slide-6">
+            <h2 class="slide-title"><i class="fa-solid fa-diagram-predecessor"></i> Nguyên Lý OOP: Tính Kế Thừa (Inheritance)</h2>
+            <div class="columns">
+                <div class="column" style="flex: 1;">
+                    <div class="card" style="flex: 1;">
+                        <div class="card-header"><i class="fa-solid fa-network-wired"></i> Phân cấp Kế thừa tối ưu</div>
+                        <ul class="styled-list">
+                            <li><strong>Kế thừa Con người:</strong> 
+                                Lớp chi trừu tượng <code>Person</code> chứa các trường chung như <code>id</code>, <code>name</code>, <code>phone</code>, <code>address</code>. 
+                                Các lớp con <code>Customer</code> và <code>Employee</code> kế thừa qua từ khóa <code>extends</code> để tái sử dụng mã nguồn.
+                            </li>
+                            <li><strong>Mở rộng Nhân sự:</strong> 
+                                <code>Employee</code> tiếp tục được kế thừa bởi các nhân sự chuyên biệt: <code>Mechanic</code> (Thợ máy), <code>Accountant</code> (Kế toán), <code>Storekeeper</code> (Thủ kho) và <code>Owner</code> (Quản lý).
+                            </li>
+                            <li><strong>Kế thừa Hạng mục:</strong> 
+                                Lớp <code>HangMuc</code> (cha) được kế thừa bởi <code>LinhKien</code> (bổ sung số lượng tồn kho) và <code>DichVu</code>.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="column" style="flex: 1;">
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>LinhKien.java kế thừa HangMuc.java</span>
+                            <span>Java Kế thừa</span>
+                        </div>
+                        <div class="code-content">
+<pre><span class="comment">// Kế thừa lớp cha HangMuc thông qua từ khóa extends</span>
+<span class="keyword">public class</span> <span class="type">LinhKien</span> <span class="keyword">extends</span> <span class="type">HangMuc</span> {
+    <span class="comment">// Thuộc tính riêng biệt mở rộng của lớp con</span>
+    <span class="keyword">private</span> <span class="type">int</span> soLuongTon;
+    <span class="keyword">private</span> <span class="type">String</span> location;
+
+    <span class="comment">// Constructor lớp con gọi Constructor lớp cha</span>
+    <span class="keyword">public</span> <span class="method">LinhKien</span>(<span class="type">String</span> ma, <span class="type">String</span> ten, <span class="type">double</span> donGia, <span class="type">int</span> soLuongTon, <span class="type">String</span> location) {
+        <span class="keyword">super</span>(ma, ten, donGia); <span class="comment">// Gọi constructor lớp cha</span>
+        <span class="keyword">this</span>.soLuongTon = soLuongTon;
+        <span class="keyword">this</span>.location = location;
+    }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: NGUYÊN LÝ OOP: TÍNH ĐA HÌNH -->
+        <div class="slide" id="slide-7">
+            <h2 class="slide-title"><i class="fa-solid fa-shapes"></i> Nguyên Lý OOP: Tính Đa Hình (Polymorphism)</h2>
+            <div class="columns">
+                <div class="column" style="flex: 0.9;">
+                    <div class="card" style="flex: 1;">
+                        <div class="card-header"><i class="fa-solid fa-copy"></i> Ghi đè phương thức (Method Overriding)</div>
+                        <p style="font-size: 14px; line-height: 1.6; color: var(--text-muted);">
+                            Hành vi <code>tinhThanhTien(int soLuong)</code> được khai báo ở lớp cha <code>HangMuc</code> nhưng có cách xử lý đa hình ở các lớp con:
+                        </p>
+                        <ul class="styled-list" style="margin-top: 8px;">
+                            <li>Lớp <code>LinhKien</code> nhân với số lượng thực tế: <br><code>Đơn giá * Số lượng</code>.</li>
+                            <li>Lớp <code>DichVu</code> trả về đơn giá cố định (trọn gói): <br><code>Đơn giá</code>.</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="flex: 0.8;">
+                        <div class="card-header"><i class="fa-solid fa-layer-group"></i> Nạp chồng phương thức (Overloading)</div>
+                        <p style="font-size: 14px; line-height: 1.6; color: var(--text-muted);">
+                            Thể hiện qua việc nạp chồng các Constructor (Constructor không tham số phục vụ chuyển đổi CSDL, Constructor có tham số để khởi tạo trực tiếp).
+                        </p>
+                    </div>
+                </div>
+                <div class="column" style="flex: 1.1;">
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>Sự khác biệt đa hình trong triển khai code</span>
+                            <span>Java Đa Hình</span>
+                        </div>
+                        <div class="code-content">
+<pre><span class="comment">// 1. Triển khai tinhThanhTien trong LinhKien.java</span>
+<span class="keyword">@Override</span>
+<span class="keyword">public double</span> <span class="method">tinhThanhTien</span>(<span class="type">int</span> soLuong) {
+    <span class="keyword">return</span> getDonGia() * soLuong; <span class="comment">// Đơn giá nhân số lượng</span>
+}
+
+<span class="comment">// 2. Triển khai tinhThanhTien trong DichVu.java</span>
+<span class="keyword">@Override</span>
+<span class="keyword">public double</span> <span class="method">tinhThanhTien</span>(<span class="type">int</span> soLuong) {
+    <span class="keyword">return</span> getDonGia(); <span class="comment">// Trả về đơn giá cố định</span>
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: NGUYÊN LÝ OOP: TÍNH TRƯỜNG TƯỢNG -->
+        <div class="slide" id="slide-8">
+            <h2 class="slide-title"><i class="fa-solid fa-eye-slash"></i> Nguyên Lý OOP: Tính Trừu Tượng (Abstraction)</h2>
+            <div class="columns">
+                <div class="column" style="flex: 1;">
+                    <div class="card" style="flex: 1;">
+                        <div class="card-header"><i class="fa-solid fa-cube"></i> Lớp & Phương thức trừu tượng</div>
+                        <ul class="styled-list">
+                            <li><strong>Abstract Class:</strong> Lớp <code>Person</code> và <code>HangMuc</code> được khai báo <code>abstract</code>. Các lớp này đóng vai trò định nghĩa cấu trúc khung mẫu và không thể khởi tạo đối tượng trực tiếp.</li>
+                            <li><strong>Abstract Method:</strong> Phương thức <code>getRoleDescription()</code> và <code>tinhThanhTien(...)</code> không có phần thân, ép buộc các lớp con phải tự triển khai chi tiết nghiệp vụ.</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="flex: 0.9;">
+                        <div class="card-header"><i class="fa-solid fa-code-branch"></i> Thiết kế Interface đồng bộ</div>
+                        <p style="font-size: 14px; line-height: 1.5; color: var(--text-muted);">
+                            Dự án sử dụng Interface Generic <code>IRepository&lt;T&gt;</code> để định nghĩa trừu tượng các thao tác quản lý dữ liệu (CRUD). Tất cả lớp DAO đều phải triển khai Interface này.
+                        </p>
+                    </div>
+                </div>
+                <div class="column" style="flex: 1;">
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>IRepository.java (Interface Trừu Tượng)</span>
+                            <span>Java Interface</span>
+                        </div>
+                        <div class="code-content">
+<pre><span class="keyword">package</span> com.mycompany.quanlygara.controller;
+<span class="keyword">import</span> java.util.List;
+
+<span class="comment">// Interface định nghĩa các phương thức trừu tượng</span>
+<span class="keyword">public interface</span> <span class="type">IRepository</span>&lt;<span class="type">T</span>&gt; {
+    <span class="keyword">void</span> <span class="method">themMoi</span>(<span class="type">T</span> item) <span class="keyword">throws</span> <span class="type">Exception</span>;
+    <span class="keyword">void</span> <span class="method">capNhat</span>(<span class="type">T</span> item) <span class="keyword">throws</span> <span class="type">Exception</span>;
+    <span class="keyword">void</span> <span class="method">xoa</span>(<span class="type">Object</span> id) <span class="keyword">throws</span> <span class="type">Exception</span>;
+    <span class="type">List</span>&lt;<span class="type">T</span>&gt; <span class="method">layTatCa</span>() <span class="keyword">throws</span> <span class="type">Exception</span>;
+    <span class="type">T</span> <span class="method">layTheoId</span>(<span class="type">Object</span> id) <span class="keyword">throws</span> <span class="type">Exception</span>;
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: CƠ CHẾ LƯU TRỮ MYSQL & KẾT NỐI JDBC -->
+        <div class="slide" id="slide-9">
+            <h2 class="slide-title"><i class="fa-solid fa-link"></i> Cơ Chế Lưu Trữ MySQL & Kết Nối JDBC</h2>
+            <div class="columns">
+                <div class="column" style="flex: 0.9;">
+                    <div class="card" style="flex: 1;">
+                        <div class="card-header"><i class="fa-solid fa-circle-nodes"></i> Quản lý Kết nối JDBC</div>
+                        <p style="font-size: 14px; line-height: 1.5; color: var(--text-muted);">
+                            Thông qua lớp tập trung <code>DBConnection.java</code> để cấp phát đối tượng <code>Connection</code>. Dự án tích hợp thư viện MySQL Connector J Driver.
+                        </p>
+                    </div>
+                    <div class="card" style="flex: 1.2;">
+                        <div class="card-header"><i class="fa-solid fa-vault"></i> An toàn dữ liệu & Transactions</div>
+                        <ul class="styled-list">
+                            <li><strong>Ngăn chặn SQL Injection:</strong> Sử dụng <code>PreparedStatement</code> truyền tham số dạng <code>?</code> để an toàn.</li>
+                            <li><strong>Database Transaction:</strong> Áp dụng cơ chế tắt tự động lưu dữ liệu: <br>
+                                <code>conn.setAutoCommit(false);</code> <br>
+                                Chỉ khi trừ kho linh kiện thành công và thêm hóa đơn chi tiết thành công mới thực hiện lưu DB: <code>conn.commit();</code> <br>
+                                Nếu có bất kỳ lỗi nào xảy ra, hệ thống tự động hoàn tác: <code>conn.rollback();</code>.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="column" style="flex: 1.1;">
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>PhieuSuaChuaDAO.java (Database Transaction)</span>
+                            <span>Java JDBC Transaction</span>
+                        </div>
+                        <div class="code-content">
+<pre><span class="keyword">try</span> (<span class="type">Connection</span> conn = <span class="type">DBConnection</span>.getConnection()) {
+    conn.<span class="method">setAutoCommit</span>(<span class="keyword">false</span>); <span class="comment">// Bắt đầu Transaction</span>
+    <span class="keyword">try</span> {
+        <span class="comment">// Lệnh SQL 1: Trừ tồn kho linh kiện</span>
+        <span class="type">PreparedStatement</span> psUpdate = conn.prepareStatement(
+            <span class="string">"UPDATE linh_kien SET so_luong_ton = so_luong_ton - ? WHERE ma = ?"</span>);
+        psUpdate.executeUpdate();
+
+        <span class="comment">// Lệnh SQL 2: Thêm mới chi tiết phiếu sửa chữa</span>
+        <span class="type">PreparedStatement</span> psInsert = conn.prepareStatement(
+            <span class="string">"INSERT INTO repair_order_details (...) VALUES (...)"</span>);
+        psInsert.executeUpdate();
+
+        conn.<span class="method">commit</span>(); <span class="comment">// Thành công -> Commit</span>
+    } <span class="keyword">catch</span> (<span class="type">Exception</span> e) {
+        conn.<span class="method">rollback</span>(); <span class="comment">// Lỗi -> Rollback toàn bộ</span>
+        <span class="keyword">throw</span> e;
+    }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: RÀNG BUỘC NGHIỆP VỤ TỰ ĐỘNG THÔNG MINH -->
+        <div class="slide" id="slide-10">
+            <h2 class="slide-title"><i class="fa-solid fa-brain"></i> Ràng Buộc Nghiệp Vụ Tự Động Thông Minh</h2>
+            <div class="columns">
+                <div class="column" style="flex: 1;">
+                    <div class="card" style="flex: 1;">
+                        <div class="card-header"><i class="fa-solid fa-magnifying-glass-chart"></i> Phân tích Biển Số Xe Việt Nam</div>
+                        <p style="font-size: 14px; line-height: 1.6; color: var(--text-muted);">
+                            Hệ thống tích hợp bộ quy tắc phân loại 5 loại biển số xe bằng <strong>Regular Expression (Regex)</strong> cực kỳ chi tiết trong <code>Vehicle.java</code>.
+                        </p>
+                        <ul class="styled-list" style="margin-top: 8px;">
+                            <li><strong>Biển dân sự:</strong> Trắng, Vàng, Xanh. Kiểm tra cấu trúc 2 chữ số đầu, chữ cái Seri và định dạng số đuôi.</li>
+                            <li><strong>Biển quân đội:</strong> Chữ cái ký hiệu đơn vị (ví dụ: <code>AA</code>, <code>VT</code>, <code>HQ</code>) kèm 4-5 chữ số.</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="flex: 0.9;">
+                        <div class="card-header"><i class="fa-solid fa-map-location-dot"></i> Tự động truy xuất Tỉnh Thành & Đơn vị</div>
+                        <p style="font-size: 14px; line-height: 1.5; color: var(--text-muted);">
+                            Nếu biển số hợp lệ, hệ thống tự đối chiếu mã vùng để điền thông tin <strong>Nơi cấp / Đơn vị quản lý</strong> (Ví dụ: <code>29</code> -> Hà Nội, <code>59</code> -> TP.HCM, <code>VT</code> -> Tập đoàn Viettel) giúp tối ưu nhập liệu.
+                        </p>
+                    </div>
+                </div>
+                <div class="column" style="flex: 1;">
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>Vehicle.java (Xác thực Biển Số bằng Regex)</span>
+                            <span>Java Regular Expression</span>
+                        </div>
+                        <div class="code-content">
+<pre><span class="comment">// Regex phân tích cấu trúc biển số xe dân sự VN</span>
+<span class="type">String</span> civilRegex = <span class="string">"^([0-9]{2})([A-Z]{1,2}[0-9]?)[- ]?([0-9]{3,5}|[0-9]{3}\\.[0-9]{2})$"</span>;
+
+<span class="keyword">if</span> (inputPlate.<span class="method">matches</span>(civilRegex)) {
+    <span class="type">String</span> provCode = inputPlate.substring(0, 2);
+    <span class="type">String</span> provName = <span class="method">getProvinceName</span>(provCode); <span class="comment">// Lấy tên tỉnh</span>
+    <span class="keyword">if</span> (provName != <span class="keyword">null</span>) {
+        isValid = <span class="keyword">true</span>;
+        <span class="keyword">this</span>.licensePlate = inputPlate;
+        System.out.println(<span class="string">"Nơi cấp: "</span> + provName);
+    } <span class="keyword">else</span> {
+        System.out.println(<span class="string">"Mã tỉnh không tồn tại!"</span>);
+    }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: GIẢI THUẬT BÁO CÁO & THUẬT TOÁN SẢP XẾP MAP -->
+        <div class="slide" id="slide-11">
+            <h2 class="slide-title"><i class="fa-solid fa-chart-line"></i> Giải Thuật Báo Cáo & Thuật Toán Sắp Xếp Map</h2>
+            <div class="columns">
+                <div class="column" style="flex: 0.9;">
+                    <div class="card" style="flex: 1;">
+                        <div class="card-header"><i class="fa-solid fa-calculator"></i> SQL Aggregation</div>
+                        <p style="font-size: 14px; line-height: 1.5; color: var(--text-muted);">
+                            Để tính toán các chỉ số phức tạp (Doanh thu, Top xe sửa chữa, Top thợ tích cực), hệ thống sử dụng kết hợp các lệnh SQL: 
+                            <code>SUM()</code>, <code>COUNT()</code>, <code>JOIN</code> và <code>GROUP BY</code>.
+                        </p>
+                    </div>
+                    <div class="card" style="flex: 1.1;">
+                        <div class="card-header"><i class="fa-solid fa-list-ol"></i> Tận dụng LinkedHashMap trong Java</div>
+                        <p style="font-size: 14px; line-height: 1.5; color: var(--text-muted);">
+                            Truy vấn cơ sở dữ liệu đã sắp xếp sẵn dữ liệu giảm dần nhờ lệnh <code>ORDER BY count DESC</code>. 
+                            Tại lớp <code>ReportController</code>, dữ liệu trả về được đưa vào cấu trúc <strong>LinkedHashMap</strong>.
+                        </p>
+                        <p style="font-size: 14px; line-height: 1.5; color: var(--text-muted); margin-top: 8px;">
+                            <code>LinkedHashMap</code> duy trì chính xác thứ tự chèn phần tử, giúp View in báo cáo ra màn hình đúng thứ tự mà không cần tốn hiệu năng sắp xếp lại trong bộ nhớ Java.
+                        </p>
+                    </div>
+                </div>
+                <div class="column" style="flex: 1.1;">
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>ReportController.java (Thống kê và sắp xếp)</span>
+                            <span>Java Collections & SQL</span>
+                        </div>
+                        <div class="code-content">
+<pre><span class="keyword">public</span> <span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">Integer</span>&gt; <span class="method">getMostRepairedVehicles</span>(<span class="type">int</span> limit) {
+    <span class="comment">// LinkedHashMap để giữ nguyên thứ tự sắp xếp trả về từ SQL</span>
+    <span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">Integer</span>&gt; result = <span class="keyword">new</span> <span class="type">LinkedHashMap</span>&lt;&gt;();
+    <span class="type">String</span> sql = <span class="string">"SELECT ro.license_plate, COUNT(ro.order_id) as qty "</span> +
+                 <span class="string">"FROM repair_orders ro "</span> +
+                 <span class="string">"GROUP BY ro.license_plate "</span> +
+                 <span class="string">"ORDER BY qty DESC LIMIT ?"</span>; <span class="comment">// SQL sắp xếp sẵn</span>
+    <span class="keyword">try</span> (<span class="type">Connection</span> conn = <span class="type">DBConnection</span>.getConnection();
+         <span class="type">PreparedStatement</span> ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, limit);
+        <span class="type">ResultSet</span> rs = ps.executeQuery();
+        <span class="keyword">while</span> (rs.next()) {
+            result.put(rs.getString(<span class="string">"license_plate"</span>), rs.getInt(<span class="string">"qty"</span>));
+        }
+    }
+    <span class="keyword">return</span> result;
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 12: XỬ LÝ NGOẠI LỆ TÙY CHỈNH -->
+        <div class="slide" id="slide-12">
+            <h2 class="slide-title"><i class="fa-solid fa-triangle-exclamation"></i> Xử Lý Ngoại Lệ Tùy Chỉnh (Custom Exceptions)</h2>
+            <div class="columns">
+                <div class="column" style="flex: 1.1;">
+                    <div class="card" style="flex: 1.1;">
+                        <div class="card-header"><i class="fa-solid fa-code"></i> Định nghĩa Custom Exception</div>
+                        <p style="font-size: 14px; line-height: 1.5; color: var(--text-muted);">
+                            Hệ thống xây dựng các lớp ngoại lệ chuyên biệt mở rộng từ lớp <code>Exception</code> cơ sở:
+                        </p>
+                        <ul class="styled-list" style="margin-top: 8px;">
+                            <li><code>InvalidPlateNumberException</code>: Khi biển số xe không hợp quy chuẩn Việt Nam.</li>
+                            <li><code>PartOutOfStockException</code>: Khi số lượng yêu cầu trong phiếu vượt quá tồn kho thực tế.</li>
+                            <li><code>DuplicateMaException</code>: Khi thêm mới dịch vụ/linh kiện bị trùng mã.</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="flex: 0.9;">
+                        <div class="card-header"><i class="fa-solid fa-rotate-left"></i> Kỹ thuật lùi biến lặp (i--) độc đáo</div>
+                        <p style="font-size: 14px; line-height: 1.5; color: var(--text-muted);">
+                            Tại View, khi nhập dữ liệu lặp (ví dụ nhập danh sách 5 linh kiện), nếu DAO ném ngoại lệ (nhập trùng mã), khối catch sẽ bắt lỗi, hiển thị cảnh báo và thực hiện **<code>i--</code>** để lùi vòng lặp lại, cho phép người dùng nhập lại mà không bị mất lượt hay lỗi app.
+                        </p>
+                    </div>
+                </div>
+                <div class="column" style="flex: 0.9;">
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span>ConsoleView.java (Bắt lỗi và lùi biến lặp)</span>
+                            <span>Java Exception Handling</span>
+                        </div>
+                        <div class="code-content">
+<pre><span class="keyword">for</span> (<span class="type">int</span> i = 0; i &lt; count; i++) {
+    System.out.println(<span class="string">"Nhập thông tin thứ "</span> + (i+1));
+    <span class="type">DichVu</span> dv = <span class="keyword">new</span> <span class="type">DichVu</span>();
+    dv.nhapInfo(sc);
+    <span class="keyword">try</span> {
+        dichVuDAO.themMoi(dv);
+    } <span class="keyword">catch</span> (<span class="type">Exception</span> e) {
+        System.out.println(<span class="string">"Lỗi: "</span> + e.getMessage());
+        i--; <span class="comment">// Lùi vòng lặp để nhập lại</span>
+    }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 13: LUỒNG NGHIỆP VỤ THỰC TẾ -->
+        <div class="slide" id="slide-13">
+            <h2 class="slide-title"><i class="fa-solid fa-route"></i> Luồng Nghiệp Vụ Thực Tế (Business Workflow)</h2>
+            
+            <div style="text-align: center; margin-top: 80px;">
+                <p style="font-size: 18px; margin-bottom: 40px; color: var(--text-muted); line-height: 1.6;">
+                    Biểu đồ luồng nghiệp vụ thực tế (Business Workflow) của hệ thống,<br>
+                    mô tả chi tiết các bước từ khi tiếp nhận xe đến lúc thanh toán xuất hóa đơn.<br><br>
+                    Nhấn vào nút bên dưới để mở trang biểu đồ tương tác đầy đủ kích thước.
+                </p>
+                
+                <a href="SoDoNghiepVu.html" target="_blank" class="diagram-link-btn" style="display: inline-block; padding: 18px 40px; font-size: 20px; font-weight: bold; background-color: var(--uef-blue); color: white; border-radius: 50px; text-decoration: none; box-shadow: 0 10px 20px rgba(0,45,98,0.3); transition: all 0.3s ease; text-transform: uppercase;">
+                    <i class="fa-solid fa-up-right-from-square" style="margin-right: 10px;"></i> Mở Sơ Đồ Luồng Nghiệp Vụ
+                </a>
+
+                <style>
+                    .diagram-link-btn:hover {
+                        transform: translateY(-5px);
+                        background-color: #008000;
+                        box-shadow: 0 15px 25px rgba(0,128,0,0.4);
+                    }
+                </style>
+            </div>
+        </div>
+
+        <!-- SLIDE DEMO -->
+        <div class="slide cover-slide" id="slide-demo">
+            <div style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%;">
+                <h1 style="font-size: 150px; color: var(--uef-blue); margin: 0; text-align: center; letter-spacing: 20px; text-shadow: 0 10px 25px rgba(0,45,98,0.2);">DEMO</h1>
+            </div>
+        </div>
+
+        <!-- SLIDE 14: TỔNG KẾT & HƯỚNG PHÁT TRIỂN -->
+        <div class="slide" id="slide-14">
+            <h2 class="slide-title"><i class="fa-solid fa-graduation-cap"></i> Tổng Kết & Hướng Phát Triển Đồ Án</h2>
+            <div class="columns">
+                <div class="column">
+                    <div class="card" style="flex: 1;">
+                        <div class="card-header"><i class="fa-solid fa-square-check"></i> Kết quả Đạt Được</div>
+                        <ul class="styled-list">
+                            <li><strong>Kiến trúc chuẩn:</strong> Ứng dụng triển khai mô hình MVC khoa học, tách bạch code giao diện view và DAO kết nối MySQL.</li>
+                            <li><strong>Áp dụng triệt để OOP:</strong> Sử dụng nhuần nhuyễn Đóng gói (private fields/validation), Kế thừa (Person, HangMuc), Đa hình (Override tính thành tiền) và Trực quan (Abstract classes & Interface).</li>
+                            <li><strong>Ổn định:</strong> Giao dịch CSDL kho (Transactions) hoạt động chính xác, xử lý triệt để ngoại lệ và chống trùng lặp dữ liệu.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card" style="flex: 1;">
+                        <div class="card-header"><i class="fa-solid fa-arrow-trend-up"></i> Định Hướng Phát Triển</div>
+                        <ul class="styled-list">
+                            <li><strong>Phát triển giao diện GUI:</strong> Chuyển đổi giao diện CLI (Console) hiện tại sang giao diện trực quan bằng **JavaFX** hoặc **Java Swing**.</li>
+                            <li><strong>Phát triển phiên bản Web:</strong> Xây dựng hệ thống backend bằng **Spring Boot** kết hợp frontend **ReactJS** để sử dụng trên trình duyệt và thiết bị di động.</li>
+                            <li><strong>Công nghệ phụ trợ:</strong> Tích hợp camera nhận diện biển số xe tự động khi vào cổng, xuất hóa đơn QR Code ngân hàng.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 15: CẢM ƠN -->
+        <div class="slide cover-slide" id="slide-15">
+            <h1 class="cover-title" style="color: var(--uef-red); font-size: 64px; margin-bottom: 20px;">XIN CHÂN THÀNH CẢM ƠN!</h1>
+            <p class="cover-subtitle" style="color: var(--uef-blue); font-size: 20px; font-weight: 700; margin-bottom: 30px;">Hội đồng đánh giá & Giảng viên hướng dẫn: ThS. Châu Trần Trúc Ly</p>
+            
+            <div style="background-color: rgba(0,86,145,0.05); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); max-width: 600px; text-align: center; margin-top: 20px;">
+                <p style="font-size: 16px; margin-bottom: 10px;"><strong>ĐỒ ÁN CUỐI KỲ MÔN LẬP TRÌNH HƯỚNG ĐỐI TƯỢNG (JAVA)</strong></p>
+                <p style="font-size: 14px; color: var(--text-muted);">
+                    Nhóm sinh viên thực hiện đồ án:<br>
+                    Lê Thành Tài • Thượng Mạnh Quỳnh • Đỗ Trung Phong • Châu Tuấn Kiệt
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Navigation controls & overlay -->
+    <div class="controls-overlay">
+        <button class="nav-btn" id="prev-btn" title="Slide trước (Mũi tên Trái)"><i class="fa-solid fa-arrow-left"></i></button>
+        <button class="nav-btn" id="next-btn" title="Slide sau (Mũi tên Phải)"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebar-toggle-btn"><i class="fa-solid fa-list"></i> Mục lục Slide</button>
+
+    <!-- Sidebar index panel -->
+    <div class="sidebar-index" id="sidebar-index">
+        <div class="sidebar-header">
+            <h3>Danh sách slide</h3>
+            <button class="sidebar-close" id="sidebar-close-btn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <ul class="sidebar-list" id="sidebar-list">
+            <!-- Populated via Javascript -->
+        </ul>
+    </div>
+
+    <!-- Slide Footer -->
+    <div class="slide-footer">
+        <div class="project-title">Đề tài: Hệ Thống Quản Lý Gara Ô Tô (MVC - Java - OOP)</div>
+        <div class="page-number" id="page-indicator">Trang 1 / 15</div>
+    </div>
+</div>
+
+<script>
+    // Slide Management
+    let currentSlide = 1;
+
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const pageIndicator = document.getElementById('page-indicator');
+    const sidebarIndex = document.getElementById('sidebar-index');
+    const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+    const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+    const sidebarList = document.getElementById('sidebar-list');
+
+    // Slide Titles for index
+    const slideTitles = [
+        "1. Trang bìa & Giới thiệu đề tài",
+        "2. Mục lục tổng quan báo cáo",
+        "3. Đặt vấn đề & Mục tiêu đề tài",
+        "4. Sơ đồ lớp (Class Diagram)",
+        "5. Thiết kế cơ sở dữ liệu quan hệ",
+        "6. Nguyên lý OOP: Tính Đóng gói",
+        "7. Nguyên lý OOP: Tính Kế thừa",
+        "8. Nguyên lý OOP: Tính Đa hình",
+        "9. Nguyên lý OOP: Tính Trừu tượng",
+        "10. Cơ chế MySQL & Kết nối JDBC",
+        "11. Ràng buộc nghiệp vụ tự động",
+        "12. Giải thuật báo cáo & Sắp xếp Map",
+        "13. Xử lý ngoại lệ tùy chỉnh",
+        "14. Sơ đồ nghiệp vụ",
+        "15. Demo chương trình",
+        "16. Tổng kết & Hướng phát triển",
+        "17. Lời cảm ơn"
+    ];
+    
+    let totalSlides = slideTitles.length;
+
+    // Initialize sidebar items
+    slideTitles.forEach((title, idx) => {
+        const li = document.createElement('li');
+        li.className = `sidebar-item ${idx === 0 ? 'active' : ''}`;
+        li.innerHTML = `<i class="fa-regular fa-file-powerpoint"></i> ${title}`;
+        li.onclick = () => {
+            goToSlide(idx + 1);
+            closeSidebar();
+        };
+        sidebarList.appendChild(li);
+    });
+
+    function updateSlides() {
+        // Toggle slide display
+        const slides = document.querySelectorAll('.slide');
+        totalSlides = slides.length;
+        slides.forEach((slide, idx) => {
+            if (idx === currentSlide - 1) {
+                slide.classList.add('active');
+            } else {
+                slide.classList.remove('active');
+            }
+        });
+
+        // Update footer page indicator
+        pageIndicator.textContent = `Trang ${currentSlide} / ${totalSlides}`;
+
+        // Update active class in sidebar items
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        sidebarItems.forEach((item, idx) => {
+            if (idx === currentSlide - 1) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    function nextSlide() {
+        if (currentSlide < totalSlides) {
+            currentSlide++;
+            updateSlides();
+        }
+    }
+
+    function prevSlide() {
+        if (currentSlide > 1) {
+            currentSlide--;
+            updateSlides();
+        }
+    }
+
+    function goToSlide(n) {
+        if (n >= 1 && n <= totalSlides) {
+            currentSlide = n;
+            updateSlides();
+        }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+            nextSlide();
+        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+            prevSlide();
+        }
+    });
+
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    // Sidebar Toggle
+    sidebarToggleBtn.addEventListener('click', () => {
+        sidebarIndex.classList.add('open');
+    });
+
+    sidebarCloseBtn.addEventListener('click', closeSidebar);
+
+    function closeSidebar() {
+        sidebarIndex.classList.remove('open');
+    }
+
+    // Interactive flowchart highlight on Slide 13
+    function highlightStep(stepNum) {
+        // Remove active class from all step cards
+        const cards = document.querySelectorAll('.flow-step-card');
+        cards.forEach((card, idx) => {
+            if (idx === stepNum - 1) {
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
+        });
+
+        // Set colors in SVG nodes
+        for (let i = 1; i <= 5; i++) {
+            const node = document.getElementById(`node-${i}`);
+            const textNode = document.getElementById(`text-node-${i}`);
+            if (i === stepNum) {
+                node.setAttribute('fill', '#e1f5fe');
+                node.setAttribute('stroke', '#005691');
+                node.setAttribute('stroke-width', '3');
+                if (textNode) textNode.setAttribute('fill', '#005691');
+            } else {
+                node.setAttribute('fill', '#f8fafc');
+                node.setAttribute('stroke', '#cbd5e1');
+                node.setAttribute('stroke-width', '2');
+                if (textNode) textNode.setAttribute('fill', '#475569');
+            }
+        }
+
+        // Highlight arrows
+        for (let i = 2; i <= 5; i++) {
+            const link = document.getElementById(`link-${i-1}-${i}`);
+            const arrow = document.getElementById(`arrow-${i-1}-${i}`);
+            if (link && arrow) {
+                if (stepNum >= i) {
+                    link.setAttribute('stroke', '#005691');
+                    arrow.setAttribute('fill', '#005691');
+                } else {
+                    link.setAttribute('stroke', '#cbd5e1');
+                    arrow.setAttribute('fill', '#cbd5e1');
+                }
+            }
+        }
+    }
+
+
+</script>
+</body>
+</html>
