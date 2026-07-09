@@ -18,6 +18,7 @@ import java.util.Scanner;
  */
 public class Customer extends Person {
 
+    // Email (Địa chỉ thư điện tử)
     private String email;
 
     // Constructor mặc định (Không tham số)
@@ -33,10 +34,12 @@ public class Customer extends Person {
         this.email = email;
     }
 
+    // Lấy giá trị của thuộc tính Email
     public String getEmail() {
         return email;
     }
 
+    // Cập nhật giá trị cho thuộc tính Email
     public void setEmail(String email) {
         this.email = email;
     }
@@ -51,10 +54,10 @@ public class Customer extends Person {
     public void nhapInfo(Scanner sc) {
         super.nhapInfo(sc);
         System.out.print("Nhap email: ");
-        this.email = sc.nextLine().trim();
+        this.email = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         while (!this.email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
             System.out.print("Email khong hop le (Phai chua @ va dung dinh dang)! Moi nhap lai: ");
-            this.email = sc.nextLine().trim();
+            this.email = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
     }
 

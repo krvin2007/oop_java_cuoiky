@@ -9,6 +9,7 @@ package com.mycompany.quanlygara.model;
  * @author ManhQuynh
  */
 public class DuplicateMaException extends Exception {
+    // Khởi tạo đối tượng DuplicateMaException mới
     public DuplicateMaException(String message) {
         super(message);
     }

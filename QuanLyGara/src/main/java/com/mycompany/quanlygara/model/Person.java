@@ -21,10 +21,15 @@ import java.util.Scanner;
  */
 public abstract class Person {
     // Các thuộc tính private (Đóng gói dữ liệu)
+    // Mã định danh (ID)
     private int id;
+    // Họ và tên (Name)
     private String name;
+    // Số điện thoại (Phone)
     private String phone;
+    // Địa chỉ (Address)
     private String address;
+    // Trạng thái đã xóa (Is Deleted)
     private boolean isDeleted;
 
     // Constructor mặc định (Không tham số)
@@ -41,10 +46,12 @@ public abstract class Person {
         this.isDeleted = false;
     }
 
+    // Lấy trạng thái boolean của thuộc tính Deleted
     public boolean isDeleted() {
         return isDeleted;
     }
 
+    // Cập nhật giá trị cho thuộc tính Deleted
     public void setDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
@@ -98,26 +105,26 @@ public abstract class Person {
     public void nhapInfo(Scanner sc) {
         // Nhập họ tên: Không được để trống
         System.out.print("Nhap ho ten: ");
-        this.name = sc.nextLine().trim();
+        this.name = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         while (this.name.isEmpty()) {
             System.out.print("Ho ten khong duoc de trong! Moi nhap lai: ");
-            this.name = sc.nextLine().trim();
+            this.name = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
 
         // Nhập số điện thoại: Kiểm tra định dạng Regex (bắt đầu bằng 0, gồm 10 số)
         System.out.print("Nhap so dien thoai: ");
-        this.phone = sc.nextLine().trim();
+        this.phone = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         while (!this.phone.matches("^(03|05|07|08|09)\\d{8}$")) {
             System.out.print("So dien thoai khong hop le (Gom 10 so, bat dau bang 03,05,07,08,09). Moi nhap lai: ");
-            this.phone = sc.nextLine().trim();
+            this.phone = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
 
         // Nhập địa chỉ: Không được để trống
         System.out.print("Nhap dia chi: ");
-        this.address = sc.nextLine().trim();
+        this.address = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         while (this.address.isEmpty()) {
             System.out.print("Dia chi khong duoc de trong! Moi nhap lai: ");
-            this.address = sc.nextLine().trim();
+            this.address = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
     }
 

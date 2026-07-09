@@ -20,11 +20,12 @@ import java.util.List;
  */
 public class ChuXeDAO implements IRepository<Customer> {
 
+    // Thêm mới một bản ghi vào cơ sở dữ liệu
     @Override
     public void themMoi(Customer Customer) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
             if (Customer.getId() > 0) {
-                try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM owners WHERE id = ?")) {
+                try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM chu_xe WHERE id = ?")) {
                     ps.setInt(1, Customer.getId());
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
@@ -33,7 +34,7 @@ public class ChuXeDAO implements IRepository<Customer> {
                     }
                 }
             }
-            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM owners WHERE phone = ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM chu_xe WHERE sdt = ?")) {
                 ps.setString(1, Customer.getPhone());
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -44,7 +45,7 @@ public class ChuXeDAO implements IRepository<Customer> {
 
             if (Customer.getId() > 0) {
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "INSERT INTO owners (id, name, phone, address, email) VALUES (?, ?, ?, ?, ?)")) {
+                        "INSERT INTO chu_xe (id, ten, sdt, dia_chi, email) VALUES (?, ?, ?, ?, ?)")) {
                     ps.setInt(1, Customer.getId());
                     ps.setString(2, Customer.getName());
                     ps.setString(3, Customer.getPhone());
@@ -54,7 +55,7 @@ public class ChuXeDAO implements IRepository<Customer> {
                 }
             } else {
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "INSERT INTO owners (name, phone, address, email) VALUES (?, ?, ?, ?)",
+                        "INSERT INTO chu_xe (ten, sdt, dia_chi, email) VALUES (?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
                     ps.setString(1, Customer.getName());
                     ps.setString(2, Customer.getPhone());
@@ -71,10 +72,11 @@ public class ChuXeDAO implements IRepository<Customer> {
         }
     }
 
+    // Cập nhật thông tin bản ghi trong cơ sở dữ liệu
     @Override
     public void capNhat(Customer Customer) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM owners WHERE phone = ? AND id <> ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM chu_xe WHERE sdt = ? AND id <> ?")) {
                 ps.setString(1, Customer.getPhone());
                 ps.setInt(2, Customer.getId());
                 try (ResultSet rs = ps.executeQuery()) {
@@ -84,7 +86,7 @@ public class ChuXeDAO implements IRepository<Customer> {
                 }
             }
             try (PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE owners SET name = ?, phone = ?, address = ?, email = ? WHERE id = ?")) {
+                    "UPDATE chu_xe SET ten = ?, sdt = ?, dia_chi = ?, email = ? WHERE id = ?")) {
                 ps.setString(1, Customer.getName());
                 ps.setString(2, Customer.getPhone());
                 ps.setString(3, Customer.getAddress());
@@ -98,11 +100,12 @@ public class ChuXeDAO implements IRepository<Customer> {
         }
     }
 
+    // Xóa bản ghi khỏi cơ sở dữ liệu
     @Override
     public void xoa(Object id) throws Exception {
         int targetId = (Integer) id;
         try (Connection conn = DBConnection.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM vehicles WHERE owner_id = ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM xe WHERE ma_chu_xe = ?")) {
                 ps.setInt(1, targetId);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next() && rs.getInt(1) > 0) {
@@ -110,7 +113,7 @@ public class ChuXeDAO implements IRepository<Customer> {
                     }
                 }
             }
-            try (PreparedStatement ps = conn.prepareStatement("UPDATE owners SET is_deleted = TRUE WHERE id = ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("UPDATE chu_xe SET da_xoa = TRUE WHERE id = ?")) {
                 ps.setInt(1, targetId);
                 int rows = ps.executeUpdate();
                 if (rows == 0) {
@@ -120,10 +123,11 @@ public class ChuXeDAO implements IRepository<Customer> {
         }
     }
 
+    // Lấy toàn bộ danh sách dữ liệu
     @Override
     public List<Customer> layTatCa() throws Exception {
         List<Customer> list = new ArrayList<>();
-        String sql = "SELECT id, name, phone, address, email, is_deleted FROM owners WHERE is_deleted = FALSE ORDER BY id";
+        String sql = "SELECT id, ten, sdt, dia_chi, email, da_xoa FROM chu_xe WHERE da_xoa = FALSE ORDER BY id";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -134,15 +138,17 @@ public class ChuXeDAO implements IRepository<Customer> {
         return list;
     }
 
+    // Lấy dữ liệu chi tiết theo mã định danh (ID)
     @Override
     public Customer layTheoId(Object id) throws Exception {
         int targetId = (Integer) id;
-        String sql = "SELECT id, name, phone, address, email, is_deleted FROM owners WHERE id = ? AND is_deleted = FALSE";
+        String sql = "SELECT id, ten, sdt, dia_chi, email, da_xoa FROM chu_xe WHERE id = ? AND da_xoa = FALSE";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, targetId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
+                    // Ánh xạ dữ liệu từ ResultSet sang đối tượng Java
                     return mapRow(rs);
                 }
             }
@@ -150,9 +156,10 @@ public class ChuXeDAO implements IRepository<Customer> {
         return null;
     }
 
+    // Tìm kiếm dữ liệu dựa trên điều kiện đầu vào
     public List<Customer> searchByName(String keyword) throws Exception {
         List<Customer> result = new ArrayList<>();
-        String sql = "SELECT id, name, phone, address, email, is_deleted FROM owners WHERE LOWER(name) LIKE ? AND is_deleted = FALSE ORDER BY id";
+        String sql = "SELECT id, ten, sdt, dia_chi, email, da_xoa FROM chu_xe WHERE LOWER(ten) LIKE ? AND da_xoa = FALSE ORDER BY id";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword.toLowerCase() + "%");
@@ -165,9 +172,11 @@ public class ChuXeDAO implements IRepository<Customer> {
         return result;
     }
 
+    // Ánh xạ dữ liệu từ ResultSet sang đối tượng Java
     private Customer mapRow(ResultSet rs) throws SQLException {
-        Customer Customer = new Customer(rs.getInt("id"), rs.getString("name"), rs.getString("phone"), rs.getString("address"), rs.getString("email"));
-        Customer.setDeleted(rs.getBoolean("is_deleted"));
+        Customer Customer = new Customer(rs.getInt("id"), rs.getString("ten"), rs.getString("sdt"), rs.getString("dia_chi"), rs.getString("email"));
+        Customer.setDeleted(rs.getBoolean("da_xoa"));
         return Customer;
     }
 }
+

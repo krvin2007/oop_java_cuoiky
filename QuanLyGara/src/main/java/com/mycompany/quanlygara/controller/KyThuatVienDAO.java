@@ -12,11 +12,12 @@ import java.util.List;
 
 public class KyThuatVienDAO implements IRepository<Mechanic> {
 
+    // Thêm mới một bản ghi vào cơ sở dữ liệu
     @Override
     public void themMoi(Mechanic mechanic) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
             if (mechanic.getId() > 0) {
-                try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM employees WHERE id = ?")) {
+                try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM nhan_vien WHERE id = ?")) {
                     ps.setInt(1, mechanic.getId());
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
@@ -25,7 +26,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
                     }
                 }
             }
-            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM employees WHERE phone = ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM nhan_vien WHERE sdt = ?")) {
                 ps.setString(1, mechanic.getPhone());
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -42,7 +43,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
 
             if (mechanic.getId() > 0) {
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "INSERT INTO employees (id, name, phone, address, username, password, role, specialization, salary, status) VALUES (?, ?, ?, ?, ?, ?, 'KyThuat', ?, ?, ?)")) {
+                        "INSERT INTO nhan_vien (id, ten, sdt, dia_chi, ten_dang_nhap, mat_khau, vai_tro, chuyen_mon, luong, trang_thai) VALUES (?, ?, ?, ?, ?, ?, 'KyThuat', ?, ?, ?)")) {
                     ps.setInt(1, mechanic.getId());
                     ps.setString(2, mechanic.getName());
                     ps.setString(3, mechanic.getPhone());
@@ -56,7 +57,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
                 }
             } else {
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "INSERT INTO employees (name, phone, address, username, password, role, specialization, salary, status) VALUES (?, ?, ?, ?, ?, 'KyThuat', ?, ?, ?)",
+                        "INSERT INTO nhan_vien (ten, sdt, dia_chi, ten_dang_nhap, mat_khau, vai_tro, chuyen_mon, luong, trang_thai) VALUES (?, ?, ?, ?, ?, 'KyThuat', ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
                     ps.setString(1, mechanic.getName());
                     ps.setString(2, mechanic.getPhone());
@@ -77,10 +78,11 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
         }
     }
 
+    // Cập nhật thông tin bản ghi trong cơ sở dữ liệu
     @Override
     public void capNhat(Mechanic mechanic) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM employees WHERE phone = ? AND id <> ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM nhan_vien WHERE sdt = ? AND id <> ?")) {
                 ps.setString(1, mechanic.getPhone());
                 ps.setInt(2, mechanic.getId());
                 try (ResultSet rs = ps.executeQuery()) {
@@ -90,7 +92,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
                 }
             }
             try (PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE employees SET name = ?, phone = ?, address = ?, username = ?, password = ?, specialization = ?, salary = ?, status = ? WHERE id = ? AND role = 'KyThuat'")) {
+                    "UPDATE nhan_vien SET ten = ?, sdt = ?, dia_chi = ?, ten_dang_nhap = ?, mat_khau = ?, chuyen_mon = ?, luong = ?, trang_thai = ? WHERE id = ? AND vai_tro = 'KyThuat'")) {
                 ps.setString(1, mechanic.getName());
                 ps.setString(2, mechanic.getPhone());
                 ps.setString(3, mechanic.getAddress());
@@ -108,11 +110,12 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
         }
     }
 
+    // Xóa bản ghi khỏi cơ sở dữ liệu
     @Override
     public void xoa(Object id) throws Exception {
         int targetId = (Integer) id;
         try (Connection conn = DBConnection.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM repair_orders WHERE mechanic_id = ? AND status != 'COMPLETED'")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM phieu_sua_chua WHERE ma_tho_may = ? AND trang_thai != 'COMPLETED'")) {
                 ps.setInt(1, targetId);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next() && rs.getInt(1) > 0) {
@@ -120,7 +123,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
                     }
                 }
             }
-            try (PreparedStatement ps = conn.prepareStatement("UPDATE employees SET is_deleted = TRUE WHERE id = ? AND role = 'KyThuat'")) {
+            try (PreparedStatement ps = conn.prepareStatement("UPDATE nhan_vien SET da_xoa = TRUE WHERE id = ? AND vai_tro = 'KyThuat'")) {
                 ps.setInt(1, targetId);
                 int rows = ps.executeUpdate();
                 if (rows == 0) {
@@ -130,28 +133,36 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
         }
     }
 
+    // Lấy toàn bộ danh sách dữ liệu
     @Override
     public List<Mechanic> layTatCa() throws Exception {
-        return querySql("SELECT id, name, phone, address, username, password, specialization, salary, status, is_deleted FROM employees WHERE role = 'KyThuat' AND is_deleted = FALSE ORDER BY id", null);
+        // Thực thi phương thức querySql để xử lý logic tương ứng
+        return querySql("SELECT id, ten, sdt, dia_chi, ten_dang_nhap, mat_khau, chuyen_mon, luong, trang_thai, da_xoa FROM nhan_vien WHERE vai_tro = 'KyThuat' AND da_xoa = FALSE ORDER BY id", null);
     }
 
+    // Lấy dữ liệu chi tiết theo mã định danh (ID)
     @Override
     public Mechanic layTheoId(Object id) throws Exception {
         int targetId = (Integer) id;
         List<Mechanic> list = querySql(
-                "SELECT id, name, phone, address, username, password, specialization, salary, status, is_deleted FROM employees WHERE id = ? AND role = 'KyThuat' AND is_deleted = FALSE", targetId);
+                "SELECT id, ten, sdt, dia_chi, ten_dang_nhap, mat_khau, chuyen_mon, luong, trang_thai, da_xoa FROM nhan_vien WHERE id = ? AND vai_tro = 'KyThuat' AND da_xoa = FALSE", targetId);
         return list.isEmpty() ? null : list.get(0);
     }
 
+    // Sắp xếp danh sách dữ liệu
     public List<Mechanic> sortBySalary(boolean ascending) throws Exception {
         String order = ascending ? "ASC" : "DESC";
-        return querySql("SELECT id, name, phone, address, username, password, specialization, salary, status, is_deleted FROM employees WHERE role = 'KyThuat' AND is_deleted = FALSE ORDER BY salary " + order, null);
+        // Thực thi phương thức querySql để xử lý logic tương ứng
+        return querySql("SELECT id, ten, sdt, dia_chi, ten_dang_nhap, mat_khau, chuyen_mon, luong, trang_thai, da_xoa FROM nhan_vien WHERE vai_tro = 'KyThuat' AND da_xoa = FALSE ORDER BY luong " + order, null);
     }
 
+    // Sắp xếp danh sách dữ liệu
     public List<Mechanic> sortByName() throws Exception {
-        return querySql("SELECT id, name, phone, address, username, password, specialization, salary, status, is_deleted FROM employees WHERE role = 'KyThuat' AND is_deleted = FALSE ORDER BY name ASC", null);
+        // Thực thi phương thức querySql để xử lý logic tương ứng
+        return querySql("SELECT id, ten, sdt, dia_chi, ten_dang_nhap, mat_khau, chuyen_mon, luong, trang_thai, da_xoa FROM nhan_vien WHERE vai_tro = 'KyThuat' AND da_xoa = FALSE ORDER BY ten ASC", null);
     }
 
+    // Thực thi phương thức querySql để xử lý logic tương ứng
     private List<Mechanic> querySql(String sql, Integer idParam) throws Exception {
         List<Mechanic> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
@@ -168,19 +179,21 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
         return list;
     }
 
+    // Ánh xạ dữ liệu từ ResultSet sang đối tượng Java
     private Mechanic mapRow(ResultSet rs) throws SQLException {
         Mechanic mechanic = new Mechanic(
             rs.getInt("id"), 
-            rs.getString("name"), 
-            rs.getString("phone"), 
-            rs.getString("address"),
-            rs.getString("username"),
-            rs.getString("password"),
-            rs.getDouble("salary"), 
-            rs.getString("status"),
-            rs.getString("specialization")
+            rs.getString("ten"), 
+            rs.getString("sdt"), 
+            rs.getString("dia_chi"),
+            rs.getString("ten_dang_nhap"),
+            rs.getString("mat_khau"),
+            rs.getDouble("luong"), 
+            rs.getString("trang_thai"),
+            rs.getString("chuyen_mon")
         );
-        mechanic.setDeleted(rs.getBoolean("is_deleted"));
+        mechanic.setDeleted(rs.getBoolean("da_xoa"));
         return mechanic;
     }
 }
+

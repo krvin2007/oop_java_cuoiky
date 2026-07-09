@@ -6,21 +6,30 @@ import java.util.Scanner;
 import java.text.ParseException;
 
 public class Invoice {
+    // Mã hóa đơn (Invoice ID)
     private int invoiceId;
+    // Phiếu sửa chữa (Repair Order)
     private RepairOrder repairOrder;
+    // Ngày thanh toán (Payment Date)
     private Date paymentDate;
+    // Tổng chi phí linh kiện (Total Part Cost)
     private double totalPartCost;
+    // Tổng chi phí nhân công/dịch vụ (Total Labor Cost)
     private double totalLaborCost;
+    // Thuế suất giá trị gia tăng (VAT Rate)
     private double vatRate; // ví dụ 0.1 cho 10%
+    // Tổng số tiền thanh toán (Total Amount)
     private double totalAmount;
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    // Khởi tạo đối tượng Invoice mới
     public Invoice() {
         this.paymentDate = new Date();
         this.vatRate = 0.1; // mac dinh VAT 10%
     }
 
+    // Khởi tạo đối tượng Invoice mới
     public Invoice(int invoiceId, RepairOrder repairOrder, Date paymentDate, double totalPartCost, double totalLaborCost, double vatRate, double totalAmount) {
         this.invoiceId = invoiceId;
         this.repairOrder = repairOrder;
@@ -31,32 +40,48 @@ public class Invoice {
         this.totalAmount = totalAmount;
     }
 
+    // Lấy giá trị của thuộc tính InvoiceId
     public int getInvoiceId() { return invoiceId; }
+    // Cập nhật giá trị cho thuộc tính InvoiceId
     public void setInvoiceId(int invoiceId) { this.invoiceId = invoiceId; }
 
+    // Lấy giá trị của thuộc tính RepairOrder
     public RepairOrder getRepairOrder() { return repairOrder; }
+    // Cập nhật giá trị cho thuộc tính RepairOrder
     public void setRepairOrder(RepairOrder repairOrder) { this.repairOrder = repairOrder; }
 
+    // Lấy giá trị của thuộc tính PaymentDate
     public Date getPaymentDate() { return paymentDate; }
+    // Cập nhật giá trị cho thuộc tính PaymentDate
     public void setPaymentDate(Date paymentDate) { this.paymentDate = paymentDate; }
 
+    // Lấy giá trị của thuộc tính TotalPartCost
     public double getTotalPartCost() { return totalPartCost; }
+    // Cập nhật giá trị cho thuộc tính TotalPartCost
     public void setTotalPartCost(double totalPartCost) { this.totalPartCost = totalPartCost; }
 
+    // Lấy giá trị của thuộc tính TotalLaborCost
     public double getTotalLaborCost() { return totalLaborCost; }
+    // Cập nhật giá trị cho thuộc tính TotalLaborCost
     public void setTotalLaborCost(double totalLaborCost) { this.totalLaborCost = totalLaborCost; }
 
+    // Lấy giá trị của thuộc tính VatRate
     public double getVatRate() { return vatRate; }
+    // Cập nhật giá trị cho thuộc tính VatRate
     public void setVatRate(double vatRate) { this.vatRate = vatRate; }
 
+    // Lấy giá trị của thuộc tính TotalAmount
     public double getTotalAmount() { return totalAmount; }
+    // Cập nhật giá trị cho thuộc tính TotalAmount
     public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
 
+    // Tính toán tổng chi phí của hóa đơn (bao gồm linh kiện, dịch vụ và VAT)
     public void calculateTotal() {
         double subTotal = totalPartCost + totalLaborCost;
         this.totalAmount = subTotal + (subTotal * vatRate);
     }
 
+    // In thông tin chi tiết của hóa đơn ra màn hình
     public void printInvoice() {
         System.out.println("----- HOA DON THANH TOAN -----");
         System.out.println("Ma hoa don: " + invoiceId);
@@ -69,6 +94,7 @@ public class Invoice {
         System.out.println("------------------------------");
     }
 
+    // Nhập thông tin cho đối tượng từ giao diện Console
     public void nhapInfo(Scanner sc) {
         while (true) {
             try {
@@ -82,7 +108,7 @@ public class Invoice {
             }
         }
         System.out.print("Nhap ngay thanh toan (yyyy-MM-dd HH:mm:ss hoac go Enter de lay hien tai): ");
-        String dStr = sc.nextLine().trim();
+        String dStr = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         if (dStr.isEmpty()) {
             this.paymentDate = new Date();
         } else {
@@ -114,6 +140,7 @@ public class Invoice {
         calculateTotal();
     }
 
+    // Trả về chuỗi đại diện chứa thông tin của đối tượng
     @Override
     public String toString() {
         return "Invoice [ID: " + invoiceId + ", OrderID: " + (repairOrder != null ? repairOrder.getOrderId() : "N/A") + 

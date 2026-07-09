@@ -18,6 +18,7 @@ import java.util.List;
  */
 public class DichVuDAO implements IRepository<DichVu> {
 
+    // Thêm mới một bản ghi vào cơ sở dữ liệu
     @Override
     public void themMoi(DichVu dv) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
@@ -56,6 +57,7 @@ public class DichVuDAO implements IRepository<DichVu> {
         }
     }
 
+    // Cập nhật thông tin bản ghi trong cơ sở dữ liệu
     @Override
     public void capNhat(DichVu dv) throws Exception {
         String sql = "UPDATE dich_vu SET ten = ?, don_gia = ? WHERE LOWER(ma) = LOWER(?)";
@@ -71,6 +73,7 @@ public class DichVuDAO implements IRepository<DichVu> {
         }
     }
 
+    // Xóa bản ghi khỏi cơ sở dữ liệu
     @Override
     public void xoa(Object id) throws Exception {
         String ma = (String) id;
@@ -84,11 +87,14 @@ public class DichVuDAO implements IRepository<DichVu> {
         }
     }
 
+    // Lấy toàn bộ danh sách dữ liệu
     @Override
     public List<DichVu> layTatCa() throws Exception {
+        // Thực thi phương thức querySql để xử lý logic tương ứng
         return querySql("SELECT ma, ten, don_gia FROM dich_vu ORDER BY ma", null);
     }
 
+    // Lấy dữ liệu chi tiết theo mã định danh (ID)
     @Override
     public DichVu layTheoId(Object id) throws Exception {
         String ma = (String) id;
@@ -96,11 +102,13 @@ public class DichVuDAO implements IRepository<DichVu> {
         return list.isEmpty() ? null : list.get(0);
     }
 
+    // Tìm kiếm dữ liệu dựa trên điều kiện đầu vào
     public List<DichVu> searchByName(String keyword) throws Exception {
         return querySql("SELECT ma, ten, don_gia FROM dich_vu WHERE LOWER(ten) LIKE ? ORDER BY ma",
                 "%" + keyword.toLowerCase() + "%");
     }
 
+    // Thực thi phương thức querySql để xử lý logic tương ứng
     private List<DichVu> querySql(String sql, String param) throws Exception {
         List<DichVu> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
@@ -117,7 +125,9 @@ public class DichVuDAO implements IRepository<DichVu> {
         return list;
     }
 
+    // Ánh xạ dữ liệu từ ResultSet sang đối tượng Java
     private DichVu mapRow(ResultSet rs) throws SQLException {
         return new DichVu(rs.getString("ma"), rs.getString("ten"), rs.getDouble("don_gia"));
     }
 }
+

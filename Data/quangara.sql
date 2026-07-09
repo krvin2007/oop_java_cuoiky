@@ -1,4 +1,4 @@
--- phpMyAdmin SQL Dump
+﻿-- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
@@ -36,17 +36,17 @@ CREATE TABLE `dich_vu` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `invoices`
+-- Table structure for table `hoa_don`
 --
 
-CREATE TABLE `invoices` (
-  `invoice_id` int(11) NOT NULL,
-  `order_id` int(11) NOT NULL,
-  `payment_date` datetime DEFAULT NULL,
-  `total_part_cost` double NOT NULL DEFAULT 0,
-  `total_labor_cost` double NOT NULL DEFAULT 0,
-  `vat_rate` double NOT NULL DEFAULT 0.1,
-  `total_amount` double NOT NULL DEFAULT 0
+CREATE TABLE `hoa_don` (
+  `ma_hoa_don` int(11) NOT NULL,
+  `ma_phieu` int(11) NOT NULL,
+  `ngay_thanh_toan` datetime DEFAULT NULL,
+  `tong_tien_linh_kien` double NOT NULL DEFAULT 0,
+  `tong_tien_cong` double NOT NULL DEFAULT 0,
+  `thue_vat` double NOT NULL DEFAULT 0.1,
+  `tong_tien` double NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -60,79 +60,79 @@ CREATE TABLE `linh_kien` (
   `ten` varchar(255) NOT NULL,
   `don_gia` double NOT NULL DEFAULT 0,
   `so_luong_ton` int(11) NOT NULL DEFAULT 0,
-  `location` varchar(255) DEFAULT NULL
+  `vi_tri` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `employees`
+-- Table structure for table `nhan_vien`
 --
 
-CREATE TABLE `employees` (
+CREATE TABLE `nhan_vien` (
   `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `phone` varchar(20) NOT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `username` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `role` varchar(50) NOT NULL,
-  `specialization` varchar(255) DEFAULT NULL,
-  `salary` double NOT NULL DEFAULT 0,
-  `status` varchar(50) NOT NULL DEFAULT 'Đang rảnh',
-  `is_deleted` tinyint(1) NOT NULL DEFAULT 0
+  `ten` varchar(255) NOT NULL,
+  `sdt` varchar(20) NOT NULL,
+  `dia_chi` varchar(255) DEFAULT NULL,
+  `ten_dang_nhap` varchar(50) NOT NULL,
+  `mat_khau` varchar(255) NOT NULL,
+  `vai_tro` varchar(50) NOT NULL,
+  `chuyen_mon` varchar(255) DEFAULT NULL,
+  `luong` double NOT NULL DEFAULT 0,
+  `trang_thai` varchar(50) NOT NULL DEFAULT 'Dang ranh',
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `employees`
+-- Dumping data for table `nhan_vien`
 --
 
-INSERT INTO `employees` (`id`, `name`, `phone`, `address`, `username`, `password`, `role`, `specialization`, `salary`, `status`) VALUES
-(1, 'Admin User', '0900000001', 'System', 'admin', 'admin', 'QuanLy', NULL, 0, 'Đang rảnh'),
-(2, 'Ketoan User', '0900000002', 'System', 'ketoan', '123456', 'KeToan', NULL, 0, 'Đang rảnh'),
-(3, 'Thukho User', '0900000003', 'System', 'thukho', '123456', 'ThuKho', NULL, 0, 'Đang rảnh'),
-(4, 'Thomay User', '0900000004', 'System', 'thomay', '123456', 'KyThuat', 'Chung', 5000000, 'Đang rảnh');
+INSERT INTO `nhan_vien` (`id`, `ten`, `sdt`, `dia_chi`, `ten_dang_nhap`, `mat_khau`, `vai_tro`, `chuyen_mon`, `luong`, `trang_thai`) VALUES
+(1, 'Admin User', '0900000001', 'System', 'admin', 'admin', 'QuanLy', NULL, 0, 'Dang ranh'),
+(2, 'Ketoan User', '0900000002', 'System', 'ketoan', '123456', 'KeToan', NULL, 0, 'Dang ranh'),
+(3, 'Thukho User', '0900000003', 'System', 'thukho', '123456', 'ThuKho', NULL, 0, 'Dang ranh'),
+(4, 'Thomay User', '0900000004', 'System', 'thomay', '123456', 'KyThuat', 'Chung', 5000000, 'Dang ranh');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `owners`
+-- Table structure for table `chu_xe`
 --
 
-CREATE TABLE `owners` (
+CREATE TABLE `chu_xe` (
   `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `phone` varchar(20) NOT NULL,
-  `address` varchar(255) DEFAULT NULL,
+  `ten` varchar(255) NOT NULL,
+  `sdt` varchar(20) NOT NULL,
+  `dia_chi` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
-  `is_deleted` tinyint(1) NOT NULL DEFAULT 0
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `repair_orders`
+-- Table structure for table `phieu_sua_chua`
 --
 
-CREATE TABLE `repair_orders` (
-  `order_id` int(11) NOT NULL,
-  `license_plate` varchar(20) NOT NULL,
-  `entry_date` datetime DEFAULT NULL,
-  `exit_date` datetime DEFAULT NULL,
-  `mechanic_id` int(11) NOT NULL,
-  `status` varchar(50) NOT NULL DEFAULT 'RECEIVING',
-  `visual_condition` varchar(255) DEFAULT NULL
+CREATE TABLE `phieu_sua_chua` (
+  `ma_phieu` int(11) NOT NULL,
+  `bien_so` varchar(20) NOT NULL,
+  `ngay_vao` datetime DEFAULT NULL,
+  `ngay_ra` datetime DEFAULT NULL,
+  `ma_tho_may` int(11) NOT NULL,
+  `trang_thai` varchar(50) NOT NULL DEFAULT 'RECEIVING',
+  `tinh_trang_ben_ngoai` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `repair_order_details`
+-- Table structure for table `chi_tiet_phieu_sua`
 --
 
-CREATE TABLE `repair_order_details` (
+CREATE TABLE `chi_tiet_phieu_sua` (
   `id` int(11) NOT NULL,
-  `order_id` int(11) NOT NULL,
+  `ma_phieu` int(11) NOT NULL,
   `ma_hang_muc` varchar(20) NOT NULL,
   `loai_hang_muc` varchar(20) NOT NULL,
   `don_gia_thuc_te` double NOT NULL DEFAULT 0,
@@ -142,18 +142,18 @@ CREATE TABLE `repair_order_details` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `vehicles`
+-- Table structure for table `xe`
 --
 
-CREATE TABLE `vehicles` (
-  `license_plate` varchar(20) NOT NULL,
-  `brand` varchar(100) DEFAULT NULL,
-  `model` varchar(100) DEFAULT NULL,
-  `production_year` int(11) DEFAULT NULL,
-  `owner_id` int(11) NOT NULL,
-  `color` varchar(50) DEFAULT NULL,
-  `condition_receipt` varchar(255) DEFAULT NULL,
-  `is_deleted` tinyint(1) NOT NULL DEFAULT 0
+CREATE TABLE `xe` (
+  `bien_so` varchar(20) NOT NULL,
+  `hang_xe` varchar(100) DEFAULT NULL,
+  `dong_xe` varchar(100) DEFAULT NULL,
+  `nam_san_xuat` int(11) DEFAULT NULL,
+  `ma_chu_xe` int(11) NOT NULL,
+  `mau_sac` varchar(50) DEFAULT NULL,
+  `tinh_trang_tiep_nhan` varchar(255) DEFAULT NULL,
+  `da_xoa` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -163,11 +163,11 @@ ALTER TABLE `dich_vu`
   ADD PRIMARY KEY (`ma`);
 
 --
--- Indexes for table `invoices`
+-- Indexes for table `hoa_don`
 --
-ALTER TABLE `invoices`
-  ADD PRIMARY KEY (`invoice_id`),
-  ADD UNIQUE KEY `order_id` (`order_id`);
+ALTER TABLE `hoa_don`
+  ADD PRIMARY KEY (`ma_hoa_don`),
+  ADD UNIQUE KEY `ma_phieu` (`ma_phieu`);
 
 --
 -- Indexes for table `linh_kien`
@@ -176,74 +176,74 @@ ALTER TABLE `linh_kien`
   ADD PRIMARY KEY (`ma`);
 
 --
--- Indexes for table `employees`
+-- Indexes for table `nhan_vien`
 --
-ALTER TABLE `employees`
+ALTER TABLE `nhan_vien`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `username` (`username`),
-  ADD UNIQUE KEY `phone` (`phone`);
+  ADD UNIQUE KEY `ten_dang_nhap` (`ten_dang_nhap`),
+  ADD UNIQUE KEY `sdt` (`sdt`);
 
 --
--- Indexes for table `owners`
+-- Indexes for table `chu_xe`
 --
-ALTER TABLE `owners`
+ALTER TABLE `chu_xe`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `phone` (`phone`);
+  ADD UNIQUE KEY `sdt` (`sdt`);
 
 --
--- Indexes for table `repair_orders`
+-- Indexes for table `phieu_sua_chua`
 --
-ALTER TABLE `repair_orders`
-  ADD PRIMARY KEY (`order_id`),
-  ADD KEY `fk_order_vehicle` (`license_plate`),
-  ADD KEY `fk_order_mechanic` (`mechanic_id`);
+ALTER TABLE `phieu_sua_chua`
+  ADD PRIMARY KEY (`ma_phieu`),
+  ADD KEY `fk_order_vehicle` (`bien_so`),
+  ADD KEY `fk_order_mechanic` (`ma_tho_may`);
 
 --
--- Indexes for table `repair_order_details`
+-- Indexes for table `chi_tiet_phieu_sua`
 --
-ALTER TABLE `repair_order_details`
+ALTER TABLE `chi_tiet_phieu_sua`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uq_order_item` (`order_id`,`ma_hang_muc`,`loai_hang_muc`);
+  ADD UNIQUE KEY `uq_order_item` (`ma_phieu`,`ma_hang_muc`,`loai_hang_muc`);
 
 --
--- Indexes for table `vehicles`
+-- Indexes for table `xe`
 --
-ALTER TABLE `vehicles`
-  ADD PRIMARY KEY (`license_plate`),
-  ADD KEY `fk_vehicle_owner` (`owner_id`);
+ALTER TABLE `xe`
+  ADD PRIMARY KEY (`bien_so`),
+  ADD KEY `fk_vehicle_owner` (`ma_chu_xe`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table `invoices`
+-- AUTO_INCREMENT for table `hoa_don`
 --
-ALTER TABLE `invoices`
-  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `hoa_don`
+  MODIFY `ma_hoa_don` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `employees`
+-- AUTO_INCREMENT for table `nhan_vien`
 --
-ALTER TABLE `employees`
+ALTER TABLE `nhan_vien`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `owners`
+-- AUTO_INCREMENT for table `chu_xe`
 --
-ALTER TABLE `owners`
+ALTER TABLE `chu_xe`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `repair_orders`
+-- AUTO_INCREMENT for table `phieu_sua_chua`
 --
-ALTER TABLE `repair_orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `phieu_sua_chua`
+  MODIFY `ma_phieu` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `repair_order_details`
+-- AUTO_INCREMENT for table `chi_tiet_phieu_sua`
 --
-ALTER TABLE `repair_order_details`
+ALTER TABLE `chi_tiet_phieu_sua`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -251,32 +251,88 @@ ALTER TABLE `repair_order_details`
 --
 
 --
--- Constraints for table `invoices`
+-- Constraints for table `hoa_don`
 --
-ALTER TABLE `invoices`
-  ADD CONSTRAINT `fk_invoice_order` FOREIGN KEY (`order_id`) REFERENCES `repair_orders` (`order_id`) ON DELETE RESTRICT;
+ALTER TABLE `hoa_don`
+  ADD CONSTRAINT `fk_invoice_order` FOREIGN KEY (`ma_phieu`) REFERENCES `phieu_sua_chua` (`ma_phieu`) ON DELETE RESTRICT;
 
 --
--- Constraints for table `repair_orders`
+-- Constraints for table `phieu_sua_chua`
 --
-ALTER TABLE `repair_orders`
-  ADD CONSTRAINT `fk_order_mechanic` FOREIGN KEY (`mechanic_id`) REFERENCES `employees` (`id`) ON DELETE RESTRICT,
-  ADD CONSTRAINT `fk_order_vehicle` FOREIGN KEY (`license_plate`) REFERENCES `vehicles` (`license_plate`) ON DELETE RESTRICT;
+ALTER TABLE `phieu_sua_chua`
+  ADD CONSTRAINT `fk_order_mechanic` FOREIGN KEY (`ma_tho_may`) REFERENCES `nhan_vien` (`id`) ON DELETE RESTRICT,
+  ADD CONSTRAINT `fk_order_vehicle` FOREIGN KEY (`bien_so`) REFERENCES `xe` (`bien_so`) ON DELETE RESTRICT;
 
 --
--- Constraints for table `repair_order_details`
+-- Constraints for table `chi_tiet_phieu_sua`
 --
-ALTER TABLE `repair_order_details`
-  ADD CONSTRAINT `fk_detail_order` FOREIGN KEY (`order_id`) REFERENCES `repair_orders` (`order_id`) ON DELETE RESTRICT;
+ALTER TABLE `chi_tiet_phieu_sua`
+  ADD CONSTRAINT `fk_detail_order` FOREIGN KEY (`ma_phieu`) REFERENCES `phieu_sua_chua` (`ma_phieu`) ON DELETE RESTRICT;
 
 --
--- Constraints for table `vehicles`
+-- Constraints for table `xe`
 --
-ALTER TABLE `vehicles`
-  ADD CONSTRAINT `fk_vehicle_owner` FOREIGN KEY (`owner_id`) REFERENCES `owners` (`id`) ON DELETE RESTRICT;
+ALTER TABLE `xe`
+  ADD CONSTRAINT `fk_vehicle_owner` FOREIGN KEY (`ma_chu_xe`) REFERENCES `chu_xe` (`id`) ON DELETE RESTRICT;
+
+--
+-- Dumping data for table `chu_xe`
+--
+INSERT INTO `chu_xe` (`id`, `ten`, `sdt`, `dia_chi`, `email`, `da_xoa`) VALUES
+(1, 'Nguyen Van A', '0912345678', '123 Tran Hung Dao, TP.HCM', 'nva@gmail.com', 0),
+(2, 'Le Thi B', '0987654321', '456 Le Loi, Ha Noi', 'ltb@gmail.com', 0),
+(3, 'Tran Van C', '0901112223', '789 Nguyen Hue, Da Nang', 'tvc@gmail.com', 0);
+
+--
+-- Dumping data for table `xe`
+--
+INSERT INTO `xe` (`bien_so`, `hang_xe`, `dong_xe`, `nam_san_xuat`, `ma_chu_xe`, `mau_sac`, `tinh_trang_tiep_nhan`, `da_xoa`) VALUES
+('51A-123.45', 'Toyota', 'Vios', 2020, 1, 'Trang', 'Tray xuoc nhe', 0),
+('29A-678.90', 'Honda', 'Civic', 2022, 2, 'Den', 'Bao duong dinh ky', 0),
+('43A-111.22', 'Mazda', 'CX-5', 2021, 3, 'Do', 'Hong dong co', 0);
+
+--
+-- Dumping data for table `linh_kien`
+--
+INSERT INTO `linh_kien` (`ma`, `ten`, `don_gia`, `so_luong_ton`, `vi_tri`) VALUES
+('LK01', 'Loc dau dong co', 250000, 50, 'Ke A1'),
+('LK02', 'Bugi NGK', 120000, 100, 'Ke A2'),
+('LK03', 'Ma phanh truoc', 550000, 30, 'Ke B1'),
+('LK04', 'Dau nhot Castrol', 800000, 20, 'Kho nhot');
+
+--
+-- Dumping data for table `dich_vu`
+--
+INSERT INTO `dich_vu` (`ma`, `ten`, `don_gia`) VALUES
+('DV01', 'Thay dau nhot', 100000),
+('DV02', 'Kiem tra phanh', 150000),
+('DV03', 'Bao duong tong the', 500000);
+
+--
+-- Dumping data for table `phieu_sua_chua`
+--
+INSERT INTO `phieu_sua_chua` (`ma_phieu`, `bien_so`, `ngay_vao`, `ngay_ra`, `ma_tho_may`, `trang_thai`, `tinh_trang_ben_ngoai`) VALUES
+(1, '51A-123.45', '2026-07-01 08:30:00', '2026-07-01 11:30:00', 4, 'COMPLETED', 'Tray xuoc nhe'),
+(2, '29A-678.90', '2026-07-02 09:00:00', NULL, 4, 'IN_PROGRESS', 'Bao duong dinh ky');
+
+--
+-- Dumping data for table `chi_tiet_phieu_sua`
+--
+INSERT INTO `chi_tiet_phieu_sua` (`id`, `ma_phieu`, `ma_hang_muc`, `loai_hang_muc`, `don_gia_thuc_te`, `so_luong`) VALUES
+(1, 1, 'LK04', 'LINHKIEN', 800000, 1),
+(2, 1, 'DV01', 'DICHVU', 100000, 1),
+(3, 2, 'LK02', 'LINHKIEN', 120000, 4),
+(4, 2, 'DV03', 'DICHVU', 500000, 1);
+
+--
+-- Dumping data for table `hoa_don`
+--
+INSERT INTO `hoa_don` (`ma_hoa_don`, `ma_phieu`, `ngay_thanh_toan`, `tong_tien_linh_kien`, `tong_tien_cong`, `thue_vat`, `tong_tien`) VALUES
+(1, 1, '2026-07-01 12:00:00', 800000, 100000, 0.1, 990000);
 
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+

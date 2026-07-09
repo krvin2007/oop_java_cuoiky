@@ -3,6 +3,7 @@ package com.mycompany.quanlygara.controller;
 import java.util.*;
 
 public class TestDB {
+    // Phương thức main - Điểm bắt đầu chạy chương trình
     public static void main(String[] args) {
         try {
             ReportController report = new ReportController();
@@ -15,3 +16,4 @@ public class TestDB {
         }
     }
 }
+

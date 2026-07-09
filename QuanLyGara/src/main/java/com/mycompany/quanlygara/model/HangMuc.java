@@ -19,8 +19,11 @@ import java.util.Scanner;
  */
 public abstract class HangMuc {
     // Các thuộc tính private (Đóng gói)
+    // Mã hạng mục (Category Code)
     private String ma;
+    // Tên hạng mục (Category Name)
     private String ten;
+    // Đơn giá (Unit Price)
     private double donGia;
 
     // Constructor mặc định (Không tham số)
@@ -36,26 +39,32 @@ public abstract class HangMuc {
 
     // --- CÁC PHƯƠNG THỨC GETTER VÀ SETTER (Đóng gói) ---
 
+    // Lấy giá trị của thuộc tính Ma
     public String getMa() {
         return ma;
     }
 
+    // Cập nhật giá trị cho thuộc tính Ma
     public void setMa(String ma) {
         this.ma = ma;
     }
 
+    // Lấy giá trị của thuộc tính Ten
     public String getTen() {
         return ten;
     }
 
+    // Cập nhật giá trị cho thuộc tính Ten
     public void setTen(String ten) {
         this.ten = ten;
     }
 
+    // Lấy giá trị của thuộc tính DonGia
     public double getDonGia() {
         return donGia;
     }
 
+    // Cập nhật giá trị cho thuộc tính DonGia
     public void setDonGia(double donGia) {
         this.donGia = donGia;
     }
@@ -66,17 +75,17 @@ public abstract class HangMuc {
      */
     public void nhapInfo(Scanner sc) {
         System.out.print("Nhap ma hang muc: ");
-        this.ma = sc.nextLine().trim();
+        this.ma = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         while (this.ma.isEmpty()) {
             System.out.print("Ma hang muc khong duoc de trong! Moi nhap lai: ");
-            this.ma = sc.nextLine().trim();
+            this.ma = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
 
         System.out.print("Nhap ten hang muc: ");
-        this.ten = sc.nextLine().trim();
+        this.ten = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         while (this.ten.isEmpty()) {
             System.out.print("Ten hang muc khong duoc de trong! Moi nhap lai: ");
-            this.ten = sc.nextLine().trim();
+            this.ten = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
         
         while (true) {

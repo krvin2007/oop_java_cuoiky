@@ -36,20 +36,22 @@ public class DichVu extends HangMuc {
      */
     @Override
     public double tinhThanhTien(int soLuong) {
+        // Lấy giá trị của thuộc tính DonGia
         return getDonGia();
     }
 
+    // Nhập thông tin cho đối tượng từ giao diện Console
     @Override
     public void nhapInfo(Scanner sc) {
         System.out.print("Nhap ma dich vu (de trong de tu dong tao): ");
-        String maInput = sc.nextLine().trim();
+        String maInput = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         this.setMa(maInput); // can be empty for auto-generation
 
         System.out.print("Nhap ten dich vu: ");
-        String tenInput = sc.nextLine().trim();
+        String tenInput = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         while (tenInput.isEmpty()) {
             System.out.print("Ten dich vu khong duoc de trong! Moi nhap lai: ");
-            tenInput = sc.nextLine().trim();
+            tenInput = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
         this.setTen(tenInput);
 

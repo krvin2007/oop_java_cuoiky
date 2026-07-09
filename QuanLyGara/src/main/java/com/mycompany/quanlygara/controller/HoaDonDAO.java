@@ -22,11 +22,12 @@ import java.util.List;
  */
 public class HoaDonDAO implements IRepository<Invoice> {
 
+    // Thêm mới một hóa đơn vào cơ sở dữ liệu
     @Override
     public void themMoi(Invoice invoice) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
             int oId = invoice.getRepairOrder() != null ? invoice.getRepairOrder().getOrderId() : 0;
-            try (PreparedStatement ps = conn.prepareStatement("SELECT invoice_id FROM invoices WHERE order_id = ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT ma_hoa_don FROM hoa_don WHERE ma_phieu = ?")) {
                 ps.setInt(1, oId);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -35,7 +36,7 @@ public class HoaDonDAO implements IRepository<Invoice> {
                 }
             }
             try (PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO invoices (order_id, payment_date, total_part_cost, total_labor_cost, vat_rate, total_amount) VALUES (?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO hoa_don (ma_phieu, ngay_thanh_toan, tong_tien_linh_kien, tong_tien_cong, thue_vat, tong_tien) VALUES (?, ?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS)) {
                 ps.setInt(1, invoice.getRepairOrder() != null ? invoice.getRepairOrder().getOrderId() : 0);
                 ps.setTimestamp(2,
@@ -54,9 +55,10 @@ public class HoaDonDAO implements IRepository<Invoice> {
         }
     }
 
+    // Cập nhật thông tin hóa đơn đã tồn tại trong cơ sở dữ liệu
     @Override
     public void capNhat(Invoice invoice) throws Exception {
-        String sql = "UPDATE invoices SET order_id = ?, payment_date = ?, total_part_cost = ?, total_labor_cost = ?, vat_rate = ?, total_amount = ? WHERE invoice_id = ?";
+        String sql = "UPDATE hoa_don SET ma_phieu = ?, ngay_thanh_toan = ?, tong_tien_linh_kien = ?, tong_tien_cong = ?, thue_vat = ?, tong_tien = ? WHERE ma_hoa_don = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, invoice.getRepairOrder() != null ? invoice.getRepairOrder().getOrderId() : 0);
@@ -74,11 +76,12 @@ public class HoaDonDAO implements IRepository<Invoice> {
         }
     }
 
+    // Xóa hóa đơn khỏi cơ sở dữ liệu dựa trên ID
     @Override
     public void xoa(Object id) throws Exception {
         int targetId = (Integer) id;
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement("DELETE FROM invoices WHERE invoice_id = ?")) {
+                PreparedStatement ps = conn.prepareStatement("DELETE FROM hoa_don WHERE ma_hoa_don = ?")) {
             ps.setInt(1, targetId);
             int rows = ps.executeUpdate();
             if (rows == 0) {
@@ -87,29 +90,33 @@ public class HoaDonDAO implements IRepository<Invoice> {
         }
     }
 
+    // Lấy danh sách tất cả hóa đơn từ cơ sở dữ liệu
     @Override
     public List<Invoice> layTatCa() throws Exception {
         return querySql(
-                "SELECT invoice_id, order_id, payment_date, total_part_cost, total_labor_cost, vat_rate, total_amount FROM invoices ORDER BY invoice_id",
+                "SELECT ma_hoa_don, ma_phieu, ngay_thanh_toan, tong_tien_linh_kien, tong_tien_cong, thue_vat, tong_tien FROM hoa_don ORDER BY ma_hoa_don",
                 null);
     }
 
+    // Lấy thông tin hóa đơn dựa trên ID
     @Override
     public Invoice layTheoId(Object id) throws Exception {
         int targetId = (Integer) id;
         List<Invoice> list = querySql(
-                "SELECT invoice_id, order_id, payment_date, total_part_cost, total_labor_cost, vat_rate, total_amount FROM invoices WHERE invoice_id = ?",
+                "SELECT ma_hoa_don, ma_phieu, ngay_thanh_toan, tong_tien_linh_kien, tong_tien_cong, thue_vat, tong_tien FROM hoa_don WHERE ma_hoa_don = ?",
                 targetId);
         return list.isEmpty() ? null : list.get(0);
     }
 
+    // Lấy thông tin hóa đơn dựa trên mã phiếu sửa chữa (Order ID)
     public Invoice getByOrderId(int orderId) throws Exception {
         List<Invoice> list = querySql(
-                "SELECT invoice_id, order_id, payment_date, total_part_cost, total_labor_cost, vat_rate, total_amount FROM invoices WHERE order_id = ?",
+                "SELECT ma_hoa_don, ma_phieu, ngay_thanh_toan, tong_tien_linh_kien, tong_tien_cong, thue_vat, tong_tien FROM hoa_don WHERE ma_phieu = ?",
                 orderId);
         return list.isEmpty() ? null : list.get(0);
     }
 
+    // Tạo hóa đơn tự động từ mã phiếu sửa chữa, bao gồm tính toán tiền linh kiện, tiền công và thuế VAT
     public Invoice generateInvoice(int orderId) throws Exception {
         PhieuSuaChuaDAO roDAO = new PhieuSuaChuaDAO();
 
@@ -137,6 +144,7 @@ public class HoaDonDAO implements IRepository<Invoice> {
         return invoice;
     }
 
+    // Hàm hỗ trợ thực thi truy vấn SQL lấy danh sách hóa đơn dựa trên tham số truyền vào
     private List<Invoice> querySql(String sql, Integer idParam) throws Exception {
         List<Invoice> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
@@ -153,9 +161,10 @@ public class HoaDonDAO implements IRepository<Invoice> {
         return list;
     }
 
+    // Ánh xạ dữ liệu từ ResultSet (kết quả truy vấn) sang đối tượng Invoice
     private Invoice mapRow(ResultSet rs) throws SQLException {
-        Timestamp pay = rs.getTimestamp("payment_date");
-        int orderId = rs.getInt("order_id");
+        Timestamp pay = rs.getTimestamp("ngay_thanh_toan");
+        int orderId = rs.getInt("ma_phieu");
         com.mycompany.quanlygara.model.RepairOrder ro = null;
         try {
             PhieuSuaChuaDAO phieuDAO = new PhieuSuaChuaDAO();
@@ -165,12 +174,13 @@ public class HoaDonDAO implements IRepository<Invoice> {
         }
 
         return new Invoice(
-                rs.getInt("invoice_id"),
+                rs.getInt("ma_hoa_don"),
                 ro,
                 pay != null ? new Date(pay.getTime()) : null,
-                rs.getDouble("total_part_cost"),
-                rs.getDouble("total_labor_cost"),
-                rs.getDouble("vat_rate"),
-                rs.getDouble("total_amount"));
+                rs.getDouble("tong_tien_linh_kien"),
+                rs.getDouble("tong_tien_cong"),
+                rs.getDouble("thue_vat"),
+                rs.getDouble("tong_tien"));
     }
 }
+

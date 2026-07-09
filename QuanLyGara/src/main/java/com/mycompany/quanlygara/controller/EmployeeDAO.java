@@ -8,8 +8,9 @@ import java.sql.SQLException;
 
 public class EmployeeDAO {
     
+    // Xác thực thông tin đăng nhập của nhân viên và trả về đối tượng Employee tương ứng nếu thành công
     public Employee login(String username, String password) {
-        String sql = "SELECT id, name, phone, address, username, password, role, specialization, salary, status FROM employees WHERE BINARY username = ? AND BINARY password = ? AND is_deleted = FALSE";
+        String sql = "SELECT id, ten, sdt, dia_chi, ten_dang_nhap, mat_khau, vai_tro, chuyen_mon, luong, trang_thai FROM nhan_vien WHERE BINARY ten_dang_nhap = ? AND BINARY mat_khau = ? AND da_xoa = FALSE";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
              
@@ -17,16 +18,16 @@ public class EmployeeDAO {
             ps.setString(2, password);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    String role = rs.getString("role");
+                    String role = rs.getString("vai_tro");
                     int id = rs.getInt("id");
-                    String n = rs.getString("name");
-                    String p = rs.getString("phone");
-                    String a = rs.getString("address");
-                    String u = rs.getString("username");
-                    String pw = rs.getString("password");
-                    double sal = rs.getDouble("salary");
-                    String st = rs.getString("status");
-                    String spec = rs.getString("specialization");
+                    String n = rs.getString("ten");
+                    String p = rs.getString("sdt");
+                    String a = rs.getString("dia_chi");
+                    String u = rs.getString("ten_dang_nhap");
+                    String pw = rs.getString("mat_khau");
+                    double sal = rs.getDouble("luong");
+                    String st = rs.getString("trang_thai");
+                    String spec = rs.getString("chuyen_mon");
                     
                     if (role.equals("QuanLy")) {
                         return new Owner(id, n, p, a, u, pw, sal, st);
@@ -45,8 +46,9 @@ public class EmployeeDAO {
         return null;
     }
 
+    // Cập nhật mật khẩu mới cho tài khoản nhân viên dựa trên tên đăng nhập
     public boolean updatePassword(String username, String newPassword) {
-        String sql = "UPDATE employees SET password = ? WHERE username = ?";
+        String sql = "UPDATE nhan_vien SET mat_khau = ? WHERE ten_dang_nhap = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, newPassword);
@@ -59,3 +61,4 @@ public class EmployeeDAO {
         }
     }
 }
+

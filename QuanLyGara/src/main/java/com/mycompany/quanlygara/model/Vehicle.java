@@ -11,18 +11,28 @@ import java.util.Scanner;
  * @author ManhQuynh
  */
 public class Vehicle {
+    // Biển số xe (License Plate)
     private String licensePlate;
+    // Hãng xe (Brand)
     private String brand;
+    // Mẫu xe (Model)
     private String model;
+    // Năm sản xuất (Production Year)
     private int productionYear;
+    // Khách hàng - Chủ xe (Customer/Owner)
     private Customer Customer;
+    // Màu sắc (Color)
     private String color;
+    // Tình trạng xe (Condition)
     private String condition;
+    // Trạng thái đã xóa (Is Deleted)
     private boolean isDeleted;
 
+    // Khởi tạo đối tượng Vehicle mới
     public Vehicle() {
     }
 
+    // Khởi tạo đối tượng Vehicle mới
     public Vehicle(String licensePlate, String brand, String model, int productionYear, Customer Customer, String color, String condition) {
         this.licensePlate = licensePlate;
         this.brand = brand;
@@ -34,70 +44,87 @@ public class Vehicle {
         this.isDeleted = false;
     }
 
+    // Lấy giá trị của thuộc tính Color
     public String getColor() {
         return color;
     }
 
+    // Cập nhật giá trị cho thuộc tính Color
     public void setColor(String color) {
         this.color = color;
     }
 
+    // Lấy giá trị của thuộc tính Condition
     public String getCondition() {
         return condition;
     }
 
+    // Cập nhật giá trị cho thuộc tính Condition
     public void setCondition(String condition) {
         this.condition = condition;
     }
 
+    // Lấy trạng thái boolean của thuộc tính Deleted
     public boolean isDeleted() {
         return isDeleted;
     }
 
+    // Cập nhật giá trị cho thuộc tính Deleted
     public void setDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
 
+    // Lấy giá trị của thuộc tính LicensePlate
     public String getLicensePlate() {
         return licensePlate;
     }
 
+    // Cập nhật giá trị cho thuộc tính LicensePlate
     public void setLicensePlate(String licensePlate) {
         this.licensePlate = licensePlate;
     }
 
+    // Lấy giá trị của thuộc tính Brand
     public String getBrand() {
         return brand;
     }
 
+    // Cập nhật giá trị cho thuộc tính Brand
     public void setBrand(String brand) {
         this.brand = brand;
     }
 
+    // Lấy giá trị của thuộc tính Model
     public String getModel() {
         return model;
     }
 
+    // Cập nhật giá trị cho thuộc tính Model
     public void setModel(String model) {
         this.model = model;
     }
 
+    // Lấy giá trị của thuộc tính ProductionYear
     public int getProductionYear() {
         return productionYear;
     }
 
+    // Cập nhật giá trị cho thuộc tính ProductionYear
     public void setProductionYear(int productionYear) {
         this.productionYear = productionYear;
     }
 
+    // Lấy giá trị của thuộc tính Owner
     public Customer getOwner() {
         return Customer;
     }
 
+    // Cập nhật giá trị cho thuộc tính Owner
     public void setOwner(Customer Customer) {
         this.Customer = Customer;
     }
 
+    // Lấy giá trị của thuộc tính ProvinceName
     public static String getProvinceName(String code) {
         switch (code) {
             case "11": return "Cao Bằng";
@@ -164,6 +191,7 @@ public class Vehicle {
         }
     }
 
+    // Lấy giá trị của thuộc tính MilitaryUnit
     public static String getMilitaryUnit(String prefix) {
         switch (prefix) {
             case "AA": return "Quân khu 1";
@@ -215,6 +243,7 @@ public class Vehicle {
         }
     }
 
+    // Nhập thông tin cho đối tượng từ giao diện Console
     public void nhapInfo(Scanner sc) {
         while (true) {
             System.out.println("--- Chon loai bien so xe ---");
@@ -224,14 +253,14 @@ public class Vehicle {
             System.out.println("4. Bien mau xanh (Co quan hanh chinh nha nuoc, chinh tri - xa hoi)");
             System.out.println("5. Bien mau do (Quan doi nhan dan)");
             System.out.print("Nhap lua chon cua ban (1-5): ");
-            String plateTypeChoice = sc.nextLine().trim();
+            String plateTypeChoice = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
             if (!plateTypeChoice.matches("[1-5]")) {
                 System.out.println("Lua chon khong hop le! Vui long nhap tu 1 den 5.");
                 continue;
             }
             
             System.out.print("Nhap bien so xe (Vi du: 29A-123.45 hoac AA-12-34): ");
-            String inputPlate = sc.nextLine().trim().toUpperCase();
+            String inputPlate = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim()).toUpperCase();
             
             if (inputPlate.isEmpty()) {
                 System.out.println("Bien so xe khong duoc de trong!");
@@ -282,17 +311,17 @@ public class Vehicle {
         }
 
         System.out.print("Nhap hang xe (brand): ");
-        this.brand = sc.nextLine().trim();
+        this.brand = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         while (this.brand.isEmpty()) {
             System.out.print("Hang xe khong duoc de trong! Moi nhap lai: ");
-            this.brand = sc.nextLine().trim();
+            this.brand = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
 
         System.out.print("Nhap mau xe (model): ");
-        this.model = sc.nextLine().trim();
+        this.model = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         while (this.model.isEmpty()) {
             System.out.print("Mau xe khong duoc de trong! Moi nhap lai: ");
-            this.model = sc.nextLine().trim();
+            this.model = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
         while (true) {
             try {
@@ -308,17 +337,17 @@ public class Vehicle {
             }
         }
         System.out.print("Nhap mau sac xe (color): ");
-        this.color = sc.nextLine().trim();
+        this.color = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         while (this.color.isEmpty()) {
             System.out.print("Mau sac khong duoc de trong! Moi nhap lai: ");
-            this.color = sc.nextLine().trim();
+            this.color = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
 
         System.out.print("Nhap tinh trang xe luc tiep nhan: ");
-        this.condition = sc.nextLine().trim();
+        this.condition = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         while (this.condition.isEmpty()) {
             System.out.print("Tinh trang xe khong duoc de trong! Moi nhap lai: ");
-            this.condition = sc.nextLine().trim();
+            this.condition = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
 
         // Note: Customer should be set by the caller fetching from DAO based on input ID.
@@ -340,6 +369,7 @@ public class Vehicle {
         this.Customer.setId(inputOwnerId); // Temporary ID wrapper
     }
 
+    // Trả về chuỗi đại diện chứa thông tin của đối tượng
     @Override
     public String toString() {
         return "Vehicle [License Plate: " + licensePlate + ", Brand: " + brand + ", Model: " + model + ", Production Year: " + productionYear + ", Color: " + color + ", Condition: " + condition + ", Customer: " + (Customer != null ? Customer.getName() : "null") + "]";

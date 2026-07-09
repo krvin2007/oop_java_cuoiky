@@ -22,7 +22,9 @@ import java.util.Scanner;
  */
 public class LinhKien extends HangMuc {
     // Thuộc tính riêng của LinhKien (Đóng gói)
+    // Số lượng tồn kho (Stock Quantity)
     private int soLuongTon;
+    // Vị trí lưu trữ (Storage Location)
     private String location;
 
     // Constructor mặc định
@@ -37,20 +39,24 @@ public class LinhKien extends HangMuc {
         this.location = location;
     }
 
+    // Lấy giá trị của thuộc tính Location
     public String getLocation() {
         return location;
     }
 
+    // Cập nhật giá trị cho thuộc tính Location
     public void setLocation(String location) {
         this.location = location;
     }
 
     // --- GETTER VÀ SETTER CHO THUỘC TÍNH RIÊNG (Đóng gói) ---
 
+    // Lấy giá trị của thuộc tính SoLuongTon
     public int getSoLuongTon() {
         return soLuongTon;
     }
 
+    // Cập nhật giá trị cho thuộc tính SoLuongTon
     public void setSoLuongTon(int soLuongTon) {
         this.soLuongTon = soLuongTon;
     }
@@ -73,14 +79,14 @@ public class LinhKien extends HangMuc {
     @Override
     public void nhapInfo(Scanner sc) {
         System.out.print("Nhap ma linh kien (de trong de tu dong tao): ");
-        String maInput = sc.nextLine().trim();
+        String maInput = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         this.setMa(maInput); // can be empty for auto-generation
 
         System.out.print("Nhap ten linh kien: ");
-        String tenInput = sc.nextLine().trim();
+        String tenInput = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         while (tenInput.isEmpty()) {
             System.out.print("Ten linh kien khong duoc de trong! Moi nhap lai: ");
-            tenInput = sc.nextLine().trim();
+            tenInput = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
         this.setTen(tenInput);
 
@@ -114,7 +120,7 @@ public class LinhKien extends HangMuc {
         }
 
         System.out.print("Nhap vi tri luu tru trong kho: ");
-        this.location = sc.nextLine().trim();
+        this.location = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
     }
 
     /**

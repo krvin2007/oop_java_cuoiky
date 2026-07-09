@@ -22,11 +22,12 @@ import java.util.List;
 
 public class XeDAO implements IRepository<Vehicle> {
 
+    // Thêm mới một bản ghi vào cơ sở dữ liệu
     @Override
     public void themMoi(Vehicle vehicle) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(
-                    "SELECT license_plate FROM vehicles WHERE LOWER(license_plate) = LOWER(?)")) {
+                    "SELECT bien_so FROM xe WHERE LOWER(bien_so) = LOWER(?)")) {
                 ps.setString(1, vehicle.getLicensePlate());
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -35,7 +36,7 @@ public class XeDAO implements IRepository<Vehicle> {
                 }
             }
             try (PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO vehicles (license_plate, brand, model, production_year, owner_id, color, condition_receipt) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                    "INSERT INTO xe (bien_so, hang_xe, dong_xe, nam_san_xuat, ma_chu_xe, mau_sac, tinh_trang_tiep_nhan) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
                 ps.setString(1, vehicle.getLicensePlate());
                 ps.setString(2, vehicle.getBrand());
                 ps.setString(3, vehicle.getModel());
@@ -48,9 +49,10 @@ public class XeDAO implements IRepository<Vehicle> {
         }
     }
 
+    // Cập nhật thông tin bản ghi trong cơ sở dữ liệu
     @Override
     public void capNhat(Vehicle vehicle) throws Exception {
-        String sql = "UPDATE vehicles SET brand = ?, model = ?, production_year = ?, owner_id = ?, color = ?, condition_receipt = ? WHERE LOWER(license_plate) = LOWER(?)";
+        String sql = "UPDATE xe SET hang_xe = ?, dong_xe = ?, nam_san_xuat = ?, ma_chu_xe = ?, mau_sac = ?, tinh_trang_tiep_nhan = ? WHERE LOWER(bien_so) = LOWER(?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, vehicle.getBrand());
@@ -67,12 +69,13 @@ public class XeDAO implements IRepository<Vehicle> {
         }
     }
 
+    // Xóa bản ghi khỏi cơ sở dữ liệu
     @Override
     public void xoa(Object id) throws Exception {
         String lp = (String) id;
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                     "UPDATE vehicles SET is_deleted = TRUE WHERE LOWER(license_plate) = LOWER(?)")) {
+                     "UPDATE xe SET da_xoa = TRUE WHERE LOWER(bien_so) = LOWER(?)")) {
             ps.setString(1, lp);
             int rows = ps.executeUpdate();
             if (rows == 0) {
@@ -81,10 +84,11 @@ public class XeDAO implements IRepository<Vehicle> {
         }
     }
 
+    // Lấy toàn bộ danh sách dữ liệu
     @Override
     public List<Vehicle> layTatCa() throws Exception {
         List<Vehicle> list = new ArrayList<>();
-        String sql = "SELECT license_plate, brand, model, production_year, owner_id, color, condition_receipt, is_deleted FROM vehicles WHERE is_deleted = FALSE ORDER BY license_plate";
+        String sql = "SELECT bien_so, hang_xe, dong_xe, nam_san_xuat, ma_chu_xe, mau_sac, tinh_trang_tiep_nhan, da_xoa FROM xe WHERE da_xoa = FALSE ORDER BY bien_so";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -95,15 +99,17 @@ public class XeDAO implements IRepository<Vehicle> {
         return list;
     }
 
+    // Lấy dữ liệu chi tiết theo mã định danh (ID)
     @Override
     public Vehicle layTheoId(Object id) throws Exception {
         String lp = (String) id;
-        String sql = "SELECT license_plate, brand, model, production_year, owner_id, color, condition_receipt, is_deleted FROM vehicles WHERE LOWER(license_plate) = LOWER(?) AND is_deleted = FALSE";
+        String sql = "SELECT bien_so, hang_xe, dong_xe, nam_san_xuat, ma_chu_xe, mau_sac, tinh_trang_tiep_nhan, da_xoa FROM xe WHERE LOWER(bien_so) = LOWER(?) AND da_xoa = FALSE";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, lp);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
+                    // Ánh xạ dữ liệu từ ResultSet sang đối tượng Java
                     return mapRow(rs);
                 }
             }
@@ -111,9 +117,10 @@ public class XeDAO implements IRepository<Vehicle> {
         return null;
     }
 
+    // Tìm kiếm dữ liệu dựa trên điều kiện đầu vào
     public List<Vehicle> searchByLicensePlate(String lp) throws Exception {
         List<Vehicle> result = new ArrayList<>();
-        String sql = "SELECT license_plate, brand, model, production_year, owner_id, color, condition_receipt, is_deleted FROM vehicles WHERE LOWER(license_plate) LIKE ? AND is_deleted = FALSE ORDER BY license_plate";
+        String sql = "SELECT bien_so, hang_xe, dong_xe, nam_san_xuat, ma_chu_xe, mau_sac, tinh_trang_tiep_nhan, da_xoa FROM xe WHERE LOWER(bien_so) LIKE ? AND da_xoa = FALSE ORDER BY bien_so";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + lp.toLowerCase() + "%");
@@ -126,11 +133,12 @@ public class XeDAO implements IRepository<Vehicle> {
         return result;
     }
 
+    // Tìm kiếm dữ liệu dựa trên điều kiện đầu vào
     public List<Vehicle> searchByOwnerName(String ownerName) throws Exception {
         List<Vehicle> result = new ArrayList<>();
-        String sql = "SELECT v.license_plate, v.brand, v.model, v.production_year, v.owner_id, v.color, v.condition_receipt, v.is_deleted "
-                + "FROM vehicles v JOIN owners o ON v.owner_id = o.id "
-                + "WHERE LOWER(o.name) LIKE ? AND v.is_deleted = FALSE ORDER BY v.license_plate";
+        String sql = "SELECT v.bien_so, v.hang_xe, v.dong_xe, v.nam_san_xuat, v.ma_chu_xe, v.mau_sac, v.tinh_trang_tiep_nhan, v.da_xoa "
+                + "FROM xe v JOIN chu_xe o ON v.ma_chu_xe = o.id "
+                + "WHERE LOWER(o.ten) LIKE ? AND v.da_xoa = FALSE ORDER BY v.bien_so";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + ownerName.toLowerCase() + "%");
@@ -143,8 +151,9 @@ public class XeDAO implements IRepository<Vehicle> {
         return result;
     }
 
+    // Ánh xạ dữ liệu từ ResultSet sang đối tượng Java
     private Vehicle mapRow(ResultSet rs) throws SQLException {
-        int ownerId = rs.getInt("owner_id");
+        int ownerId = rs.getInt("ma_chu_xe");
         com.mycompany.quanlygara.model.Customer Customer = null;
         try {
             ChuXeDAO chuXeDAO = new ChuXeDAO();
@@ -153,9 +162,10 @@ public class XeDAO implements IRepository<Vehicle> {
             System.out.println("Loi khi lay thong tin chu xe: " + e.getMessage());
         }
         
-        Vehicle vehicle = new Vehicle(rs.getString("license_plate"), rs.getString("brand"), rs.getString("model"),
-                rs.getInt("production_year"), Customer, rs.getString("color"), rs.getString("condition_receipt"));
-        vehicle.setDeleted(rs.getBoolean("is_deleted"));
+        Vehicle vehicle = new Vehicle(rs.getString("bien_so"), rs.getString("hang_xe"), rs.getString("dong_xe"),
+                rs.getInt("nam_san_xuat"), Customer, rs.getString("mau_sac"), rs.getString("tinh_trang_tiep_nhan"));
+        vehicle.setDeleted(rs.getBoolean("da_xoa"));
         return vehicle;
     }
 }
+

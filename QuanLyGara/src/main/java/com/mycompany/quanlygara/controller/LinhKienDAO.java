@@ -19,6 +19,7 @@ import java.util.List;
  */
 public class LinhKienDAO implements IRepository<LinhKien> {
 
+    // Thêm mới một bản ghi vào cơ sở dữ liệu
     @Override
     public void themMoi(LinhKien lk) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
@@ -49,7 +50,7 @@ public class LinhKienDAO implements IRepository<LinhKien> {
                 }
             }
             try (PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO linh_kien (ma, ten, don_gia, so_luong_ton, location) VALUES (?, ?, ?, ?, ?)")) {
+                    "INSERT INTO linh_kien (ma, ten, don_gia, so_luong_ton, vi_tri) VALUES (?, ?, ?, ?, ?)")) {
                 ps.setString(1, lk.getMa());
                 ps.setString(2, lk.getTen());
                 ps.setDouble(3, lk.getDonGia());
@@ -60,9 +61,10 @@ public class LinhKienDAO implements IRepository<LinhKien> {
         }
     }
 
+    // Cập nhật thông tin bản ghi trong cơ sở dữ liệu
     @Override
     public void capNhat(LinhKien lk) throws Exception {
-        String sql = "UPDATE linh_kien SET ten = ?, don_gia = ?, so_luong_ton = ?, location = ? WHERE LOWER(ma) = LOWER(?)";
+        String sql = "UPDATE linh_kien SET ten = ?, don_gia = ?, so_luong_ton = ?, vi_tri = ? WHERE LOWER(ma) = LOWER(?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, lk.getTen());
@@ -77,6 +79,7 @@ public class LinhKienDAO implements IRepository<LinhKien> {
         }
     }
 
+    // Xóa bản ghi khỏi cơ sở dữ liệu
     @Override
     public void xoa(Object id) throws Exception {
         String ma = (String) id;
@@ -90,26 +93,31 @@ public class LinhKienDAO implements IRepository<LinhKien> {
         }
     }
 
+    // Lấy toàn bộ danh sách dữ liệu
     @Override
     public List<LinhKien> layTatCa() throws Exception {
-        return querySql("SELECT ma, ten, don_gia, so_luong_ton, location FROM linh_kien ORDER BY ma", null);
+        // Thực thi phương thức querySql để xử lý logic tương ứng
+        return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien ORDER BY ma", null);
     }
 
+    // Lấy dữ liệu chi tiết theo mã định danh (ID)
     @Override
     public LinhKien layTheoId(Object id) throws Exception {
         String ma = (String) id;
-        List<LinhKien> list = querySql("SELECT ma, ten, don_gia, so_luong_ton, location FROM linh_kien WHERE LOWER(ma) = LOWER(?)", ma);
+        List<LinhKien> list = querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE LOWER(ma) = LOWER(?)", ma);
         return list.isEmpty() ? null : list.get(0);
     }
 
+    // Tìm kiếm dữ liệu dựa trên điều kiện đầu vào
     public List<LinhKien> searchByName(String keyword) throws Exception {
-        return querySql("SELECT ma, ten, don_gia, so_luong_ton, location FROM linh_kien WHERE LOWER(ten) LIKE ? ORDER BY ma",
+        return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE LOWER(ten) LIKE ? ORDER BY ma",
                 "%" + keyword.toLowerCase() + "%");
     }
 
+    // Tìm kiếm dữ liệu dựa trên điều kiện đầu vào
     public List<LinhKien> searchByPriceRange(double minPrice, double maxPrice) throws Exception {
         List<LinhKien> list = new ArrayList<>();
-        String sql = "SELECT ma, ten, don_gia, so_luong_ton, location FROM linh_kien WHERE don_gia >= ? AND don_gia <= ? ORDER BY don_gia ASC";
+        String sql = "SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE don_gia >= ? AND don_gia <= ? ORDER BY don_gia ASC";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, minPrice);
@@ -123,6 +131,7 @@ public class LinhKienDAO implements IRepository<LinhKien> {
         return list;
     }
 
+    // Thực thi phương thức deductQuantity để xử lý logic tương ứng
     public void deductQuantity(String ma, int qtyToDeduct) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(
@@ -138,16 +147,21 @@ public class LinhKienDAO implements IRepository<LinhKien> {
         }
     }
 
+    // Sắp xếp danh sách dữ liệu
     public List<LinhKien> sortByPrice(boolean ascending) throws Exception {
         String order = ascending ? "ASC" : "DESC";
-        return querySql("SELECT ma, ten, don_gia, so_luong_ton, location FROM linh_kien ORDER BY don_gia " + order, null);
+        // Thực thi phương thức querySql để xử lý logic tương ứng
+        return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien ORDER BY don_gia " + order, null);
     }
 
+    // Sắp xếp danh sách dữ liệu
     public List<LinhKien> sortByQuantity(boolean ascending) throws Exception {
         String order = ascending ? "ASC" : "DESC";
-        return querySql("SELECT ma, ten, don_gia, so_luong_ton, location FROM linh_kien ORDER BY so_luong_ton " + order, null);
+        // Thực thi phương thức querySql để xử lý logic tương ứng
+        return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien ORDER BY so_luong_ton " + order, null);
     }
 
+    // Thực thi phương thức querySql để xử lý logic tương ứng
     private List<LinhKien> querySql(String sql, String param) throws Exception {
         List<LinhKien> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
@@ -164,7 +178,9 @@ public class LinhKienDAO implements IRepository<LinhKien> {
         return list;
     }
 
+    // Ánh xạ dữ liệu từ ResultSet sang đối tượng Java
     private LinhKien mapRow(ResultSet rs) throws SQLException {
-        return new LinhKien(rs.getString("ma"), rs.getString("ten"), rs.getDouble("don_gia"), rs.getInt("so_luong_ton"), rs.getString("location"));
+        return new LinhKien(rs.getString("ma"), rs.getString("ten"), rs.getDouble("don_gia"), rs.getInt("so_luong_ton"), rs.getString("vi_tri"));
     }
 }
+

@@ -27,11 +27,12 @@ import java.util.List;
  */
 public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
 
+    // Thêm mới một bản ghi vào cơ sở dữ liệu
     @Override
     public void themMoi(RepairOrder order) throws Exception {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                     "INSERT INTO repair_orders (license_plate, entry_date, exit_date, mechanic_id, status, visual_condition) VALUES (?, ?, ?, ?, ?, ?)",
+                     "INSERT INTO phieu_sua_chua (bien_so, ngay_vao, ngay_ra, ma_tho_may, trang_thai, tinh_trang_ben_ngoai) VALUES (?, ?, ?, ?, ?, ?)",
                      Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, order.getVehicle() != null ? order.getVehicle().getLicensePlate() : null);
             ps.setTimestamp(2, order.getEntryDate() != null ? new Timestamp(order.getEntryDate().getTime()) : null);
@@ -56,6 +57,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         }
     }
 
+    // Cập nhật thông tin bản ghi trong cơ sở dữ liệu
     @Override
     public void capNhat(RepairOrder order) throws Exception {
         RepairOrder existing = layTheoId(order.getOrderId());
@@ -68,7 +70,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                     "UPDATE repair_orders SET license_plate = ?, entry_date = ?, exit_date = ?, mechanic_id = ?, status = ?, visual_condition = ? WHERE order_id = ?")) {
+                     "UPDATE phieu_sua_chua SET bien_so = ?, ngay_vao = ?, ngay_ra = ?, ma_tho_may = ?, trang_thai = ?, tinh_trang_ben_ngoai = ? WHERE ma_phieu = ?")) {
             ps.setString(1, order.getVehicle() != null ? order.getVehicle().getLicensePlate() : null);
             ps.setTimestamp(2, order.getEntryDate() != null ? new Timestamp(order.getEntryDate().getTime()) : null);
             ps.setTimestamp(3, order.getExitDate() != null ? new Timestamp(order.getExitDate().getTime()) : null);
@@ -102,6 +104,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         }
     }
 
+    // Xóa bản ghi khỏi cơ sở dữ liệu
     @Override
     public void xoa(Object id) throws Exception {
         int targetId = (Integer) id;
@@ -112,7 +115,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
 
         try (Connection conn = DBConnection.getConnection()) {
             // Hoan lai linh kien ve kho neu co
-            try (PreparedStatement ps = conn.prepareStatement("SELECT ma_hang_muc, so_luong FROM repair_order_details WHERE order_id = ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT ma_hang_muc, so_luong FROM chi_tiet_phieu_sua WHERE ma_phieu = ?")) {
                 ps.setInt(1, targetId);
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
@@ -129,11 +132,11 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
                 }
             }
             
-            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM repair_order_details WHERE order_id = ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM chi_tiet_phieu_sua WHERE ma_phieu = ?")) {
                 ps.setInt(1, targetId);
                 ps.executeUpdate();
             }
-            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM repair_orders WHERE order_id = ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM phieu_sua_chua WHERE ma_phieu = ?")) {
                 ps.setInt(1, targetId);
                 ps.executeUpdate();
             }
@@ -151,10 +154,11 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         }
     }
 
+    // Lấy toàn bộ danh sách dữ liệu
     @Override
     public List<RepairOrder> layTatCa() throws Exception {
         List<RepairOrder> list = new ArrayList<>();
-        String sql = "SELECT order_id, license_plate, entry_date, exit_date, mechanic_id, status, visual_condition FROM repair_orders ORDER BY order_id";
+        String sql = "SELECT ma_phieu, bien_so, ngay_vao, ngay_ra, ma_tho_may, trang_thai, tinh_trang_ben_ngoai FROM phieu_sua_chua ORDER BY ma_phieu";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -165,15 +169,17 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         return list;
     }
 
+    // Lấy dữ liệu chi tiết theo mã định danh (ID)
     @Override
     public RepairOrder layTheoId(Object id) throws Exception {
         int targetId = (Integer) id;
-        String sql = "SELECT order_id, license_plate, entry_date, exit_date, mechanic_id, status, visual_condition FROM repair_orders WHERE order_id = ?";
+        String sql = "SELECT ma_phieu, bien_so, ngay_vao, ngay_ra, ma_tho_may, trang_thai, tinh_trang_ben_ngoai FROM phieu_sua_chua WHERE ma_phieu = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, targetId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
+                    // Ánh xạ dữ liệu từ ResultSet sang đối tượng Java
                     return mapRow(rs);
                 }
             }
@@ -181,6 +187,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         return null;
     }
 
+    // Thêm một chi tiết vào danh sách phiếu sửa chữa
     public void addDetail(RepairOrderDetail detail) throws Exception {
         RepairOrder ro = layTheoId(detail.getOrderId());
         if (ro != null && "COMPLETED".equalsIgnoreCase(ro.getStatus())) {
@@ -190,7 +197,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         try (Connection conn = DBConnection.getConnection()) {
             Integer existingQty = null;
             try (PreparedStatement ps = conn.prepareStatement(
-                    "SELECT so_luong FROM repair_order_details WHERE order_id = ? AND LOWER(ma_hang_muc) = LOWER(?) AND loai_hang_muc = ?")) {
+                    "SELECT so_luong FROM chi_tiet_phieu_sua WHERE ma_phieu = ? AND LOWER(ma_hang_muc) = LOWER(?) AND loai_hang_muc = ?")) {
                 ps.setInt(1, detail.getOrderId());
                 ps.setString(2, detail.getMaHangMuc());
                 ps.setString(3, detail.getLoaiHangMuc());
@@ -202,7 +209,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
             }
             if (existingQty != null) {
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "UPDATE repair_order_details SET so_luong = ?, don_gia_thuc_te = ? WHERE order_id = ? AND LOWER(ma_hang_muc) = LOWER(?) AND loai_hang_muc = ?")) {
+                        "UPDATE chi_tiet_phieu_sua SET so_luong = ?, don_gia_thuc_te = ? WHERE ma_phieu = ? AND LOWER(ma_hang_muc) = LOWER(?) AND loai_hang_muc = ?")) {
                     ps.setInt(1, existingQty + detail.getSoLuong());
                     ps.setDouble(2, detail.getDonGiaThucTe());
                     ps.setInt(3, detail.getOrderId());
@@ -212,7 +219,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
                 }
             } else {
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "INSERT INTO repair_order_details (order_id, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong) VALUES (?, ?, ?, ?, ?)")) {
+                        "INSERT INTO chi_tiet_phieu_sua (ma_phieu, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong) VALUES (?, ?, ?, ?, ?)")) {
                     ps.setInt(1, detail.getOrderId());
                     ps.setString(2, detail.getMaHangMuc());
                     ps.setString(3, detail.getLoaiHangMuc());
@@ -224,6 +231,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         }
     }
 
+    // Thêm chi tiết sửa chữa và tự động trừ số lượng tồn kho
     public void themMoiChiTietVaTruKho(RepairOrderDetail detail) throws Exception {
         RepairOrder ro = layTheoId(detail.getOrderId());
         if (ro != null && "COMPLETED".equalsIgnoreCase(ro.getStatus())) {
@@ -248,7 +256,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
                 
                 Integer existingQty = null;
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "SELECT so_luong FROM repair_order_details WHERE order_id = ? AND LOWER(ma_hang_muc) = LOWER(?) AND loai_hang_muc = ?")) {
+                        "SELECT so_luong FROM chi_tiet_phieu_sua WHERE ma_phieu = ? AND LOWER(ma_hang_muc) = LOWER(?) AND loai_hang_muc = ?")) {
                     ps.setInt(1, detail.getOrderId());
                     ps.setString(2, detail.getMaHangMuc());
                     ps.setString(3, detail.getLoaiHangMuc());
@@ -260,7 +268,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
                 }
                 if (existingQty != null) {
                     try (PreparedStatement ps = conn.prepareStatement(
-                            "UPDATE repair_order_details SET so_luong = ?, don_gia_thuc_te = ? WHERE order_id = ? AND LOWER(ma_hang_muc) = LOWER(?) AND loai_hang_muc = ?")) {
+                            "UPDATE chi_tiet_phieu_sua SET so_luong = ?, don_gia_thuc_te = ? WHERE ma_phieu = ? AND LOWER(ma_hang_muc) = LOWER(?) AND loai_hang_muc = ?")) {
                         ps.setInt(1, existingQty + detail.getSoLuong());
                         ps.setDouble(2, detail.getDonGiaThucTe());
                         ps.setInt(3, detail.getOrderId());
@@ -270,7 +278,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
                     }
                 } else {
                     try (PreparedStatement ps = conn.prepareStatement(
-                            "INSERT INTO repair_order_details (order_id, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong) VALUES (?, ?, ?, ?, ?)")) {
+                            "INSERT INTO chi_tiet_phieu_sua (ma_phieu, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong) VALUES (?, ?, ?, ?, ?)")) {
                         ps.setInt(1, detail.getOrderId());
                         ps.setString(2, detail.getMaHangMuc());
                         ps.setString(3, detail.getLoaiHangMuc());
@@ -289,15 +297,16 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         }
     }
 
+    // Lấy giá trị của thuộc tính DetailsByOrderId
     public List<RepairOrderDetail> getDetailsByOrderId(int orderId) throws Exception {
         List<RepairOrderDetail> result = new ArrayList<>();
-        String sql = "SELECT order_id, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong FROM repair_order_details WHERE order_id = ?";
+        String sql = "SELECT ma_phieu, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong FROM chi_tiet_phieu_sua WHERE ma_phieu = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    result.add(new RepairOrderDetail(rs.getInt("order_id"), rs.getString("ma_hang_muc"), rs.getString("loai_hang_muc"), rs.getDouble("don_gia_thuc_te"), rs.getInt("so_luong")));
+                    result.add(new RepairOrderDetail(rs.getInt("ma_phieu"), rs.getString("ma_hang_muc"), rs.getString("loai_hang_muc"), rs.getDouble("don_gia_thuc_te"), rs.getInt("so_luong")));
                 }
             }
         }
@@ -306,21 +315,22 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
 
     /**
      * Lay toan bo chi tiet phieu sua chua (dung cho bao cao thong ke).
-     * Thay the cho JsonStorage.loadList("repair_order_details.json", ...) truoc day.
+     * Thay the cho JsonStorage.loadList("chi_tiet_phieu_sua.json", ...) truoc day.
      */
     public List<RepairOrderDetail> getAllDetails() throws Exception {
         List<RepairOrderDetail> result = new ArrayList<>();
-        String sql = "SELECT order_id, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong FROM repair_order_details";
+        String sql = "SELECT ma_phieu, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong FROM chi_tiet_phieu_sua";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                result.add(new RepairOrderDetail(rs.getInt("order_id"), rs.getString("ma_hang_muc"), rs.getString("loai_hang_muc"), rs.getDouble("don_gia_thuc_te"), rs.getInt("so_luong")));
+                result.add(new RepairOrderDetail(rs.getInt("ma_phieu"), rs.getString("ma_hang_muc"), rs.getString("loai_hang_muc"), rs.getDouble("don_gia_thuc_te"), rs.getInt("so_luong")));
             }
         }
         return result;
     }
 
+    // Lấy giá trị của thuộc tính DanhSachChiTiet
     public List<HangMuc> getDanhSachChiTiet(int orderId) throws Exception {
         List<RepairOrderDetail> details = getDetailsByOrderId(orderId);
         List<HangMuc> danhSachChiTiet = new ArrayList<>();
@@ -351,14 +361,15 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         return danhSachChiTiet;
     }
 
+    // Ánh xạ dữ liệu từ ResultSet sang đối tượng Java
     private RepairOrder mapRow(ResultSet rs) throws SQLException {
-        Timestamp entry = rs.getTimestamp("entry_date");
-        Timestamp exit = rs.getTimestamp("exit_date");
-        int orderId = rs.getInt("order_id");
-        String licensePlate = rs.getString("license_plate");
-        int mechanicId = rs.getInt("mechanic_id");
-        String status = rs.getString("status");
-        String visualCondition = rs.getString("visual_condition");
+        Timestamp entry = rs.getTimestamp("ngay_vao");
+        Timestamp exit = rs.getTimestamp("ngay_ra");
+        int orderId = rs.getInt("ma_phieu");
+        String licensePlate = rs.getString("bien_so");
+        int mechanicId = rs.getInt("ma_tho_may");
+        String status = rs.getString("trang_thai");
+        String visualCondition = rs.getString("tinh_trang_ben_ngoai");
 
         com.mycompany.quanlygara.model.Vehicle vehicle = null;
         com.mycompany.quanlygara.model.Mechanic mechanic = null;
@@ -389,3 +400,4 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         return ro;
     }
 }
+
