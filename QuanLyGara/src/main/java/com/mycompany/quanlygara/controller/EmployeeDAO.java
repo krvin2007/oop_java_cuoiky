@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public class EmployeeDAO {
     
     public Employee login(String username, String password) {
-        String sql = "SELECT id, name, phone, address, username, password, role, specialization, salary, status FROM employees WHERE username = ? AND password = ? AND is_deleted = FALSE";
+        String sql = "SELECT id, name, phone, address, username, password, role, specialization, salary, status FROM employees WHERE BINARY username = ? AND BINARY password = ? AND is_deleted = FALSE";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
              
