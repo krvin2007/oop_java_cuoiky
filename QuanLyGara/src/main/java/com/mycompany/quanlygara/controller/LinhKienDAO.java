@@ -84,7 +84,7 @@ public class LinhKienDAO implements IRepository<LinhKien> {
     public void xoa(Object id) throws Exception {
         String ma = (String) id;
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement("DELETE FROM linh_kien WHERE LOWER(ma) = LOWER(?)")) {
+             PreparedStatement ps = conn.prepareStatement("UPDATE linh_kien SET da_xoa = TRUE WHERE LOWER(ma) = LOWER(?)")) {
             ps.setString(1, ma);
             int rows = ps.executeUpdate();
             if (rows == 0) {
@@ -97,27 +97,27 @@ public class LinhKienDAO implements IRepository<LinhKien> {
     @Override
     public List<LinhKien> layTatCa() throws Exception {
         // Thực thi phương thức querySql để xử lý logic tương ứng
-        return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien ORDER BY ma", null);
+        return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE da_xoa = FALSE ORDER BY ma", null);
     }
 
     // Lấy dữ liệu chi tiết theo mã định danh (ID)
     @Override
     public LinhKien layTheoId(Object id) throws Exception {
         String ma = (String) id;
-        List<LinhKien> list = querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE LOWER(ma) = LOWER(?)", ma);
+        List<LinhKien> list = querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE LOWER(ma) = LOWER(?) AND da_xoa = FALSE", ma);
         return list.isEmpty() ? null : list.get(0);
     }
 
     // Tìm kiếm dữ liệu dựa trên điều kiện đầu vào
     public List<LinhKien> searchByName(String keyword) throws Exception {
-        return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE LOWER(ten) LIKE ? ORDER BY ma",
+        return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE LOWER(ten) LIKE ? AND da_xoa = FALSE ORDER BY ma",
                 "%" + keyword.toLowerCase() + "%");
     }
 
     // Tìm kiếm dữ liệu dựa trên điều kiện đầu vào
     public List<LinhKien> searchByPriceRange(double minPrice, double maxPrice) throws Exception {
         List<LinhKien> list = new ArrayList<>();
-        String sql = "SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE don_gia >= ? AND don_gia <= ? ORDER BY don_gia ASC";
+        String sql = "SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE don_gia >= ? AND don_gia <= ? AND da_xoa = FALSE ORDER BY don_gia ASC";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, minPrice);
@@ -135,7 +135,7 @@ public class LinhKienDAO implements IRepository<LinhKien> {
     public void deductQuantity(String ma, int qtyToDeduct) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE linh_kien SET so_luong_ton = so_luong_ton - ? WHERE LOWER(ma) = LOWER(?) AND so_luong_ton >= ?")) {
+                    "UPDATE linh_kien SET so_luong_ton = so_luong_ton - ? WHERE LOWER(ma) = LOWER(?) AND so_luong_ton >= ? AND da_xoa = FALSE")) {
                 ps.setInt(1, qtyToDeduct);
                 ps.setString(2, ma);
                 ps.setInt(3, qtyToDeduct);
@@ -151,14 +151,14 @@ public class LinhKienDAO implements IRepository<LinhKien> {
     public List<LinhKien> sortByPrice(boolean ascending) throws Exception {
         String order = ascending ? "ASC" : "DESC";
         // Thực thi phương thức querySql để xử lý logic tương ứng
-        return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien ORDER BY don_gia " + order, null);
+        return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE da_xoa = FALSE ORDER BY don_gia " + order, null);
     }
 
     // Sắp xếp danh sách dữ liệu
     public List<LinhKien> sortByQuantity(boolean ascending) throws Exception {
         String order = ascending ? "ASC" : "DESC";
         // Thực thi phương thức querySql để xử lý logic tương ứng
-        return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien ORDER BY so_luong_ton " + order, null);
+        return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE da_xoa = FALSE ORDER BY so_luong_ton " + order, null);
     }
 
     // Thực thi phương thức querySql để xử lý logic tương ứng

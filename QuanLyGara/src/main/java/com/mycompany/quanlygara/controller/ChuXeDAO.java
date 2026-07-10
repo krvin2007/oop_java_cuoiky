@@ -34,7 +34,7 @@ public class ChuXeDAO implements IRepository<Customer> {
                     }
                 }
             }
-            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM chu_xe WHERE sdt = ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM chu_xe WHERE sdt = ? AND da_xoa = FALSE")) {
                 ps.setString(1, Customer.getPhone());
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -76,7 +76,7 @@ public class ChuXeDAO implements IRepository<Customer> {
     @Override
     public void capNhat(Customer Customer) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM chu_xe WHERE sdt = ? AND id <> ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM chu_xe WHERE sdt = ? AND id <> ? AND da_xoa = FALSE")) {
                 ps.setString(1, Customer.getPhone());
                 ps.setInt(2, Customer.getId());
                 try (ResultSet rs = ps.executeQuery()) {
@@ -105,7 +105,7 @@ public class ChuXeDAO implements IRepository<Customer> {
     public void xoa(Object id) throws Exception {
         int targetId = (Integer) id;
         try (Connection conn = DBConnection.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM xe WHERE ma_chu_xe = ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM xe WHERE ma_chu_xe = ? AND da_xoa = FALSE")) {
                 ps.setInt(1, targetId);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next() && rs.getInt(1) > 0) {

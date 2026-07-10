@@ -78,7 +78,7 @@ public class DichVuDAO implements IRepository<DichVu> {
     public void xoa(Object id) throws Exception {
         String ma = (String) id;
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement("DELETE FROM dich_vu WHERE LOWER(ma) = LOWER(?)")) {
+             PreparedStatement ps = conn.prepareStatement("UPDATE dich_vu SET da_xoa = TRUE WHERE LOWER(ma) = LOWER(?)")) {
             ps.setString(1, ma);
             int rows = ps.executeUpdate();
             if (rows == 0) {
@@ -91,20 +91,20 @@ public class DichVuDAO implements IRepository<DichVu> {
     @Override
     public List<DichVu> layTatCa() throws Exception {
         // Thực thi phương thức querySql để xử lý logic tương ứng
-        return querySql("SELECT ma, ten, don_gia FROM dich_vu ORDER BY ma", null);
+        return querySql("SELECT ma, ten, don_gia FROM dich_vu WHERE da_xoa = FALSE ORDER BY ma", null);
     }
 
     // Lấy dữ liệu chi tiết theo mã định danh (ID)
     @Override
     public DichVu layTheoId(Object id) throws Exception {
         String ma = (String) id;
-        List<DichVu> list = querySql("SELECT ma, ten, don_gia FROM dich_vu WHERE LOWER(ma) = LOWER(?)", ma);
+        List<DichVu> list = querySql("SELECT ma, ten, don_gia FROM dich_vu WHERE LOWER(ma) = LOWER(?) AND da_xoa = FALSE", ma);
         return list.isEmpty() ? null : list.get(0);
     }
 
     // Tìm kiếm dữ liệu dựa trên điều kiện đầu vào
     public List<DichVu> searchByName(String keyword) throws Exception {
-        return querySql("SELECT ma, ten, don_gia FROM dich_vu WHERE LOWER(ten) LIKE ? ORDER BY ma",
+        return querySql("SELECT ma, ten, don_gia FROM dich_vu WHERE LOWER(ten) LIKE ? AND da_xoa = FALSE ORDER BY ma",
                 "%" + keyword.toLowerCase() + "%");
     }
 

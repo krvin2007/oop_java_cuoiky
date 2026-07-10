@@ -97,8 +97,8 @@ public abstract class HangMuc {
             try {
                 System.out.print("Nhap don gia (VND): ");
                 this.donGia = Double.parseDouble(sc.nextLine());
-                if (this.donGia < 0) {
-                    System.out.println("Don gia phai >= 0!");
+                if (this.donGia <= 0) {
+                    System.out.println("Don gia phai > 0!");
                     continue;
                 }
                 break;

@@ -475,7 +475,6 @@ public class Vehicle {
             System.out.print("Mau xe qua ngan (it nhat 2 ky tu)! Moi nhap lai: ");
             this.model = sc.nextLine().trim();
         }
-
         int currentYear = java.time.Year.now().getValue();
         while (true) {
             try {
@@ -504,24 +503,43 @@ public class Vehicle {
             this.condition = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
 
-        // Note: Customer should be set by the caller fetching from DAO based on input
-        // ID.
+        // Note: Customer should be set by the caller fetching from DAO based on input ID.
         int inputOwnerId = 0;
         while (true) {
-            System.out.print("Nhap ID chu xe: ");
             try {
+                System.out.println("--- Danh sach Chu xe hien co ---");
+                com.mycompany.quanlygara.controller.ChuXeDAO ownerDAO = new com.mycompany.quanlygara.controller.ChuXeDAO();
+                java.util.List<Customer> availableOwners = ownerDAO.layTatCa();
+                com.mycompany.quanlygara.util.TableFormatter.printCustomers(availableOwners);
+                System.out.println("--------------------------------");
+                
+                System.out.print("Nhap ID chu xe: ");
                 inputOwnerId = Integer.parseInt(sc.nextLine());
                 if (inputOwnerId <= 0) {
                     System.out.println("ID chu xe phai la so nguyen duong. Vui long nhap lai!");
                     continue;
                 }
+                
+                boolean exists = false;
+                for (Customer c : availableOwners) {
+                    if (c.getId() == inputOwnerId) {
+                        exists = true;
+                        this.Customer = c;
+                        break;
+                    }
+                }
+                
+                if (!exists) {
+                    System.out.println("Loi: ID chu xe khong ton tai! Vui long nhap dung ID tu danh sach tren.");
+                    continue;
+                }
                 break;
             } catch (NumberFormatException e) {
                 System.out.println("Vui long nhap so nguyen hop le!");
+            } catch (Exception e) {
+                System.out.println("Loi lay du lieu chu xe: " + e.getMessage());
             }
         }
-        this.Customer = new Customer();
-        this.Customer.setId(inputOwnerId); // Temporary ID wrapper
     }
 
     // Trả về chuỗi đại diện chứa thông tin của đối tượng

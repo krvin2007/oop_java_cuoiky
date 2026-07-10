@@ -26,7 +26,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
                     }
                 }
             }
-            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM nhan_vien WHERE sdt = ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM nhan_vien WHERE sdt = ? AND da_xoa = FALSE")) {
                 ps.setString(1, mechanic.getPhone());
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -40,6 +40,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
             
             String uname = mechanic.getUsername() != null && !mechanic.getUsername().isEmpty() ? mechanic.getUsername() : mechanic.getPhone();
             String pwd = mechanic.getPassword() != null && !mechanic.getPassword().isEmpty() ? mechanic.getPassword() : "123456";
+            String hashedPwd = com.mycompany.quanlygara.util.StringUtils.hashPassword(pwd);
 
             if (mechanic.getId() > 0) {
                 try (PreparedStatement ps = conn.prepareStatement(
@@ -49,7 +50,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
                     ps.setString(3, mechanic.getPhone());
                     ps.setString(4, mechanic.getAddress());
                     ps.setString(5, uname);
-                    ps.setString(6, pwd);
+                    ps.setString(6, hashedPwd);
                     ps.setString(7, mechanic.getSpec());
                     ps.setDouble(8, mechanic.getSalary());
                     ps.setString(9, mechanic.getStatus());
@@ -63,7 +64,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
                     ps.setString(2, mechanic.getPhone());
                     ps.setString(3, mechanic.getAddress());
                     ps.setString(4, uname);
-                    ps.setString(5, pwd);
+                    ps.setString(5, hashedPwd);
                     ps.setString(6, mechanic.getSpec());
                     ps.setDouble(7, mechanic.getSalary());
                     ps.setString(8, mechanic.getStatus());
@@ -82,7 +83,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
     @Override
     public void capNhat(Mechanic mechanic) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM nhan_vien WHERE sdt = ? AND id <> ?")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM nhan_vien WHERE sdt = ? AND id <> ? AND da_xoa = FALSE")) {
                 ps.setString(1, mechanic.getPhone());
                 ps.setInt(2, mechanic.getId());
                 try (ResultSet rs = ps.executeQuery()) {
@@ -97,7 +98,7 @@ public class KyThuatVienDAO implements IRepository<Mechanic> {
                 ps.setString(2, mechanic.getPhone());
                 ps.setString(3, mechanic.getAddress());
                 ps.setString(4, mechanic.getUsername());
-                ps.setString(5, mechanic.getPassword());
+                ps.setString(5, com.mycompany.quanlygara.util.StringUtils.hashPassword(mechanic.getPassword()));
                 ps.setString(6, mechanic.getSpec());
                 ps.setDouble(7, mechanic.getSalary());
                 ps.setString(8, mechanic.getStatus());

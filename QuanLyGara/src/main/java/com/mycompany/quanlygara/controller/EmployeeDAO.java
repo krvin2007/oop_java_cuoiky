@@ -17,7 +17,7 @@ public class EmployeeDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
              
             ps.setString(1, username);
-            ps.setString(2, password);
+            ps.setString(2, com.mycompany.quanlygara.util.StringUtils.hashPassword(password));
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     String role = rs.getString("vai_tro");
@@ -53,7 +53,7 @@ public class EmployeeDAO {
         String sql = "UPDATE nhan_vien SET mat_khau = ? WHERE ten_dang_nhap = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, newPassword);
+            ps.setString(1, com.mycompany.quanlygara.util.StringUtils.hashPassword(newPassword));
             ps.setString(2, username);
             int affected = ps.executeUpdate();
             return affected > 0;

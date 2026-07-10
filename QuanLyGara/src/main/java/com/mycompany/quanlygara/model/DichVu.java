@@ -66,8 +66,8 @@ public class DichVu extends HangMuc {
             try {
                 System.out.print("Nhap don gia (VND): ");
                 double gia = Double.parseDouble(sc.nextLine());
-                if (gia < 0) {
-                    System.out.println("Don gia phai >= 0!");
+                if (gia <= 0) {
+                    System.out.println("Don gia phai > 0!");
                     continue;
                 }
                 this.setDonGia(gia);

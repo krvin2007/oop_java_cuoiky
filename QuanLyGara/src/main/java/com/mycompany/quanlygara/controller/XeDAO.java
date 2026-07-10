@@ -27,7 +27,7 @@ public class XeDAO implements IRepository<Vehicle> {
     public void themMoi(Vehicle vehicle) throws Exception {
         try (Connection conn = DBConnection.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(
-                    "SELECT bien_so FROM xe WHERE LOWER(bien_so) = LOWER(?)")) {
+                    "SELECT bien_so FROM xe WHERE LOWER(bien_so) = LOWER(?) AND da_xoa = FALSE")) {
                 ps.setString(1, vehicle.getLicensePlate());
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {

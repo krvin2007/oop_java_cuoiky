@@ -112,13 +112,16 @@ public abstract class Person {
      * private.
      */
     public void nhapInfo(Scanner sc) {
-        // Nhập họ tên: Không được để trống, độ dài >= 2 và chỉ chứa chữ cái + khoảng
-        // trắng
+        // Nhập họ tên: Không được để trống, chỉ chứa chữ cái và khoảng trắng, từ 2 đến 50 ký tự
         System.out.print("Nhap ho ten: ");
-        this.name = sc.nextLine().trim();
-        while (!this.name.matches("^[\\p{L}\\s]{2,}$")) {
-            System.out.print("Ho ten khong hop le (Tu 2 ky tu tro len, chi chua chu cai)! Moi nhap lai: ");
-            this.name = sc.nextLine().trim();
+        this.name = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+        while (this.name.isEmpty() || !this.name.matches("^[a-zA-Z\\s]{2,50}$")) {
+            if (this.name.isEmpty()) {
+                System.out.print("Ho ten khong duoc de trong! Moi nhap lai: ");
+            } else {
+                System.out.print("Ho ten khong hop le (chi gom chu cai va khoang trang, tu 2-50 ky tu). Moi nhap lai: ");
+            }
+            this.name = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
         }
 
         // Nhập số điện thoại: Kiểm tra định dạng Regex (bắt đầu bằng 0, gồm 10 số)

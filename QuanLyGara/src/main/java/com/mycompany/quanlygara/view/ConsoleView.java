@@ -52,8 +52,12 @@ public class ConsoleView {
         this.currentUser = null;
     }
 
-    // PhÆ°Æ¡ng thá»©c main - Äiá»ƒm báº¯t Ä‘áº§u cháº¡y chÆ°Æ¡ng trĂ¬nh
+    // PhÆ°Æ¡ng thá»©c main - Ä iá»ƒm báº¯t Ä‘áº§u cháº¡y chÆ°Æ¡ng trĂ¬nh
     public static void main(String[] args) {
+        try {
+            System.setOut(new java.io.PrintStream(System.out, true, "UTF-8"));
+        } catch (Exception ignored) {
+        }
         ConsoleView view = new ConsoleView();
         view.start();
     }
@@ -251,13 +255,15 @@ public class ConsoleView {
             System.out.println("6. Tim kiem xe theo Ten chu xe");
             System.out.println("7. Cap nhat thong tin Chu xe");
             System.out.println("8. Xoa Xe");
+            System.out.println("9. Xoa Chu xe");
             System.out.println("0. Quay lai Menu chinh");
             System.out.println("===============================================================");
-            System.out.print("Nhap lua chon (0-8): ");
+            System.out.print("Nhap lua chon (0-9): ");
             try {
                 choice = Integer.parseInt(sc.nextLine());
 
-                if (currentUser != null && currentUser.getRole().equals("KyThuat") && (choice == 7 || choice == 8)) {
+                if (currentUser != null && currentUser.getRole().equals("KyThuat")
+                        && (choice == 7 || choice == 8 || choice == 9)) {
                     System.out.println("LOI: Ban la Ky thuat vien, khong co quyen Sua hoac Xoa thong tin Chu xe/Xe!");
                     continue;
                 }
@@ -265,8 +271,20 @@ public class ConsoleView {
                 switch (choice) {
                     case 1:
                         System.out.println("Ban muon them bao nhieu Chu xe?");
-                        System.out.print("=> So luong: ");
-                        int countCustomer = Integer.parseInt(sc.nextLine());
+                        int countCustomer = 0;
+                        while (true) {
+                            try {
+                                System.out.print("=> So luong: ");
+                                countCustomer = Integer.parseInt(sc.nextLine());
+                                if (countCustomer <= 0) {
+                                    System.out.println("So luong phai lon hon 0!");
+                                    continue;
+                                }
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Vui long nhap so nguyen hop le!");
+                            }
+                        }
                         for (int i = 0; i < countCustomer; i++) {
                             System.out.println("--- Nhap thong tin Chu xe thu " + (i + 1) + " ---");
                             Customer newOwner = new Customer();
@@ -287,25 +305,24 @@ public class ConsoleView {
                         break;
                     case 2:
                         System.out.println("Ban muon them bao nhieu Xe?");
-                        System.out.print("=> So luong: ");
-                        int countVeh = Integer.parseInt(sc.nextLine());
+                        int countVeh = 0;
+                        while (true) {
+                            try {
+                                System.out.print("=> So luong: ");
+                                countVeh = Integer.parseInt(sc.nextLine());
+                                if (countVeh <= 0) {
+                                    System.out.println("So luong phai lon hon 0!");
+                                    continue;
+                                }
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Vui long nhap so nguyen hop le!");
+                            }
+                        }
                         for (int i = 0; i < countVeh; i++) {
                             System.out.println("--- Nhap thong tin Xe thu " + (i + 1) + " ---");
-                            System.out.println("--- Danh sach Chu xe hien co ---");
-                            List<Customer> availableOwners = ownerController.layTatCa();
-                            com.mycompany.quanlygara.util.TableFormatter.printCustomers(availableOwners);
-                            System.out.println("--------------------------------");
                             Vehicle newVehicle = new Vehicle();
                             newVehicle.nhapInfo(sc);
-                            int oId = newVehicle.getOwner() != null ? newVehicle.getOwner().getId() : 0;
-                            Customer customer = ownerController.layTheoId(oId);
-                            if (customer == null) {
-                                System.out.println(
-                                        "Loi: Khong tim thay chu xe co ID = " + oId + ". Vui long tao chu xe truoc!");
-                                System.out.println("Vui long nhap lai thong tin cho xe nay!");
-                                i--;
-                                continue;
-                            }
                             Vehicle existing = vehicleController.layTheoId(newVehicle.getLicensePlate());
                             if (existing != null) {
                                 System.out.println("Loi: Bien so xe '" + newVehicle.getLicensePlate()
@@ -373,6 +390,35 @@ public class ConsoleView {
                             System.out.println("Da xoa xe thanh cong.");
                         }
                         break;
+                    case 9:
+                        System.out.println("--- XOA CHU XE ---");
+                        System.out.println("--- Danh sach Chu xe hien co ---");
+                        List<Customer> customers = ownerController.layTatCa();
+                        com.mycompany.quanlygara.util.TableFormatter.printCustomers(customers);
+                        System.out.println("--------------------------------");
+                        System.out.print("Nhap ID chu xe can xoa: ");
+                        int deleteCustId = 0;
+                        while (true) {
+                            try {
+                                deleteCustId = Integer.parseInt(sc.nextLine());
+                                if (deleteCustId <= 0) {
+                                    System.out.println("ID chu xe phai la so nguyen duong!");
+                                    System.out.print("Nhap lai ID chu xe: ");
+                                    continue;
+                                }
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Vui long nhap so nguyen hop le!");
+                                System.out.print("Nhap lai ID chu xe: ");
+                            }
+                        }
+                        try {
+                            ownerController.xoa(deleteCustId);
+                            System.out.println("Xoa chu xe thanh cong!");
+                        } catch (Exception e) {
+                            System.out.println("Loi: " + e.getMessage());
+                        }
+                        break;
                     case 0:
                         break;
                     default:
@@ -406,8 +452,20 @@ public class ConsoleView {
                 switch (choice) {
                     case 1:
                         System.out.println("Ban muon them bao nhieu Ky thuat vien?");
-                        System.out.print("=> So luong: ");
-                        int countMechanic = Integer.parseInt(sc.nextLine());
+                        int countMechanic = 0;
+                        while (true) {
+                            try {
+                                System.out.print("=> So luong: ");
+                                countMechanic = Integer.parseInt(sc.nextLine());
+                                if (countMechanic <= 0) {
+                                    System.out.println("So luong phai lon hon 0!");
+                                    continue;
+                                }
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Vui long nhap so nguyen hop le!");
+                            }
+                        }
                         for (int i = 0; i < countMechanic; i++) {
                             System.out.println("--- Nhap thong tin Ky thuat vien thu " + (i + 1) + " ---");
                             Mechanic newMechanic = new Mechanic();
@@ -501,8 +559,20 @@ public class ConsoleView {
                 switch (choice) {
                     case 1:
                         System.out.println("Ban muon them bao nhieu Linh kien?");
-                        System.out.print("=> So luong: ");
-                        int countPart = Integer.parseInt(sc.nextLine());
+                        int countPart = 0;
+                        while (true) {
+                            try {
+                                System.out.print("=> So luong: ");
+                                countPart = Integer.parseInt(sc.nextLine());
+                                if (countPart <= 0) {
+                                    System.out.println("So luong phai lon hon 0!");
+                                    continue;
+                                }
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Vui long nhap so nguyen hop le!");
+                            }
+                        }
                         for (int i = 0; i < countPart; i++) {
                             System.out.println("--- Nhap thong tin Linh kien thu " + (i + 1) + " ---");
                             LinhKien newPart = new LinhKien();
@@ -571,10 +641,39 @@ public class ConsoleView {
                         }
                         break;
                     case 8:
-                        System.out.print("Nhap gia thap nhat: ");
-                        double minPrice = Double.parseDouble(sc.nextLine());
-                        System.out.print("Nhap gia cao nhat: ");
-                        double maxPrice = Double.parseDouble(sc.nextLine());
+                        double minPrice = 0;
+                        double maxPrice = 0;
+                        while (true) {
+                            try {
+                                System.out.print("Nhap gia thap nhat: ");
+                                minPrice = Double.parseDouble(sc.nextLine());
+                                if (minPrice < 0) {
+                                    System.out.println("Gia thap nhat phai >= 0!");
+                                    continue;
+                                }
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Vui long nhap so thuc hop le!");
+                            }
+                        }
+                        while (true) {
+                            try {
+                                System.out.print("Nhap gia cao nhat: ");
+                                maxPrice = Double.parseDouble(sc.nextLine());
+                                if (maxPrice < 0) {
+                                    System.out.println("Gia cao nhat phai >= 0!");
+                                    continue;
+                                }
+                                if (maxPrice < minPrice) {
+                                    System.out.println("Gia cao nhat phai >= gia thap nhat ("
+                                            + String.format("%,.0f", minPrice) + " VND)!");
+                                    continue;
+                                }
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Vui long nhap so thuc hop le!");
+                            }
+                        }
                         List<LinhKien> partsByPrice = partController.searchByPriceRange(minPrice, maxPrice);
                         if (partsByPrice.isEmpty()) {
                             System.out.println("Khong tim thay linh kien nao trong khoang gia nay.");
@@ -1001,8 +1100,20 @@ public class ConsoleView {
                         System.out.println("----------------------------------------------");
                         break;
                     case 2:
-                        System.out.print("Nhap so luong linh kien can lay (limit): ");
-                        int limitParts = Integer.parseInt(sc.nextLine());
+                        int limitParts = 0;
+                        while (true) {
+                            try {
+                                System.out.print("Nhap so luong linh kien can lay (limit): ");
+                                limitParts = Integer.parseInt(sc.nextLine());
+                                if (limitParts <= 0) {
+                                    System.out.println("Limit phai lon hon 0!");
+                                    continue;
+                                }
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Vui long nhap so nguyen hop le!");
+                            }
+                        }
                         Map<String, Integer> partsReport = reportController.getMostUsedParts(limitParts);
                         System.out.println("=== TOP LINH KIEN SU DUNG NHIEU NHAT ===");
                         int idx1 = 1;
@@ -1011,8 +1122,20 @@ public class ConsoleView {
                         }
                         break;
                     case 3:
-                        System.out.print("Nhap so luong xe can lay (limit): ");
-                        int limitVehicles = Integer.parseInt(sc.nextLine());
+                        int limitVehicles = 0;
+                        while (true) {
+                            try {
+                                System.out.print("Nhap so luong xe can lay (limit): ");
+                                limitVehicles = Integer.parseInt(sc.nextLine());
+                                if (limitVehicles <= 0) {
+                                    System.out.println("Limit phai lon hon 0!");
+                                    continue;
+                                }
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Vui long nhap so nguyen hop le!");
+                            }
+                        }
                         Map<String, Integer> vehiclesReport = reportController.getMostRepairedVehicles(limitVehicles);
                         System.out.println("=== TOP XE DUOC SUA CHUA NHIEU NHAT ===");
                         int idx2 = 1;
@@ -1021,8 +1144,20 @@ public class ConsoleView {
                         }
                         break;
                     case 4:
-                        System.out.print("Nhap so luong ky thuat vien can lay (limit): ");
-                        int limitMechs = Integer.parseInt(sc.nextLine());
+                        int limitMechs = 0;
+                        while (true) {
+                            try {
+                                System.out.print("Nhap so luong ky thuat vien can lay (limit): ");
+                                limitMechs = Integer.parseInt(sc.nextLine());
+                                if (limitMechs <= 0) {
+                                    System.out.println("Limit phai lon hon 0!");
+                                    continue;
+                                }
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Vui long nhap so nguyen hop le!");
+                            }
+                        }
                         Map<String, Integer> mechsReport = reportController.getMostActiveMechanics(limitMechs);
                         System.out.println("=== TOP KY THUAT VIEN DUOC GIAO NHIEU VIEC ===");
                         int idx3 = 1;
@@ -1063,8 +1198,20 @@ public class ConsoleView {
                 switch (choice) {
                     case 1:
                         System.out.println("Ban muon them bao nhieu Dich vu?");
-                        System.out.print("=> So luong: ");
-                        int countDichVu = Integer.parseInt(sc.nextLine());
+                        int countDichVu = 0;
+                        while (true) {
+                            try {
+                                System.out.print("=> So luong: ");
+                                countDichVu = Integer.parseInt(sc.nextLine());
+                                if (countDichVu <= 0) {
+                                    System.out.println("So luong phai lon hon 0!");
+                                    continue;
+                                }
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Vui long nhap so nguyen hop le!");
+                            }
+                        }
                         for (int i = 0; i < countDichVu; i++) {
                             System.out.println("--- Nhap thong tin Dich vu thu " + (i + 1) + " ---");
                             DichVu newDV = new DichVu();
