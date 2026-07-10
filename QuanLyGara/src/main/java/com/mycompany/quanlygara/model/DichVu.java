@@ -14,8 +14,10 @@ import java.util.Scanner;
  * - Thừa hưởng các thuộc tính mã, tên và đơn giá từ lớp cha.
  * 
  * 2. TÍNH ĐA HÌNH (POLYMORPHISM):
- * - Ghi đè và triển khai thực thể (implement) phương thức trừu tượng 'tinhThanhTien(int soLuong)'.
- * - Đối với Dịch vụ sửa chữa, tiền công được tính trọn gói cố định cho mỗi hạng mục, nên thành tiền bằng chính đơn giá (không nhân với số lượng).
+ * - Ghi đè và triển khai thực thể (implement) phương thức trừu tượng
+ * 'tinhThanhTien(int soLuong)'.
+ * - Đối với Dịch vụ sửa chữa, tiền công được tính trọn gói cố định cho mỗi hạng
+ * mục, nên thành tiền bằng chính đơn giá (không nhân với số lượng).
  */
 public class DichVu extends HangMuc {
 
@@ -32,7 +34,8 @@ public class DichVu extends HangMuc {
     /**
      * TRIỂN KHAI PHƯƠNG THỨC TRỪU TƯỢNG (METHOD OVERRIDING):
      * - Đây là biểu hiện của tính Đa hình.
-     * - 'DichVu' định nghĩa logic riêng cho 'tinhThanhTien': Trả về trực tiếp đơn giá vì dịch vụ là trọn gói (số lượng luôn là 1).
+     * - 'DichVu' định nghĩa logic riêng cho 'tinhThanhTien': Trả về trực tiếp đơn
+     * giá vì dịch vụ là trọn gói (số lượng luôn là 1).
      */
     @Override
     public double tinhThanhTien(int soLuong) {
@@ -44,14 +47,18 @@ public class DichVu extends HangMuc {
     @Override
     public void nhapInfo(Scanner sc) {
         System.out.print("Nhap ma dich vu (de trong de tu dong tao): ");
-        String maInput = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+        String maInput = sc.nextLine().trim();
+        while (!maInput.isEmpty() && maInput.contains(" ")) {
+            System.out.print("Ma dich vu khong duoc chua khoang trang! Moi nhap lai: ");
+            maInput = sc.nextLine().trim();
+        }
         this.setMa(maInput); // can be empty for auto-generation
 
         System.out.print("Nhap ten dich vu: ");
-        String tenInput = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
-        while (tenInput.isEmpty()) {
-            System.out.print("Ten dich vu khong duoc de trong! Moi nhap lai: ");
-            tenInput = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+        String tenInput = sc.nextLine().trim();
+        while (tenInput.length() < 2) {
+            System.out.print("Ten dich vu qua ngan (it nhat 2 ky tu)! Moi nhap lai: ");
+            tenInput = sc.nextLine().trim();
         }
         this.setTen(tenInput);
 

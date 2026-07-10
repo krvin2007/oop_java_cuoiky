@@ -96,7 +96,7 @@ public class TableFormatter {
             String mName = r.getMechanic() != null ? r.getMechanic().getName() : "N/A";
             String dStr = r.getEntryDate() != null ? new java.text.SimpleDateFormat("dd/MM/yyyy").format(r.getEntryDate()) : "N/A";
             System.out.printf("| %-5d | %-12s | %-20s | %-20s | %-10s |\n",
-                r.getOrderId(), truncate(lp, 12), truncate(mName, 20), truncate(dStr, 20), truncate(r.getStatus(), 10));
+                r.getOrderId(), truncate(lp, 12), truncate(mName, 20), truncate(dStr, 20), truncate(r.getFriendlyStatus(), 10));
         }
         System.out.println("+-------+--------------+----------------------+----------------------+------------+");
     }

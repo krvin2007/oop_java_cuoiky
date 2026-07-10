@@ -122,6 +122,22 @@ public class RepairOrder {
         this.status = status;
     }
 
+    // Lấy trạng thái thân thiện không dấu tiếng Việt
+    public String getFriendlyStatus() {
+        if (this.status == null) return "";
+        switch (this.status.toUpperCase()) {
+            case "RECEIVING":
+                return "TIEP NHAN";
+            case "REPAIRING":
+            case "IN_PROGRESS":
+                return "DANG SUA";
+            case "COMPLETED":
+                return "HOAN THANH";
+            default:
+                return this.status;
+        }
+    }
+
     public java.util.List<RepairOrderDetail> getDetails() {
         return details;
     }
@@ -138,24 +154,91 @@ public class RepairOrder {
 
     // Nhập thông tin cho đối tượng từ giao diện Console
     public void nhapInfo(Scanner sc) {
-        System.out.print("Nhap bien so xe (license plate): ");
-        String inputLicensePlate = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
-        while (inputLicensePlate.isEmpty()) {
-            System.out.print("Bien so xe khong duoc de trong! Moi nhap lai: ");
-            inputLicensePlate = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+        String inputLicensePlate = "";
+        String plateTypeChoice = "";
+        while (true) {
+            System.out.println("--- Chon loai bien so xe ---");
+            System.out.println("1. Bien dan su (Trang, Vang, Xanh...) - Vi du: 29A-123.45, 51F-999.99");
+            System.out.println("2. Bien quan su (Quan doi)           - Vi du: AA-12-34");
+            System.out.print("Nhap lua chon cua ban (1-2): ");
+            plateTypeChoice = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+            if (plateTypeChoice.matches("[1-2]")) {
+                break;
+            }
+            System.out.println("Lua chon khong hop le! Vui long nhap 1 hoac 2.");
+        }
+        
+        while (true) {
+            if (plateTypeChoice.equals("2")) {
+                System.out.print("Nhap bien so xe quan doi (Vi du: AA-12-34): ");
+            } else {
+                System.out.print("Nhap bien so xe dan su (Vi du: 29A-123.45): ");
+            }
+            inputLicensePlate = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim()).toUpperCase();
+            
+            if (inputLicensePlate.isEmpty()) {
+                System.out.println("Bien so xe khong duoc de trong!");
+                continue;
+            }
+            
+            boolean isValid = false;
+            if (plateTypeChoice.equals("2")) {
+                if (inputLicensePlate.matches("^[A-Z]{2}[- ]?([0-9]{2}[- ]?[0-9]{2}|[0-9]{4,5})$")) {
+                    isValid = true;
+                } else {
+                    System.out.println("Loi: Bien so quan doi khong dung dinh dang! Vi du: AA-12-34.");
+                }
+            } else {
+                if (inputLicensePlate.matches("^([0-9]{2})([A-Z]{1,2}[0-9]?)[- ]?([0-9]{3,5}|[0-9]{3}\\.[0-9]{2})$")) {
+                    String provCode = inputLicensePlate.substring(0, 2);
+                    if (Vehicle.getProvinceName(provCode) != null) {
+                        isValid = true;
+                    } else {
+                        System.out.println("Loi: Hai chu so dau tien '" + provCode + "' khong phai ma tinh/thanh pho hop le cua Viet Nam!");
+                    }
+                } else {
+                    System.out.println("Loi: Dinh dang bien so xe khong hop le! Vi du: 29A-123.45.");
+                }
+            }
+            
+            if (isValid) {
+                break;
+            }
         }
         this.vehicle = new Vehicle();
         this.vehicle.setLicensePlate(inputLicensePlate); // Temporary wrapper
 
         while (true) {
             try {
+                System.out.println("--- Danh sach Ky thuat vien (Tho may) hien co ---");
+                com.mycompany.quanlygara.controller.KyThuatVienDAO mechanicDAO = new com.mycompany.quanlygara.controller.KyThuatVienDAO();
+                java.util.List<Mechanic> mechanics = mechanicDAO.layTatCa();
+                com.mycompany.quanlygara.util.TableFormatter.printMechanics(mechanics);
+                
                 System.out.print("Nhap ID ky thuat vien dam nhan: ");
                 int mId = Integer.parseInt(sc.nextLine());
+                
+                // Validate if mechanic exists in database
+                boolean exists = false;
+                for (Mechanic m : mechanics) {
+                    if (m.getId() == mId) {
+                        exists = true;
+                        break;
+                    }
+                }
+                
+                if (!exists) {
+                    System.out.println("Loi: ID ky thuat vien khong ton tai! Vui long nhap dung ID tu danh sach tren.");
+                    continue;
+                }
+                
                 this.mechanic = new Mechanic();
                 this.mechanic.setId(mId); // Temporary wrapper
                 break;
             } catch (NumberFormatException e) {
-                System.out.println("Vui long nhap ID so nguyen hop le!");
+                System.out.println("Loi: Vui long nhap ID la so nguyen hop le!");
+            } catch (Exception e) {
+                System.out.println("Loi lay du lieu: " + e.getMessage());
             }
         }
         System.out.print("Nhap ngay gio vao xuong (yyyy-MM-dd HH:mm:ss hoac go Enter de lay hien tai): ");
@@ -189,7 +272,7 @@ public class RepairOrder {
         String mechName = mechanic != null ? mechanic.getName() : "null";
         return "RepairOrder [ID: " + orderId + ", Vehicle: " + lp + 
                ", Entry: " + entryStr + ", Exit: " + exitStr + 
-               ", Mechanic: " + mechName + ", Status: " + status + 
+               ", Mechanic: " + mechName + ", Status: " + getFriendlyStatus() + 
                ", Visual Condition: " + visualCondition + ", Details: " + details.size() + " items]";
     }
 }

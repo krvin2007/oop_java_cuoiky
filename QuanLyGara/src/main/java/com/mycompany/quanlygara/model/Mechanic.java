@@ -13,7 +13,8 @@ public class Mechanic extends Employee {
     }
 
     // Khởi tạo đối tượng Mechanic mới
-    public Mechanic(int id, String name, String phone, String address, String username, String password, double salary, String status, String spec) {
+    public Mechanic(int id, String name, String phone, String address, String username, String password, double salary,
+            String status, String spec) {
         super(id, name, phone, address, username, password, "KyThuat", salary, status);
         this.spec = spec;
     }
@@ -39,29 +40,25 @@ public class Mechanic extends Employee {
     public void nhapInfo(Scanner sc) {
         super.nhapInfo(sc);
         System.out.print("Nhap username: ");
-        this.setUsername(com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim()));
-        while (this.getUsername().isEmpty()) {
-            System.out.print("Username khong duoc de trong! Moi nhap lai: ");
-            this.setUsername(com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim()));
+        this.setUsername(sc.nextLine().trim());
+        while (!this.getUsername().matches("^[a-zA-Z0-9_]{4,}$")) {
+            System.out.print("Username khong hop le (Tu 4 ky tu tro len, chi chua chu, so, _)! Moi nhap lai: ");
+            this.setUsername(sc.nextLine().trim());
         }
 
-        while (true) {
-            System.out.print("Nhap password: ");
-            String pwd = sc.nextLine().trim();
-            if (pwd.isEmpty()) {
-                System.out.println("Password khong duoc de trong! Moi nhap lai.");
-                continue;
-            }
-            if (com.mycompany.quanlygara.util.StringUtils.hasAccents(pwd)) {
-                System.out.println("Loi: Password khong duoc chua tieng Viet co dau! Moi nhap lai.");
-                continue;
-            }
-            this.setPassword(pwd);
-            break;
+        System.out.print("Nhap password: ");
+        this.setPassword(sc.nextLine().trim());
+        while (this.getPassword().length() < 6) {
+            System.out.print("Password phai co it nhat 6 ky tu! Moi nhap lai: ");
+            this.setPassword(sc.nextLine().trim());
         }
         System.out.print("Nhap chuyen mon (spec): ");
-        this.spec = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
-        
+        this.spec = sc.nextLine().trim();
+        while (this.spec.length() < 2) {
+            System.out.print("Chuyen mon qua ngan (it nhat 2 ky tu)! Moi nhap lai: ");
+            this.spec = sc.nextLine().trim();
+        }
+
         while (true) {
             try {
                 System.out.print("Nhap muc luong co ban: ");
@@ -81,7 +78,8 @@ public class Mechanic extends Employee {
     // Trả về chuỗi đại diện chứa thông tin của đối tượng
     @Override
     public String toString() {
-        return "Mechanic [ID: " + getId() + ", Name: " + getName() + ", Phone: " + getPhone() + 
-               ", Spec: " + spec + ", Salary: " + String.format("%,.0f", getSalary()) + ", Status: " + getStatus() + "]";
+        return "Mechanic [ID: " + getId() + ", Name: " + getName() + ", Phone: " + getPhone() +
+                ", Spec: " + spec + ", Salary: " + String.format("%,.0f", getSalary()) + ", Status: " + getStatus()
+                + "]";
     }
 }
