@@ -67,7 +67,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         if ("COMPLETED".equalsIgnoreCase(existing.getStatus())) {
             throw new Exception("Loi: Khong the cap nhat phieu sua chua da hoan tat (COMPLETED)!");
         }
-        String oldStatus = existing.getStatus();
+
         int oldMechanicId = existing.getMechanic() != null ? existing.getMechanic().getId() : 0;
         int newMechanicId = order.getMechanic() != null ? order.getMechanic().getId() : 0;
 
