@@ -23,7 +23,8 @@ public class ConsoleView {
     private final KyThuatVienDAO mechanicController;
     // Bá»™ Ä‘iá»u khiá»ƒn/Quáº£n lĂ½ linh kiá»‡n (Part Controller)
     private final LinhKienDAO partController;
-    // Bá»™ Ä‘iá»u khiá»ƒn/Quáº£n lĂ½ phiáº¿u sá»­a chá»¯a (Repair Order Controller)
+    // Bá»™ Ä‘iá»u khiá»ƒn/Quáº£n lĂ½ phiáº¿u sá»­a chá»¯a (Repair Order
+    // Controller)
     private final PhieuSuaChuaDAO repairOrderController;
     // Bá»™ Ä‘iá»u khiá»ƒn/Quáº£n lĂ½ hĂ³a Ä‘Æ¡n (Invoice Controller)
     private final HoaDonDAO invoiceController;
@@ -66,6 +67,16 @@ public class ConsoleView {
         while (true) {
             while (currentUser == null) {
                 System.out.println("\n--- VUI LONG DANG NHAP ---");
+                System.out.println("Danh sach tai khoan (Username - Chuc vu):");
+                List<Employee> accounts = employeeDAO.getAllAccounts();
+                if (accounts.isEmpty()) {
+                    System.out.println(" (Khong co tai khoan nao, vui long kiem tra CSDL)");
+                } else {
+                    for (Employee emp : accounts) {
+                        System.out.println(" - " + emp.getUsername() + " (" + emp.getRole() + ")");
+                    }
+                }
+                System.out.println("--------------------------");
                 System.out.print("Username (nhap 'exit' de thoat): ");
                 String username = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
                 if (username.equalsIgnoreCase("exit")) {
@@ -74,7 +85,7 @@ public class ConsoleView {
                 }
                 System.out.print("Password: ");
                 String password = sc.nextLine().trim();
-                
+
                 if (com.mycompany.quanlygara.util.StringUtils.hasAccents(password)) {
                     System.out.println("Loi: Mat khau khong the chua tieng Viet co dau!");
                     continue;
@@ -329,7 +340,8 @@ public class ConsoleView {
                         break;
                     case 6:
                         System.out.print("Nhap ten chu xe de tim xe: ");
-                        String ownerName = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+                        String ownerName = com.mycompany.quanlygara.util.StringUtils
+                                .removeAccents(sc.nextLine().trim());
                         List<Vehicle> searchName = vehicleController.searchByOwnerName(ownerName);
                         if (searchName.isEmpty()) {
                             System.out.println("Khong tim thay xe nao.");
@@ -523,7 +535,8 @@ public class ConsoleView {
                         break;
                     case 5:
                         System.out.print("Nhap ten linh kien can tim kiem: ");
-                        String partNameKeyword = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+                        String partNameKeyword = com.mycompany.quanlygara.util.StringUtils
+                                .removeAccents(sc.nextLine().trim());
                         List<LinhKien> partsByName = partController.searchByName(partNameKeyword);
                         if (partsByName.isEmpty()) {
                             System.out.println("Khong tim thay linh kien nao.");
@@ -533,7 +546,8 @@ public class ConsoleView {
                         break;
                     case 6:
                         System.out.print("Nhap Ma Linh kien can cap nhat: ");
-                        String editPartId = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+                        String editPartId = com.mycompany.quanlygara.util.StringUtils
+                                .removeAccents(sc.nextLine().trim());
                         LinhKien editPart = partController.layTheoId(editPartId);
                         if (editPart == null) {
                             System.out.println("Khong tim thay linh kien!");
@@ -546,7 +560,8 @@ public class ConsoleView {
                         break;
                     case 7:
                         System.out.print("Nhap Ma Linh kien can xoa: ");
-                        String deletePartId = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+                        String deletePartId = com.mycompany.quanlygara.util.StringUtils
+                                .removeAccents(sc.nextLine().trim());
                         LinhKien delPart = partController.layTheoId(deletePartId);
                         if (delPart == null) {
                             System.out.println("Linh kien khong ton tai!");
@@ -590,10 +605,11 @@ public class ConsoleView {
             System.out.println("2. Xem danh sach tat ca Phieu sua chua");
             System.out.println("3. Them Linh kien / Dich vu sua chua (Cho xe)");
             System.out.println("4. Xem chi tiet cong viec cua Phieu sua chua");
-            System.out.println("5. Cap nhat trang thai Phieu (TIEP NHAN -> DANG SUA -> HOAN THANH)");
+            System.out.println("5. Cap nhat trang thai Phieu (RECEIVING -> REPAIRING -> COMPLETED)");
+            System.out.println("6. Xoa hang muc (Linh kien/Dich vu) khoi Phieu sua chua");
             System.out.println("0. Quay lai Menu chinh");
             System.out.println("===============================================================");
-            System.out.print("Nhap lua chon (0-5): ");
+            System.out.print("Nhap lua chon (0-6): ");
             try {
                 choice = Integer.parseInt(sc.nextLine());
                 switch (choice) {
@@ -602,7 +618,9 @@ public class ConsoleView {
                         List<Vehicle> availableVehicles = vehicleController.layTatCa();
                         com.mycompany.quanlygara.util.TableFormatter.printVehicles(availableVehicles);
                         System.out.println("--- Danh sach Ky thuat vien dang ranh ---");
-                        List<Mechanic> availableMechs = mechanicController.layTatCa().stream().filter(m -> "Đang rảnh".equalsIgnoreCase(m.getStatus())).collect(java.util.stream.Collectors.toList());
+                        List<Mechanic> availableMechs = mechanicController.layTatCa().stream()
+                                .filter(m -> "Đang rảnh".equalsIgnoreCase(m.getStatus()))
+                                .collect(java.util.stream.Collectors.toList());
                         com.mycompany.quanlygara.util.TableFormatter.printMechanics(availableMechs);
                         System.out.println("--------------------------------");
                         RepairOrder order = new RepairOrder();
@@ -639,6 +657,14 @@ public class ConsoleView {
                         if (oObj.getStatus().equals("COMPLETED")) {
                             System.out.println("Loi: Phieu sua chua nay da hoan thanh va chot don, khong the sua doi!");
                             break;
+                        }
+
+                        if (currentUser.getRole().equals("KyThuat") && oObj.getMechanic() != null) {
+                            if (currentUser.getId() != oObj.getMechanic().getId()) {
+                                System.out.println(
+                                        "Loi: Tu choi quyen! Ban khong the thao tac voi Phieu sua chua do tho khac phu trach.");
+                                break;
+                            }
                         }
 
                         System.out.println("Chon loai hang muc can them:");
@@ -715,19 +741,28 @@ public class ConsoleView {
                             System.out.println("=".repeat(81));
                             System.out.printf("| %-77s |\n", "                       === THONG TIN PHIEU SUA CHUA ===");
                             System.out.println("=".repeat(81));
-                            System.out.printf("| ID Phieu: %-15d | Bien so xe: %-38s |\n", 
-                                ro.getOrderId(), 
-                                ro.getVehicle() != null ? ro.getVehicle().getLicensePlate() : "N/A");
-                            System.out.printf("| Ngay vao: %-15s | Ngay ra: %-41s |\n", 
-                                ro.getEntryDate() != null ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(ro.getEntryDate()) : "N/A", 
-                                ro.getExitDate() != null ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(ro.getExitDate()) : "N/A");
-                            System.out.printf("| Tho may:  %-15s | Trang thai: %-38s |\n", 
-                                ro.getMechanic() != null ? ro.getMechanic().getName() : "N/A", 
-                                ro.getFriendlyStatus());
-                            System.out.printf("| Ngoai quan luc nhan: %-52s |\n", 
-                                ro.getVisualCondition() != null && !ro.getVisualCondition().isEmpty() ? ro.getVisualCondition() : "N/A");
+                            System.out.printf("| ID Phieu: %-15d | Bien so xe: %-38s |\n",
+                                    ro.getOrderId(),
+                                    ro.getVehicle() != null ? ro.getVehicle().getLicensePlate() : "N/A");
+                            System.out.printf("| Ngay vao: %-15s | Ngay ra: %-41s |\n",
+                                    ro.getEntryDate() != null
+                                            ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
+                                                    .format(ro.getEntryDate())
+                                            : "N/A",
+                                    ro.getExitDate() != null
+                                            ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
+                                                    .format(ro.getExitDate())
+                                            : "N/A");
+                            System.out.printf("| Tho may:  %-15s | Trang thai: %-38s |\n",
+                                    ro.getMechanic() != null ? ro.getMechanic().getName() : "N/A",
+                                    ro.getFriendlyStatus());
+                            System.out.printf("| Ngoai quan luc nhan: %-52s |\n",
+                                    ro.getVisualCondition() != null && !ro.getVisualCondition().isEmpty()
+                                            ? ro.getVisualCondition()
+                                            : "N/A");
                             System.out.println("=".repeat(81));
-                            System.out.printf("| %-77s |\n", "               --- CHI TIET LINH KIEN & CONG VIEC (DA HINH) ---");
+                            System.out.printf("| %-77s |\n",
+                                    "               --- CHI TIET LINH KIEN & CONG VIEC (DA HINH) ---");
                             System.out.println("-".repeat(81));
 
                             List<HangMuc> listChiTiet = repairOrderController.getDanhSachChiTiet(showOrderId);
@@ -740,7 +775,7 @@ public class ConsoleView {
                                 String fmt = "| %-9s | %-9s | %-26s | %-4s | %-17s |";
                                 System.out.printf(fmt + "\n", "Loai", "Ma HM", "Ten hang muc", "SL", "Thanh tien");
                                 System.out.println("-".repeat(81));
-                                
+
                                 double totalParts = 0;
                                 double totalLabor = 0;
 
@@ -750,10 +785,13 @@ public class ConsoleView {
                                     double thanhTien = hm.tinhThanhTien(qty); // polymorphic call
 
                                     String typeStr = (hm instanceof LinhKien) ? "Linh kien" : "Dich vu";
-                                    String nameStr = hm.getTen() != null ? (hm.getTen().length() > 26 ? hm.getTen().substring(0, 23) + "..." : hm.getTen()) : "";
+                                    String nameStr = hm.getTen() != null
+                                            ? (hm.getTen().length() > 26 ? hm.getTen().substring(0, 23) + "..."
+                                                    : hm.getTen())
+                                            : "";
                                     String qtyStr = String.valueOf(qty);
                                     String priceStr = String.format("%,.0f", thanhTien) + " VND";
-                                    
+
                                     System.out.printf(fmt + "\n", typeStr, hm.getMa(), nameStr, qtyStr, priceStr);
 
                                     if (hm instanceof LinhKien) {
@@ -763,9 +801,12 @@ public class ConsoleView {
                                     }
                                 }
                                 System.out.println("-".repeat(81));
-                                System.out.printf("| Tong tien linh kien: %-56s |\n", String.format("%,.0f", totalParts) + " VND");
-                                System.out.printf("| Tong tien cong:      %-56s |\n", String.format("%,.0f", totalLabor) + " VND");
-                                System.out.printf("| Tong thanh toan:     %-56s |\n", String.format("%,.0f", totalParts + totalLabor) + " VND");
+                                System.out.printf("| Tong tien linh kien: %-56s |\n",
+                                        String.format("%,.0f", totalParts) + " VND");
+                                System.out.printf("| Tong tien cong:      %-56s |\n",
+                                        String.format("%,.0f", totalLabor) + " VND");
+                                System.out.printf("| Tong thanh toan:     %-56s |\n",
+                                        String.format("%,.0f", totalParts + totalLabor) + " VND");
                                 System.out.println("=".repeat(81));
                             }
                         }
@@ -810,6 +851,34 @@ public class ConsoleView {
 
                         repairOrderController.capNhat(orderStatus);
                         System.out.println("Cap nhat trang thai phieu sua chua thanh cong!");
+                        break;
+                    case 6:
+                        System.out.print("Nhap ID Phieu sua chua can xoa hang muc: ");
+                        int delOrderId = Integer.parseInt(sc.nextLine());
+                        RepairOrder delOrder = repairOrderController.layTheoId(delOrderId);
+                        if (delOrder == null) {
+                            System.out.println("Phieu sua chua khong ton tai!");
+                            break;
+                        }
+                        if (delOrder.getStatus().equals("COMPLETED")) {
+                            System.out.println("Loi: Phieu sua chua nay da hoan thanh, khong the sua doi!");
+                            break;
+                        }
+                        if (currentUser.getRole().equals("KyThuat") && delOrder.getMechanic() != null) {
+                            if (currentUser.getId() != delOrder.getMechanic().getId()) {
+                                System.out.println(
+                                        "Loi: Tu choi quyen! Ban khong the thao tac voi Phieu sua chua do tho khac phu trach.");
+                                break;
+                            }
+                        }
+                        System.out.print("Nhap Ma Hang muc (Linh kien / Dich vu) can xoa: ");
+                        String delMa = sc.nextLine().trim();
+                        try {
+                            repairOrderController.xoaChiTiet(delOrderId, delMa);
+                            System.out.println("Da xoa hang muc khoi phieu sua chua va hoan lai kho (neu co)!");
+                        } catch (Exception e) {
+                            System.out.println("Loi: " + e.getMessage());
+                        }
                         break;
                     case 0:
                         break;

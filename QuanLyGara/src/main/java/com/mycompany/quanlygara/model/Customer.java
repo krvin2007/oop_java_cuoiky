@@ -11,10 +11,12 @@ import java.util.Scanner;
  * 
  * 1. TÍNH KẾ THỪA (INHERITANCE):
  * - Được thể hiện qua từ khóa 'extends Person'.
- * - Lớp Customer kế thừa tất cả thuộc tính (id, name, phone, address) và các phương thức getter/setter của lớp cha Person mà không cần định nghĩa lại.
+ * - Lớp Customer kế thừa tất cả thuộc tính (id, name, phone, address) và các
+ * phương thức getter/setter của lớp cha Person mà không cần định nghĩa lại.
  * 
  * 2. TÍNH ĐA HÌNH (POLYMORPHISM):
- * - Thể hiện qua việc ghi đè phương thức (Overriding): Ghi đè nhapInfo() và toString() của lớp cha để thực hiện nghiệp vụ riêng của Customer.
+ * - Thể hiện qua việc ghi đè phương thức (Overriding): Ghi đè nhapInfo() và
+ * toString() của lớp cha để thực hiện nghiệp vụ riêng của Customer.
  */
 public class Customer extends Person {
 
@@ -23,13 +25,15 @@ public class Customer extends Person {
 
     // Constructor mặc định (Không tham số)
     public Customer() {
-        // Từ khóa super() gọi Constructor không tham số của lớp cha (Person) để khởi tạo đối tượng cha ngầm định
+        // Từ khóa super() gọi Constructor không tham số của lớp cha (Person) để khởi
+        // tạo đối tượng cha ngầm định
         super();
     }
 
     // Constructor đầy đủ tham số
     public Customer(int id, String name, String phone, String address, String email) {
-        // Từ khóa super(...) truyền các tham số trực tiếp cho Constructor của lớp cha để gán giá trị cho các thuộc tính kế thừa
+        // Từ khóa super(...) truyền các tham số trực tiếp cho Constructor của lớp cha
+        // để gán giá trị cho các thuộc tính kế thừa
         super(id, name, phone, address);
         this.email = email;
     }
@@ -47,25 +51,27 @@ public class Customer extends Person {
     /**
      * GHI ĐÈ PHƯƠNG THỨC (METHOD OVERRIDING):
      * - Ghi đè phương thức nhapInfo() từ lớp cha Person.
-     * - Sử dụng từ khóa 'super.nhapInfo(sc)' để chạy lại logic nhập thông tin cơ bản (Tên, SĐT, Địa chỉ) của lớp cha,
-     *   giúp tái sử dụng mã nguồn và tránh viết lại mã giống nhau.
+     * - Sử dụng từ khóa 'super.nhapInfo(sc)' để chạy lại logic nhập thông tin cơ
+     * bản (Tên, SĐT, Địa chỉ) của lớp cha,
+     * giúp tái sử dụng mã nguồn và tránh viết lại mã giống nhau.
      */
     @Override
     public void nhapInfo(Scanner sc) {
         super.nhapInfo(sc);
         System.out.print("Nhap email: ");
-        this.email = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
-        while (!this.email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            System.out.print("Email khong hop le (Phai chua @ va dung dinh dang)! Moi nhap lai: ");
-            this.email = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+        this.email = sc.nextLine().trim();
+        while (!this.email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            System.out.print("Email khong hop le (Vui long nhap dung dinh dang, vi du: abc@gmail.com)! Moi nhap lai: ");
+            this.email = sc.nextLine().trim();
         }
     }
 
     /**
      * GHI ĐÈ PHƯƠNG THỨC (METHOD OVERRIDING):
      * - Ghi đè phương thức toString() từ lớp cha Person.
-     * - Gọi 'super.toString()' để lấy chuỗi thông tin của Person và bổ sung nhãn "Customer [...]" 
-     *   để nhận diện đối tượng cụ thể là Chủ xe.
+     * - Gọi 'super.toString()' để lấy chuỗi thông tin của Person và bổ sung nhãn
+     * "Customer [...]"
+     * để nhận diện đối tượng cụ thể là Chủ xe.
      */
     @Override
     public String toString() {

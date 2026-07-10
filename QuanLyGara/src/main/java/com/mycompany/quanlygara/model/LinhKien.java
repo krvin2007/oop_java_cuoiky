@@ -14,11 +14,14 @@ import java.util.Scanner;
  * - Thừa hưởng các thuộc tính mã, tên, đơn giá từ lớp cha.
  * 
  * 2. TÍNH ĐÓNG GÓI (ENCAPSULATION):
- * - Thêm thuộc tính riêng 'soLuongTon' (số lượng tồn kho) có phạm vi truy cập 'private' và cung cấp getter/setter để quản lý số lượng tồn của linh kiện một cách an toàn.
+ * - Thêm thuộc tính riêng 'soLuongTon' (số lượng tồn kho) có phạm vi truy cập
+ * 'private' và cung cấp getter/setter để quản lý số lượng tồn của linh kiện một
+ * cách an toàn.
  * 
  * 3. TÍNH ĐA HÌNH (POLYMORPHISM):
- * - Ghi đè phương thức trừu tượng 'tinhThanhTien(int soLuong)'. 
- * - Với linh kiện, thành tiền sẽ bằng đơn giá nhân với số lượng thực tế sử dụng.
+ * - Ghi đè phương thức trừu tượng 'tinhThanhTien(int soLuong)'.
+ * - Với linh kiện, thành tiền sẽ bằng đơn giá nhân với số lượng thực tế sử
+ * dụng.
  */
 public class LinhKien extends HangMuc {
     // Thuộc tính riêng của LinhKien (Đóng gói)
@@ -64,7 +67,7 @@ public class LinhKien extends HangMuc {
     /**
      * TRIỂN KHAI PHƯƠNG THỨC TRỪU TƯỢNG (METHOD OVERRIDING):
      * - Định nghĩa lại phương thức tính thành tiền theo đặc trưng của Linh kiện:
-     *   Thành tiền = đơn giá * số lượng mua/sử dụng.
+     * Thành tiền = đơn giá * số lượng mua/sử dụng.
      */
     @Override
     public double tinhThanhTien(int soLuong) {
@@ -74,19 +77,24 @@ public class LinhKien extends HangMuc {
     /**
      * GHI ĐÈ PHƯƠNG THỨC NHẬP THÔNG TIN (METHOD OVERRIDING):
      * - Đầu tiên, gọi super.nhapInfo(sc) để nhập các thông tin chung của Hạng mục.
-     * - Sau đó, tiến hành nhập và validate số lượng tồn kho (phải là số nguyên và >= 0).
+     * - Sau đó, tiến hành nhập và validate số lượng tồn kho (phải là số nguyên và
+     * >= 0).
      */
     @Override
     public void nhapInfo(Scanner sc) {
         System.out.print("Nhap ma linh kien (de trong de tu dong tao): ");
-        String maInput = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+        String maInput = sc.nextLine().trim();
+        while (!maInput.isEmpty() && maInput.contains(" ")) {
+            System.out.print("Ma linh kien khong duoc chua khoang trang! Moi nhap lai: ");
+            maInput = sc.nextLine().trim();
+        }
         this.setMa(maInput); // can be empty for auto-generation
 
         System.out.print("Nhap ten linh kien: ");
-        String tenInput = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
-        while (tenInput.isEmpty()) {
-            System.out.print("Ten linh kien khong duoc de trong! Moi nhap lai: ");
-            tenInput = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+        String tenInput = sc.nextLine().trim();
+        while (tenInput.length() < 2) {
+            System.out.print("Ten linh kien qua ngan (it nhat 2 ky tu)! Moi nhap lai: ");
+            tenInput = sc.nextLine().trim();
         }
         this.setTen(tenInput);
 

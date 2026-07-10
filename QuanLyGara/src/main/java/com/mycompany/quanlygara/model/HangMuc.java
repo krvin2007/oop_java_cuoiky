@@ -7,15 +7,20 @@ package com.mycompany.quanlygara.model;
 import java.util.Scanner;
 
 /**
- * LỚP TRỪU TƯỢNG HANGMUC (Đại diện cho Hạng mục: Dịch vụ sửa chữa hoặc Linh kiện thay thế)
+ * LỚP TRỪU TƯỢNG HANGMUC (Đại diện cho Hạng mục: Dịch vụ sửa chữa hoặc Linh
+ * kiện thay thế)
  * 
  * 1. TÍNH TRỪU TƯỢNG (ABSTRACTION):
- * - Được khai báo với từ khóa 'abstract class'. Lớp này không thể khởi tạo đối tượng trực tiếp.
- * - Khai báo một phương thức trừu tượng: 'public abstract double tinhThanhTien(int soLuong);'.
- *   Phương thức này không có phần thân xử lý, buộc các lớp con (DichVu, LinhKien) phải tự định nghĩa (implement) logic tính toán cụ thể của riêng mình.
+ * - Được khai báo với từ khóa 'abstract class'. Lớp này không thể khởi tạo đối
+ * tượng trực tiếp.
+ * - Khai báo một phương thức trừu tượng: 'public abstract double
+ * tinhThanhTien(int soLuong);'.
+ * Phương thức này không có phần thân xử lý, buộc các lớp con (DichVu, LinhKien)
+ * phải tự định nghĩa (implement) logic tính toán cụ thể của riêng mình.
  * 
  * 2. TÍNH ĐÓNG GÓI (ENCAPSULATION):
- * - Các thuộc tính chung (ma, ten, donGia) đều là 'private' và được truy cập, thay đổi thông qua các phương thức Getter/Setter tương ứng.
+ * - Các thuộc tính chung (ma, ten, donGia) đều là 'private' và được truy cập,
+ * thay đổi thông qua các phương thức Getter/Setter tương ứng.
  */
 public abstract class HangMuc {
     // Các thuộc tính private (Đóng gói)
@@ -75,19 +80,19 @@ public abstract class HangMuc {
      */
     public void nhapInfo(Scanner sc) {
         System.out.print("Nhap ma hang muc: ");
-        this.ma = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
-        while (this.ma.isEmpty()) {
-            System.out.print("Ma hang muc khong duoc de trong! Moi nhap lai: ");
-            this.ma = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+        this.ma = sc.nextLine().trim();
+        while (this.ma.isEmpty() || this.ma.contains(" ")) {
+            System.out.print("Ma hang muc khong duoc de trong va khong chua khoang trang! Moi nhap lai: ");
+            this.ma = sc.nextLine().trim();
         }
 
         System.out.print("Nhap ten hang muc: ");
-        this.ten = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
-        while (this.ten.isEmpty()) {
-            System.out.print("Ten hang muc khong duoc de trong! Moi nhap lai: ");
-            this.ten = com.mycompany.quanlygara.util.StringUtils.removeAccents(sc.nextLine().trim());
+        this.ten = sc.nextLine().trim();
+        while (this.ten.length() < 2) {
+            System.out.print("Ten hang muc qua ngan (it nhat 2 ky tu)! Moi nhap lai: ");
+            this.ten = sc.nextLine().trim();
         }
-        
+
         while (true) {
             try {
                 System.out.print("Nhap don gia (VND): ");
@@ -106,8 +111,9 @@ public abstract class HangMuc {
     /**
      * PHƯƠNG THỨC TRỪU TƯỢNG (ABSTRACT METHOD):
      * - Đây là trái tim của tính đa hình trong phân cấp HangMuc.
-     * - Phương thức này không có thân hàm. 
-     * - Bất cứ lớp con nào kế thừa 'HangMuc' bắt buộc phải ghi đè và viết code xử lý riêng cho phương thức này.
+     * - Phương thức này không có thân hàm.
+     * - Bất cứ lớp con nào kế thừa 'HangMuc' bắt buộc phải ghi đè và viết code xử
+     * lý riêng cho phương thức này.
      */
     public abstract double tinhThanhTien(int soLuong);
 

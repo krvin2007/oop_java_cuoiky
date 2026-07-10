@@ -10,7 +10,7 @@ import java.sql.SQLException;
  */
 public class DBConnection {
     // Đường dẫn kết nối cơ sở dữ liệu (Database URL)
-    private static final String URL = "jdbc:mysql://localhost:3306/quangara?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC";
+    private static final String URL = "jdbc:mysql://localhost:3306/quanlygara?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC";
     // Tên đăng nhập cơ sở dữ liệu (Database Username)
     private static final String USER = "root";
     // Mật khẩu cơ sở dữ liệu (Database Password)
@@ -21,4 +21,3 @@ public class DBConnection {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }
-
