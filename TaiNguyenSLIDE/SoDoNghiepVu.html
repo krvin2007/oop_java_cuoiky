@@ -5,101 +5,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luồng Nghiệp Vụ Thực Tế (Business Flow)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #f8fafc;
-            margin: 0;
-            padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            max-width: 900px;
-            width: 100%;
-        }
-
-        .mermaid-container {
-            margin: 30px 0;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            background-color: #ffffff;
-            display: flex;
-            justify-content: center;
-            overflow-x: auto;
+            padding: 30px 15px;
+            margin: 0;
+            min-height: 100vh;
         }
 
         h1 {
             text-align: center;
             color: #1e293b;
-            font-size: 28px;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 15px;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 10px 0 20px 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
-        h2 {
-            color: #334155;
-            font-size: 20px;
-            margin-top: 30px;
-            border-left: 4px solid #3b82f6;
-            padding-left: 10px;
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 20px;
         }
 
-        ul {
-            line-height: 1.6;
-            color: #475569;
+        .mermaid-container {
+            width: 100%;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 20px;
         }
 
-        li {
-            margin-bottom: 8px;
+        .mermaid {
+            width: 100%;
+            display: flex;
+            justify-content: center;
         }
 
-        .alert-tip, .alert-important, .alert-note {
-            padding: 15px;
-            border-radius: 6px;
-            margin: 15px 0;
-            font-size: 0.95rem;
-            line-height: 1.5;
+        .mermaid svg {
+            width: 100% !important;
+            height: auto !important;
         }
 
-        .alert-tip {
-            background-color: #f0fdf4;
-            border-left: 4px solid #22c55e;
-            color: #166534;
-        }
-
-        .alert-important {
-            background-color: #fff1f2;
-            border-left: 4px solid #e11d48;
-            color: #9f1239;
-        }
-
-        .alert-note {
-            background-color: #eff6ff;
-            border-left: 4px solid #3b82f6;
-            color: #1e40af;
-        }
-        
-        strong {
-            color: #1e293b;
+        .footer {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 10px;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <h1>LUỒNG NGHIỆP VỤ THỰC TẾ (BUSINESS FLOW)<br><small style="font-size: 16px; color: #64748b; font-weight: normal;">HỆ THỐNG QUẢN LÝ GARA Ô TÔ</small></h1>
+    <h1>LUỒNG NGHIỆP VỤ THỰC TẾ (BUSINESS FLOW) - HỆ THỐNG QUẢN LÝ GARA</h1>
 
+    <div class="container">
         <div class="mermaid-container">
             <div class="mermaid">
                 graph TD
@@ -127,7 +110,7 @@
                     CheckXong -- Xong --> HoanThanh["Hoàn tất Phiếu Sửa Chữa<br>Trạng thái: COMPLETED"]
                     
                     HoanThanh --> ThoRanh[("Cập nhật hệ thống:<br>Thợ chuyển sang 'Đang rảnh'")]
-                    ThoRanh --> ThanhToan["Xuất Hóa Đơn Invoice<br>Tính tổng tiền & VAT"]
+                    ThoRanh --> ThanhToan["Xuất Hóa Đơn HoaDon<br>Tính tổng tiền & VAT"]
                     ThanhToan --> End(["Khách hàng thanh toán & Ra về"])
                     
                     %% Style adjustments
@@ -142,59 +125,10 @@
                     class Start,End terminal;
             </div>
         </div>
+    </div>
 
-        <h2>1. Tiếp nhận Khách hàng & Đăng ký Xe</h2>
-        <p>Khi một khách hàng mang xe đến gara, Quản trị viên (Admin/Owner) sẽ làm thủ tục tiếp nhận:</p>
-        <ul>
-            <li><strong>Kiểm tra thông tin Chủ xe (Customer):</strong> Nếu đây là khách hàng mới, Admin sẽ thêm thông tin Chủ xe (Tên, SĐT, Địa chỉ, Email) vào hệ thống thông qua <code>ChuXeDAO</code>. SĐT sẽ được kiểm tra không trùng lặp (duy nhất trong CSDL) và đúng định dạng số điện thoại Việt Nam.</li>
-            <li><strong>Đăng ký Xe (Vehicle):</strong> Admin tiếp tục đăng ký xe vào hệ thống (Biển số 5 loại, Hãng xe, Mẫu xe, Năm sản xuất, Màu sắc, Tình trạng tiếp nhận) và liên kết chiếc xe này với Khách hàng vừa tạo thông qua ID. Khâu này đảm bảo một chủ xe có thể sở hữu nhiều xe.</li>
-        </ul>
-
-        <h2>2. Lập Phiếu Sửa Chữa (Repair Order) - Nhận Xe</h2>
-        <p>Sau khi thông tin xe đã có trong hệ thống, xe bắt đầu được đưa vào khu vực sửa chữa:</p>
-        <ul>
-            <li><strong>Tạo phiếu:</strong> Admin lập <code>RepairOrder</code> mới. Hệ thống sẽ ghi nhận <code>entryDate</code> (thời gian vào xưởng) và chuyển trạng thái phiếu thành <strong>RECEIVING</strong> (Đang tiếp nhận).</li>
-            <li><strong>Phân công thợ (Mechanic):</strong> Hệ thống yêu cầu chỉ định một Kỹ thuật viên phụ trách sửa chiếc xe này.</li>
-        </ul>
-        <div class="alert-tip">
-            <strong>💡 Mẹo:</strong> Hệ thống có cơ chế kiểm tra tự động trạng thái thợ. Kỹ thuật viên khi được giao việc sẽ tự động chuyển trạng thái từ "Đang rảnh" sang "Đang bận" (Working).
-        </div>
-
-        <h2>3. Quá trình Sửa Chữa & Quản lý Vật tư (Chi tiết phiếu)</h2>
-        <p>Đây là giai đoạn xe đang nằm trong khu vực thi công:</p>
-        <ul>
-            <li>Trạng thái phiếu được cập nhật sang <strong>REPAIRING</strong> (Đang sửa chữa).</li>
-            <li><strong>Thêm dịch vụ & linh kiện:</strong> Thợ máy kiểm tra và Admin sẽ nhập các hạng mục (<code>HangMuc</code>) vào chi tiết phiếu sửa chữa (<code>RepairOrderDetail</code>), bao gồm:
-                <ul>
-                    <li><strong>Dịch vụ (DichVu):</strong> Rửa xe, cân chỉnh, sơn dặm (Tính tiền công).</li>
-                    <li><strong>Linh kiện/Phụ tùng (LinhKien):</strong> Nhớt, lọc gió, má phanh...</li>
-                </ul>
-            </li>
-        </ul>
-        <div class="alert-important">
-            <strong>⚠️ Quan trọng - Ràng buộc Kho an toàn:</strong> Khi xuất linh kiện, hệ thống (<code>LinhKienDAO</code>) sẽ kiểm tra số lượng tồn kho. Nếu đủ, nó sẽ dùng Database Transaction để thực hiện đồng thời 2 việc: trừ tồn kho linh kiện và ghi nhận chi tiết vào phiếu. Nếu 1 trong 2 bước lỗi, hệ thống sẽ Rollback (hoàn tác) để không bị hụt kho ảo.
-        </div>
-
-        <h2>4. Hoàn Thành & Xuất Hóa Đơn (Invoice)</h2>
-        <p>Khi thợ máy báo cáo đã sửa xong:</p>
-        <ul>
-            <li><strong>Hoàn tất phiếu:</strong> Admin chuyển trạng thái phiếu sửa chữa sang <strong>COMPLETED</strong> (Hoàn thành) và ghi nhận thời gian xe ra xưởng (<code>exitDate</code>).</li>
-            <li><strong>Giải phóng thợ:</strong> Trạng thái của Kỹ thuật viên phụ trách được hệ thống tự động trả về "Đang rảnh" (Có thể nhận xe mới).</li>
-            <li><strong>Thanh toán:</strong> Hệ thống tạo ra Hóa đơn (<code>Invoice</code>) dựa trên Phiếu sửa chữa đã hoàn thành, ghi nhận thời gian thanh toán (<code>paymentDate</code>). Hệ thống tính tổng tiền (<code>totalAmount</code>) bằng cách tách bạch Tổng tiền linh kiện (<code>totalPartCost</code>) và Tổng tiền dịch vụ (<code>totalLaborCost</code>), cộng thêm thuế VAT mặc định (<code>vatRate</code>).</li>
-        </ul>
-
-        <h2>5. Báo Cáo & Thống Kê Quản Trị</h2>
-        <p>Hàng ngày/tháng, quản lý Gara sẽ dùng tính năng báo cáo (<code>ReportController</code>) để xem:</p>
-        <ul>
-            <li>Tổng doanh thu theo khoảng thời gian.</li>
-            <li>Top linh kiện bán chạy (để có kế hoạch nhập thêm hàng).</li>
-            <li>Top xe sửa nhiều nhất (nhận diện khách hàng thân thiết/xe hay hỏng hóc).</li>
-            <li>Top thợ máy làm việc năng suất nhất.</li>
-        </ul>
-
-        <div class="alert-note">
-            <strong>📝 Lưu ý:</strong> Toàn bộ luồng nghiệp vụ trên đều được kiểm soát tính toàn vẹn ở tầng Database (Foreign Keys, Transaction) để ngăn chặn việc xóa nhầm khách hàng khi họ đang có xe sửa, hoặc xóa thợ khi họ đang vướng phiếu sửa chữa chưa xong.
-        </div>
+    <div class="footer">
+        Dự án Quản Lý Gara Ô Tô - Tích hợp sơ đồ luồng nghiệp vụ thông qua Mermaid.js
     </div>
 
     <script>
@@ -203,7 +137,7 @@
             theme: 'default',
             securityLevel: 'loose',
             flowchart: {
-                useMaxWidth: false,
+                useMaxWidth: true,
                 htmlLabels: true
             }
         });

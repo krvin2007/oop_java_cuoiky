@@ -1,11 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.mycompany.quanlygara.controller;
 
-import com.mycompany.quanlygara.model.Invoice;
-import com.mycompany.quanlygara.model.RepairOrderDetail;
+import com.mycompany.quanlygara.model.HoaDon;
+import com.mycompany.quanlygara.model.ChiTietPhieuSua;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,16 +13,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author ManhQuynh
- */
-public class HoaDonDAO implements IRepository<Invoice> {
 
-    // Thêm mới một hóa đơn vào cơ sở dữ liệu
+public class HoaDonDAO implements IKhoLuuTru<HoaDon> {
+
+    
     @Override
-    public void themMoi(Invoice invoice) throws Exception {
-        try (Connection conn = DBConnection.getConnection()) {
+    public void themMoi(HoaDon invoice) throws Exception {
+        try (Connection conn = KetNoiCSDL.getConnection()) {
             int oId = invoice.getRepairOrder() != null ? invoice.getRepairOrder().getOrderId() : 0;
             try (PreparedStatement ps = conn.prepareStatement("SELECT ma_hoa_don FROM hoa_don WHERE ma_phieu = ?")) {
                 ps.setInt(1, oId);
@@ -55,11 +49,11 @@ public class HoaDonDAO implements IRepository<Invoice> {
         }
     }
 
-    // Cập nhật thông tin hóa đơn đã tồn tại trong cơ sở dữ liệu
+    
     @Override
-    public void capNhat(Invoice invoice) throws Exception {
+    public void capNhat(HoaDon invoice) throws Exception {
         String sql = "UPDATE hoa_don SET ma_phieu = ?, ngay_thanh_toan = ?, tong_tien_linh_kien = ?, tong_tien_cong = ?, thue_vat = ?, tong_tien = ? WHERE ma_hoa_don = ?";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, invoice.getRepairOrder() != null ? invoice.getRepairOrder().getOrderId() : 0);
             ps.setTimestamp(2,
@@ -76,11 +70,11 @@ public class HoaDonDAO implements IRepository<Invoice> {
         }
     }
 
-    // Xóa hóa đơn khỏi cơ sở dữ liệu dựa trên ID
+    
     @Override
     public void xoa(Object id) throws Exception {
         int targetId = (Integer) id;
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
                 PreparedStatement ps = conn.prepareStatement("DELETE FROM hoa_don WHERE ma_hoa_don = ?")) {
             ps.setInt(1, targetId);
             int rows = ps.executeUpdate();
@@ -90,42 +84,42 @@ public class HoaDonDAO implements IRepository<Invoice> {
         }
     }
 
-    // Lấy danh sách tất cả hóa đơn từ cơ sở dữ liệu
+    
     @Override
-    public List<Invoice> layTatCa() throws Exception {
+    public List<HoaDon> layTatCa() throws Exception {
         return querySql(
                 "SELECT ma_hoa_don, ma_phieu, ngay_thanh_toan, tong_tien_linh_kien, tong_tien_cong, thue_vat, tong_tien FROM hoa_don ORDER BY ma_hoa_don",
                 null);
     }
 
-    // Lấy thông tin hóa đơn dựa trên ID
+    
     @Override
-    public Invoice layTheoId(Object id) throws Exception {
+    public HoaDon layTheoId(Object id) throws Exception {
         int targetId = (Integer) id;
-        List<Invoice> list = querySql(
+        List<HoaDon> list = querySql(
                 "SELECT ma_hoa_don, ma_phieu, ngay_thanh_toan, tong_tien_linh_kien, tong_tien_cong, thue_vat, tong_tien FROM hoa_don WHERE ma_hoa_don = ?",
                 targetId);
         return list.isEmpty() ? null : list.get(0);
     }
 
-    // Lấy thông tin hóa đơn dựa trên mã phiếu sửa chữa (Order ID)
-    public Invoice getByOrderId(int orderId) throws Exception {
-        List<Invoice> list = querySql(
+    
+    public HoaDon getByOrderId(int orderId) throws Exception {
+        List<HoaDon> list = querySql(
                 "SELECT ma_hoa_don, ma_phieu, ngay_thanh_toan, tong_tien_linh_kien, tong_tien_cong, thue_vat, tong_tien FROM hoa_don WHERE ma_phieu = ?",
                 orderId);
         return list.isEmpty() ? null : list.get(0);
     }
 
-    // Tạo hóa đơn tự động từ mã phiếu sửa chữa, bao gồm tính toán tiền linh kiện, tiền công và thuế VAT
-    public Invoice generateInvoice(int orderId) throws Exception {
+    
+    public HoaDon generateInvoice(int orderId) throws Exception {
         PhieuSuaChuaDAO roDAO = new PhieuSuaChuaDAO();
 
-        List<RepairOrderDetail> details = roDAO.getDetailsByOrderId(orderId);
+        List<ChiTietPhieuSua> details = roDAO.getDetailsByOrderId(orderId);
         double totalPartCost = 0;
         double totalLaborCost = 0;
 
         for (int i = 0; i < details.size(); i++) {
-            RepairOrderDetail d = details.get(i);
+            ChiTietPhieuSua d = details.get(i);
             if ("LINHKIEN".equalsIgnoreCase(d.getLoaiHangMuc())) {
                 totalPartCost += d.getDonGiaThucTe() * d.getSoLuong();
             } else if ("DICHVU".equalsIgnoreCase(d.getLoaiHangMuc())) {
@@ -133,21 +127,21 @@ public class HoaDonDAO implements IRepository<Invoice> {
             }
         }
 
-        Invoice invoice = new Invoice();
-        com.mycompany.quanlygara.model.RepairOrder ro = roDAO.layTheoId(orderId);
+        HoaDon invoice = new HoaDon();
+        com.mycompany.quanlygara.model.PhieuSuaChua ro = roDAO.layTheoId(orderId);
         invoice.setRepairOrder(ro);
         invoice.setTotalPartCost(totalPartCost);
         invoice.setTotalLaborCost(totalLaborCost);
-        invoice.setVatRate(0.10); // 10% VAT
+        invoice.setVatRate(0.10); 
         invoice.calculateTotal();
 
         return invoice;
     }
 
-    // Hàm hỗ trợ thực thi truy vấn SQL lấy danh sách hóa đơn dựa trên tham số truyền vào
-    private List<Invoice> querySql(String sql, Integer idParam) throws Exception {
-        List<Invoice> list = new ArrayList<>();
-        try (Connection conn = DBConnection.getConnection();
+    
+    private List<HoaDon> querySql(String sql, Integer idParam) throws Exception {
+        List<HoaDon> list = new ArrayList<>();
+        try (Connection conn = KetNoiCSDL.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             if (idParam != null) {
                 ps.setInt(1, idParam);
@@ -161,11 +155,11 @@ public class HoaDonDAO implements IRepository<Invoice> {
         return list;
     }
 
-    // Ánh xạ dữ liệu từ ResultSet (kết quả truy vấn) sang đối tượng Invoice
-    private Invoice mapRow(ResultSet rs) throws SQLException {
+    
+    private HoaDon mapRow(ResultSet rs) throws SQLException {
         Timestamp pay = rs.getTimestamp("ngay_thanh_toan");
         int orderId = rs.getInt("ma_phieu");
-        com.mycompany.quanlygara.model.RepairOrder ro = null;
+        com.mycompany.quanlygara.model.PhieuSuaChua ro = null;
         try {
             PhieuSuaChuaDAO phieuDAO = new PhieuSuaChuaDAO();
             ro = phieuDAO.layTheoId(orderId);
@@ -173,7 +167,7 @@ public class HoaDonDAO implements IRepository<Invoice> {
             System.out.println("Loi load phieu sua chua cho hoa don: " + e.getMessage());
         }
 
-        return new Invoice(
+        return new HoaDon(
                 rs.getInt("ma_hoa_don"),
                 ro,
                 pay != null ? new Date(pay.getTime()) : null,

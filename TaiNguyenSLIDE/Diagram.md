@@ -4,34 +4,34 @@
 Quản Lý Gara
 │
 ├── model/
-│   ├── Person (abstract)
-│   ├── Employee (abstract)
-│   ├── Customer
-│   ├── Owner
-│   ├── Accountant
-│   ├── Storekeeper
-│   ├── Mechanic
+│   ├── Nguoi (abstract)
+│   ├── NhanVien (abstract)
+│   ├── ChuXe
+│   ├── QuanLy
+│   ├── KeToan
+│   ├── ThuKho
+│   ├── KyThuatVien
 │   ├── HangMuc (abstract)
 │   ├── LinhKien
 │   ├── DichVu
-│   ├── Vehicle
-│   ├── RepairOrder
-│   ├── RepairOrderDetail
-│   └── Invoice
+│   ├── Xe
+│   ├── PhieuSuaChua
+│   ├── ChiTietPhieuSua
+│   └── HoaDon
 │
 ├── exception/
 │   ├── DuplicateMaException
-│   ├── InvalidPlateNumberException
-│   ├── PartOutOfStockException
-│   └── VehicleNotFoundException
+│   ├── BienSoKhongHopLeException
+│   ├── LinhKienHetHangException
+│   └── KhongTimThayXeException
 │
 ├── controller/
-│   ├── IRepository<T> (interface)
-│   ├── IReportService (interface)
-│   ├── DBConnection
-│   ├── ReportController
+│   ├── IKhoLuuTru<T> (interface)
+│   ├── IBaoCaoService (interface)
+│   ├── KetNoiCSDL
+│   ├── BaoCaoController
 │   ├── ChuXeDAO
-│   ├── EmployeeDAO
+│   ├── NhanVienDAO
 │   ├── KyThuatVienDAO
 │   ├── XeDAO
 │   ├── PhieuSuaChuaDAO
@@ -40,7 +40,7 @@ Quản Lý Gara
 │   └── HoaDonDAO
 │
 └── view/
-    └── ConsoleView (Giao diện bảng điều khiển chính)
+    └── GiaoDienConsole (Giao diện bảng điều khiển chính)
 
 
 ===========================================================================
@@ -49,7 +49,7 @@ Quản Lý Gara
 
 +-------------------------------------------------------------------------+
 |                              <<interface>>                              |
-|                              IRepository<T>                             |
+|                              IKhoLuuTru<T>                             |
 +-------------------------------------------------------------------------+
 | + themMoi(item: T): void                                                |
 | + capNhat(item: T): void                                                |
@@ -61,7 +61,7 @@ Quản Lý Gara
      .                  .                   . (implements - hiện thực hóa)
      .                  .                   .
 +----------+      +------------+      +-----------+
-| ChuXeDAO |      | EmployeeDAO|      |  XeDAO    | ... (và các DAO khác)
+| ChuXeDAO |      | NhanVienDAO|      |  XeDAO    | ... (và các DAO khác)
 +----------+      +------------+      +-----------+
 
 
@@ -71,7 +71,7 @@ Quản Lý Gara
 
 +-------------------------------------------------------------------------+
 |                               <<abstract>>                              |
-|                                 Person                                  |
+|                                 Nguoi                                  |
 +-------------------------------------------------------------------------+
 | - id: int                                                               |
 | - name: String                                                          |
@@ -79,8 +79,8 @@ Quản Lý Gara
 | - address: String                                                       |
 | - isDeleted: boolean                                                    |
 +-------------------------------------------------------------------------+
-| + Person()                                                              |
-| + Person(id: int, name: String, phone: String, address: String)         |
+| + Nguoi()                                                              |
+| + Nguoi(id: int, name: String, phone: String, address: String)         |
 | + getId(): int                                                          |
 | + setId(id: int): void                                                  |
 | + getName(): String                                                     |
@@ -100,7 +100,7 @@ Quản Lý Gara
     +---------------+                            +---------------+
     |                                                            |
 +---------------------------------------+    +---------------------------------------+
-|               Customer                |    |             Employee <<abstract>>     |
+|               ChuXe                |    |             NhanVien <<abstract>>     |
 +---------------------------------------+    +---------------------------------------+
 | - email: String                       |    | - username: String                    |
 |                                       |    | - password: String                    |
@@ -108,7 +108,7 @@ Quản Lý Gara
 |                                       |    | - salary: double                      |
 |                                       |    | - status: String                      |
 +---------------------------------------+    +---------------------------------------+
-| + Customer(...)                       |    | + Employee(...)                       |
+| + ChuXe(...)                       |    | + NhanVien(...)                       |
 | + getEmail(): String                  |    | + getUsername(): String               |
 | + setEmail(email: String): void       |    | + setUsername(username: String): void |
 | + nhapInfo(sc: Scanner): void         |    | + getPassword(): String               |
@@ -125,7 +125,7 @@ Quản Lý Gara
          +--------------------+--------------------+-------------+------+
          |                    |                    |                    |
 +--------+-------+   +--------+-------+   +--------+-------+   +--------+-------+
-|     Owner      |   |   Accountant   |   |  Storekeeper   |   |    Mechanic    |
+|     QuanLy      |   |   KeToan   |   |  ThuKho   |   |    KyThuatVien    |
 +----------------+   +----------------+   +----------------+   +----------------+
 | (Role: QuanLy) |   | (Role: KeToan) |   | (Role: ThuKho) |   | - spec: String |
 +----------------+   +----------------+   +----------------+   +----------------+
@@ -179,32 +179,32 @@ Quản Lý Gara
 
 
 +---------------------------------------+    +---------------------------------------+
-|                Vehicle                |    |              RepairOrder              |
+|                Xe                |    |              PhieuSuaChua              |
 +---------------------------------------+    +---------------------------------------+
 | - licensePlate: String                |    | - orderId: int                        |
-| - brand: String                       |    | - vehicle: Vehicle                    |
+| - brand: String                       |    | - vehicle: Xe                    |
 | - model: String                       |    | - entryDate: Date                     |
 | - productionYear: int                 |    | - exitDate: Date                      |
-| - color: String                       |    | - mechanic: Mechanic                  |
+| - color: String                       |    | - mechanic: KyThuatVien                  |
 | - condition: String                   |    | - status: String                      |
-| - Customer: Customer                  |    | - visualCondition: String             |
-| - isDeleted: boolean                  |    | - details: List<RepairOrderDetail>    |
+| - ChuXe: ChuXe                  |    | - visualCondition: String             |
+| - isDeleted: boolean                  |    | - details: List<ChiTietPhieuSua>    |
 +---------------------------------------+    +---------------------------------------+
-| + Vehicle()                           |    | + RepairOrder()                       |
+| + Xe()                           |    | + PhieuSuaChua()                       |
 | + getLicensePlate(): String           |    | + getOrderId(): int                   |
 | + setLicensePlate(lp: String): void   |    | + setOrderId(id: int): void           |
-| + getBrand(): String                  |    | + getVehicle(): Vehicle               |
-| + setBrand(brand: String): void       |    | + setVehicle(v: Vehicle): void        |
+| + getBrand(): String                  |    | + getVehicle(): Xe               |
+| + setBrand(brand: String): void       |    | + setVehicle(v: Xe): void        |
 | + getModel(): String                  |    | + getEntryDate(): Date                |
 | + setModel(model: String): void       |    | + setEntryDate(d: Date): void         |
 | + getProductionYear(): int            |    | + getExitDate(): Date                 |
 | + setProductionYear(y: int): void     |    | + setExitDate(d: Date): void          |
-| + getColor(): String                  |    | + getMechanic(): Mechanic             |
-| + setColor(color: String): void       |    | + setMechanic(m: Mechanic): void      |
+| + getColor(): String                  |    | + getMechanic(): KyThuatVien             |
+| + setColor(color: String): void       |    | + setMechanic(m: KyThuatVien): void      |
 | + getCondition(): String              |    | + getStatus(): String                 |
 | + setCondition(cond: String): void    |    | + setStatus(s: String): void          |
-| + getOwner(): Customer                |    | + getVisualCondition(): String        |
-| + setOwner(c: Customer): void         |    | + setVisualCondition(c: String): void |
+| + getOwner(): ChuXe                |    | + getVisualCondition(): String        |
+| + setOwner(c: ChuXe): void         |    | + setVisualCondition(c: String): void |
 | + isDeleted(): boolean                |    | + getDetails(): List<...>             |
 | + setDeleted(del: boolean): void      |    | + setDetails(d: List<...>): void      |
 | + nhapInfo(sc: Scanner): void         |    | + nhapInfo(sc: Scanner): void         |
@@ -216,7 +216,7 @@ Quản Lý Gara
 ===========================================================================
 
 +-------------------------------------------------------------------------+
-|                               ConsoleView                               |
+|                               GiaoDienConsole                               |
 |                             (Menu Console)                              |
 +-------------------------------------------------------------------------+
 | + start(): void                                                         |

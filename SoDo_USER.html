@@ -1,40 +1,82 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sơ Đồ Phân Quyền - Hệ Thống Quản Lý Gara</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px 20px;
+            justify-content: space-between;
+            height: 100vh;
             margin: 0;
+            padding: 15px;
+            overflow: hidden;
         }
+
         h2 {
-            color: #1a237e;
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 1.5rem;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 30px;
+            letter-spacing: 1px;
+            margin: 10px 0 5px 0;
             text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
+
         .container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
             width: 100%;
-            max-width: 1200px;
-            overflow-x: auto;
-            text-align: center;
+            max-width: 1300px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin: 10px 0;
         }
+
+        .mermaid {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mermaid svg {
+            max-width: 100% !important;
+            max-height: 100% !important;
+            height: auto !important;
+            width: auto !important;
+        }
+
         .footer {
-            margin-top: 30px;
-            color: #666;
-            font-size: 14px;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            text-align: center;
         }
     </style>
     <!-- Nhúng thư viện Mermaid.js từ CDN -->
@@ -43,12 +85,12 @@
         mermaid.initialize({ startOnLoad: true, theme: 'default' });
     </script>
 </head>
+
 <body>
 
     <h2>SƠ ĐỒ CHỨC NĂNG & PHÂN QUYỀN (USER ROLES)</h2>
-    
+
     <div class="container">
-        <!-- Đặt mã Mermaid vào trong div có class là "mermaid" -->
         <div class="mermaid">
             flowchart LR
                 %% Định nghĩa các Actor (Tài khoản)
@@ -59,7 +101,7 @@
 
                 %% Phân cụm các nhóm chức năng chính
                 subgraph Menu Hệ Thống
-                    F1(1. Quản lý Xe & Chủ xe)
+                    F1(1. Quản lý Xe & Chủ xe <br> *Thêm/Sửa/Xóa tạm thời*)
                     F2(2. Quản lý Kỹ thuật viên)
                     F3(3. Quản lý Kho linh kiện)
                     F4(4. Quản lý Phiếu sửa chữa)
@@ -67,6 +109,9 @@
                     F6(6. Báo cáo thống kê)
                     F7(7. Quản lý Dịch vụ)
                     F8(8. Đổi mật khẩu)
+                    
+                    %% Thùng rác lưu trữ mềm
+                    Trash(Thùng Rác <br> *Lưu trữ Xe & Chủ xe đã xóa*)
                     
                     %% Nhóm đặc thù bị giới hạn quyền
                     F1_Tech(1. Quản lý Xe & Chủ xe <br> *Chỉ Thêm/Xem - Cấm Sửa/Xóa*)
@@ -82,17 +127,20 @@
                 A_Admin ---> F7
                 A_Admin ---> F8
 
+                %% Hướng đi của chức năng Xóa (đưa vào Thùng Rác)
+                F1 -- Xóa tạm thời --> Trash
+
                 %% Gán quyền cho KẾ TOÁN (Bên Trái)
                 A_Acc -- Xuất hoá đơn --> F5
                 A_Acc -- Xem số liệu --> F6
                 A_Acc ---> F8
 
-                %% Gán quyền cho KỸ THUẬT VIÊN (Bên Phải - Mũi tên ngược để đẩy sang phải)
+                %% Gán quyền cho KỸ THUẬT VIÊN (Bên Phải)
                 F1_Tech <-- Tiếp nhận xe --- A_Tech
                 F4 <-- Sửa chữa --- A_Tech
                 F8 <--- A_Tech
 
-                %% Gán quyền cho THỦ KHO (Bên Phải - Mũi tên ngược)
+                %% Gán quyền cho THỦ KHO (Bên Phải)
                 F3 <-- Quản lý vật tư --- A_Store
                 F8 <--- A_Store
 
@@ -102,22 +150,26 @@
                 style A_Acc fill:#99ff99,stroke:#333,stroke-width:2px
                 style A_Store fill:#ffff99,stroke:#333,stroke-width:2px
                 style F1_Tech fill:#ffcccc,stroke:#ff0000,stroke-width:2px,stroke-dasharray: 5 5
+                style Trash fill:#e2e8f0,stroke:#64748b,stroke-width:2px,stroke-dasharray: 3 3
 
-                %% Style cho Mũi tên (Dựa vào thứ tự xuất hiện từ trên xuống dưới, bắt đầu từ 0)
+                %% Style cho Mũi tên (Dựa vào thứ tự xuất hiện từ trên xuống dưới)
                 %% Mũi tên của Quản Lý (Màu Đỏ nhạt)
                 linkStyle 0,1,2,3,4,5,6,7 stroke:#ff4d4d,stroke-width:3px;
+                %% Mũi tên Xóa tạm thời (Màu Xám sẫm)
+                linkStyle 8 stroke:#64748b,stroke-dasharray: 5 5,stroke-width:2px;
                 %% Mũi tên của Kế Toán (Màu Xanh lá)
-                linkStyle 8,9,10 stroke:#33cc33,stroke-width:3px;
+                linkStyle 9,10,11 stroke:#33cc33,stroke-width:3px;
                 %% Mũi tên của Kỹ Thuật Viên (Màu Xanh dương)
-                linkStyle 11,12,13 stroke:#3399ff,stroke-width:3px;
-                %% Mũi tên của Thủ Kho (Màu Vàng sậm cho dễ nhìn)
-                linkStyle 14,15 stroke:#d4af37,stroke-width:3px;
+                linkStyle 12,13,14 stroke:#3399ff,stroke-width:3px;
+                %% Mũi tên của Thủ Kho (Màu Vàng sậm)
+                linkStyle 15,16 stroke:#d4af37,stroke-width:3px;
         </div>
-    </div>
-    
-    <div class="footer">
-        Dự án Quản Lý Gara Ô Tô - Tích hợp sơ đồ thông qua Mermaid.js
-    </div>
+        </div>
+
+        <div class="footer">
+            Dự án Quản Lý Gara Ô Tô - Tích hợp sơ đồ thông qua Mermaid.js
+        </div>
 
 </body>
+
 </html>

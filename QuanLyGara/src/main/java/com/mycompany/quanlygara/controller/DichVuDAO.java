@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.mycompany.quanlygara.controller;
 
 import com.mycompany.quanlygara.model.DichVu;
@@ -12,16 +9,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author ManhQuynh
- */
-public class DichVuDAO implements IRepository<DichVu> {
 
-    // Thêm mới một bản ghi vào cơ sở dữ liệu
+public class DichVuDAO implements IKhoLuuTru<DichVu> {
+
+    
     @Override
     public void themMoi(DichVu dv) throws Exception {
-        try (Connection conn = DBConnection.getConnection()) {
+        try (Connection conn = KetNoiCSDL.getConnection()) {
             if (dv.getMa() == null || dv.getMa().trim().isEmpty()) {
                 int maxId = 0;
                 try (PreparedStatement ps = conn.prepareStatement("SELECT ma FROM dich_vu");
@@ -57,11 +51,11 @@ public class DichVuDAO implements IRepository<DichVu> {
         }
     }
 
-    // Cập nhật thông tin bản ghi trong cơ sở dữ liệu
+    
     @Override
     public void capNhat(DichVu dv) throws Exception {
         String sql = "UPDATE dich_vu SET ten = ?, don_gia = ? WHERE LOWER(ma) = LOWER(?)";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, dv.getTen());
             ps.setDouble(2, dv.getDonGia());
@@ -73,11 +67,11 @@ public class DichVuDAO implements IRepository<DichVu> {
         }
     }
 
-    // Xóa bản ghi khỏi cơ sở dữ liệu
+    
     @Override
     public void xoa(Object id) throws Exception {
         String ma = (String) id;
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
              PreparedStatement ps = conn.prepareStatement("UPDATE dich_vu SET da_xoa = TRUE WHERE LOWER(ma) = LOWER(?)")) {
             ps.setString(1, ma);
             int rows = ps.executeUpdate();
@@ -87,14 +81,14 @@ public class DichVuDAO implements IRepository<DichVu> {
         }
     }
 
-    // Lấy toàn bộ danh sách dữ liệu
+    
     @Override
     public List<DichVu> layTatCa() throws Exception {
-        // Thực thi phương thức querySql để xử lý logic tương ứng
+        
         return querySql("SELECT ma, ten, don_gia FROM dich_vu WHERE da_xoa = FALSE ORDER BY ma", null);
     }
 
-    // Lấy dữ liệu chi tiết theo mã định danh (ID)
+    
     @Override
     public DichVu layTheoId(Object id) throws Exception {
         String ma = (String) id;
@@ -102,16 +96,16 @@ public class DichVuDAO implements IRepository<DichVu> {
         return list.isEmpty() ? null : list.get(0);
     }
 
-    // Tìm kiếm dữ liệu dựa trên điều kiện đầu vào
+    
     public List<DichVu> searchByName(String keyword) throws Exception {
         return querySql("SELECT ma, ten, don_gia FROM dich_vu WHERE LOWER(ten) LIKE ? AND da_xoa = FALSE ORDER BY ma",
                 "%" + keyword.toLowerCase() + "%");
     }
 
-    // Thực thi phương thức querySql để xử lý logic tương ứng
+    
     private List<DichVu> querySql(String sql, String param) throws Exception {
         List<DichVu> list = new ArrayList<>();
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             if (param != null) {
                 ps.setString(1, param);
@@ -125,7 +119,7 @@ public class DichVuDAO implements IRepository<DichVu> {
         return list;
     }
 
-    // Ánh xạ dữ liệu từ ResultSet sang đối tượng Java
+    
     private DichVu mapRow(ResultSet rs) throws SQLException {
         return new DichVu(rs.getString("ma"), rs.getString("ten"), rs.getDouble("don_gia"));
     }

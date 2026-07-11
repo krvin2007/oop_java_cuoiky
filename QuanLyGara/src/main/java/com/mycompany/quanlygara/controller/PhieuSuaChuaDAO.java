@@ -1,16 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.mycompany.quanlygara.controller;
 
 import com.mycompany.quanlygara.model.HangMuc;
 import com.mycompany.quanlygara.model.LinhKien;
 import com.mycompany.quanlygara.model.DichVu;
-import com.mycompany.quanlygara.model.RepairOrder;
-import com.mycompany.quanlygara.model.RepairOrderDetail;
-import com.mycompany.quanlygara.model.Mechanic;
-import com.mycompany.quanlygara.exception.PartOutOfStockException;
+import com.mycompany.quanlygara.model.PhieuSuaChua;
+import com.mycompany.quanlygara.model.ChiTietPhieuSua;
+import com.mycompany.quanlygara.model.KyThuatVien;
+import com.mycompany.quanlygara.exception.LinhKienHetHangException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,16 +18,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author ManhQuynh
- */
-public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
 
-    // Thêm mới một bản ghi vào cơ sở dữ liệu
+public class PhieuSuaChuaDAO implements IKhoLuuTru<PhieuSuaChua> {
+
+    
     @Override
-    public void themMoi(RepairOrder order) throws Exception {
-        try (Connection conn = DBConnection.getConnection();
+    public void themMoi(PhieuSuaChua order) throws Exception {
+        try (Connection conn = KetNoiCSDL.getConnection();
                 PreparedStatement ps = conn.prepareStatement(
                         "INSERT INTO phieu_sua_chua (bien_so, ngay_vao, ngay_ra, ma_tho_may, trang_thai, tinh_trang_ben_ngoai) VALUES (?, ?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
@@ -48,19 +42,19 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
             }
         }
 
-        // Cap nhat trang thai ky thuat vien thanh "Đang bận"
+        
         KyThuatVienDAO mechanicDAO = new KyThuatVienDAO();
-        Mechanic m = mechanicDAO.layTheoId(order.getMechanic() != null ? order.getMechanic().getId() : 0);
+        KyThuatVien m = mechanicDAO.layTheoId(order.getMechanic() != null ? order.getMechanic().getId() : 0);
         if (m != null) {
-            m.setStatus("Đang bận");
+            m.setStatus("Dang ban");
             mechanicDAO.capNhat(m);
         }
     }
 
-    // Cập nhật thông tin bản ghi trong cơ sở dữ liệu
+    
     @Override
-    public void capNhat(RepairOrder order) throws Exception {
-        RepairOrder existing = layTheoId(order.getOrderId());
+    public void capNhat(PhieuSuaChua order) throws Exception {
+        PhieuSuaChua existing = layTheoId(order.getOrderId());
         if (existing == null) {
             throw new Exception("Phieu sua chua can cap nhat khong ton tai!");
         }
@@ -71,7 +65,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         int oldMechanicId = existing.getMechanic() != null ? existing.getMechanic().getId() : 0;
         int newMechanicId = order.getMechanic() != null ? order.getMechanic().getId() : 0;
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
                 PreparedStatement ps = conn.prepareStatement(
                         "UPDATE phieu_sua_chua SET bien_so = ?, ngay_vao = ?, ngay_ra = ?, ma_tho_may = ?, trang_thai = ?, tinh_trang_ben_ngoai = ? WHERE ma_phieu = ?")) {
             ps.setString(1, order.getVehicle() != null ? order.getVehicle().getLicensePlate() : null);
@@ -90,27 +84,27 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         updateMechanicStatusSafe(newMechanicId);
     }
 
-    // Xóa bản ghi khỏi cơ sở dữ liệu
+    
     @Override
     public void xoa(Object id) throws Exception {
         int targetId = (Integer) id;
-        RepairOrder toRemove = layTheoId(targetId);
+        PhieuSuaChua toRemove = layTheoId(targetId);
         if (toRemove == null) {
             throw new Exception("Khong tim thay phieu sua chua co ID = " + targetId + " de xoa!");
         }
 
-        try (Connection conn = DBConnection.getConnection()) {
-            // Kiem tra xem co Invoice nao dang tro toi RepairOrder nay khong
+        try (Connection conn = KetNoiCSDL.getConnection()) {
+            
             try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM hoa_don WHERE ma_phieu = ?")) {
                 ps.setInt(1, targetId);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next() && rs.getInt(1) > 0) {
-                        throw new Exception("Loi: Khong the xoa Phieu sua chua da duoc xuat Hoa don (Invoice)!");
+                        throw new Exception("Loi: Khong the xoa Phieu sua chua da duoc xuat Hoa don (HoaDon)!");
                     }
                 }
             }
 
-            // Hoan lai linh kien ve kho neu co
+            
             try (PreparedStatement ps = conn
                     .prepareStatement("SELECT ma_hang_muc, so_luong FROM chi_tiet_phieu_sua WHERE ma_phieu = ?")) {
                 ps.setInt(1, targetId);
@@ -140,7 +134,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
             }
         }
 
-        // Cap nhat lai trang thai tho sau khi xoa phieu
+        
         int mId = toRemove.getMechanic() != null ? toRemove.getMechanic().getId() : 0;
         updateMechanicStatusSafe(mId);
     }
@@ -148,7 +142,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
     private void updateMechanicStatusSafe(int mechanicId) {
         if (mechanicId <= 0)
             return;
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
                 PreparedStatement ps = conn.prepareStatement(
                         "SELECT COUNT(*) FROM phieu_sua_chua WHERE ma_tho_may = ? AND trang_thai != 'COMPLETED'")) {
             ps.setInt(1, mechanicId);
@@ -156,12 +150,12 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
                 if (rs.next()) {
                     int activeCount = rs.getInt(1);
                     KyThuatVienDAO mechanicDAO = new KyThuatVienDAO();
-                    Mechanic m = mechanicDAO.layTheoId(mechanicId);
+                    KyThuatVien m = mechanicDAO.layTheoId(mechanicId);
                     if (m != null) {
                         if (activeCount > 0) {
-                            m.setStatus("Đang bận");
+                            m.setStatus("Dang ban");
                         } else {
-                            m.setStatus("Đang rảnh");
+                            m.setStatus("Dang ranh");
                         }
                         mechanicDAO.capNhat(m);
                     }
@@ -172,12 +166,12 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         }
     }
 
-    // Lấy toàn bộ danh sách dữ liệu
+    
     @Override
-    public List<RepairOrder> layTatCa() throws Exception {
-        List<RepairOrder> list = new ArrayList<>();
+    public List<PhieuSuaChua> layTatCa() throws Exception {
+        List<PhieuSuaChua> list = new ArrayList<>();
         String sql = "SELECT ma_phieu, bien_so, ngay_vao, ngay_ra, ma_tho_may, trang_thai, tinh_trang_ben_ngoai FROM phieu_sua_chua ORDER BY ma_phieu";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -187,17 +181,17 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         return list;
     }
 
-    // Lấy dữ liệu chi tiết theo mã định danh (ID)
+    
     @Override
-    public RepairOrder layTheoId(Object id) throws Exception {
+    public PhieuSuaChua layTheoId(Object id) throws Exception {
         int targetId = (Integer) id;
         String sql = "SELECT ma_phieu, bien_so, ngay_vao, ngay_ra, ma_tho_may, trang_thai, tinh_trang_ben_ngoai FROM phieu_sua_chua WHERE ma_phieu = ?";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, targetId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    // Ánh xạ dữ liệu từ ResultSet sang đối tượng Java
+                    
                     return mapRow(rs);
                 }
             }
@@ -205,14 +199,14 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         return null;
     }
 
-    // Thêm một chi tiết vào danh sách phiếu sửa chữa
-    public void addDetail(RepairOrderDetail detail) throws Exception {
-        RepairOrder ro = layTheoId(detail.getOrderId());
+    
+    public void addDetail(ChiTietPhieuSua detail) throws Exception {
+        PhieuSuaChua ro = layTheoId(detail.getOrderId());
         if (ro != null && "COMPLETED".equalsIgnoreCase(ro.getStatus())) {
-            throw new Exception("Lỗi: Không thể thêm vào phiếu đã hoàn tất (COMPLETED)!");
+            throw new Exception("Loi: Khong the them vao phieu da hoan tat (COMPLETED)!");
         }
 
-        try (Connection conn = DBConnection.getConnection()) {
+        try (Connection conn = KetNoiCSDL.getConnection()) {
             Integer existingQty = null;
             try (PreparedStatement ps = conn.prepareStatement(
                     "SELECT so_luong FROM chi_tiet_phieu_sua WHERE ma_phieu = ? AND LOWER(ma_hang_muc) = LOWER(?) AND loai_hang_muc = ?")) {
@@ -250,12 +244,12 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
     }
 
     public void xoaChiTiet(int orderId, String maHangMuc) throws Exception {
-        RepairOrder ro = layTheoId(orderId);
+        PhieuSuaChua ro = layTheoId(orderId);
         if (ro != null && "COMPLETED".equalsIgnoreCase(ro.getStatus())) {
-            throw new Exception("Lỗi: Không thể xóa chi tiết của phiếu đã hoàn tất (COMPLETED)!");
+            throw new Exception("Loi: Khong the xoa chi tiet cua phieu da hoan tat (COMPLETED)!");
         }
 
-        try (Connection conn = DBConnection.getConnection()) {
+        try (Connection conn = KetNoiCSDL.getConnection()) {
             conn.setAutoCommit(false);
             try {
                 int sl = 0;
@@ -298,14 +292,14 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         }
     }
 
-    public void themMoiChiTietVaTruKho(RepairOrderDetail detail) throws Exception {
-        RepairOrder ro = layTheoId(detail.getOrderId());
+    public void themMoiChiTietVaTruKho(ChiTietPhieuSua detail) throws Exception {
+        PhieuSuaChua ro = layTheoId(detail.getOrderId());
         if (ro != null && "COMPLETED".equalsIgnoreCase(ro.getStatus())) {
-            throw new Exception("Lỗi: Không thể thêm linh kiện vào phiếu đã hoàn tất (COMPLETED)!");
+            throw new Exception("Loi: Khong the them linh kien vao phieu da hoan tat (COMPLETED)!");
         }
 
-        try (Connection conn = DBConnection.getConnection()) {
-            conn.setAutoCommit(false); // Bắt đầu Transaction
+        try (Connection conn = KetNoiCSDL.getConnection()) {
+            conn.setAutoCommit(false); 
             try {
                 if (detail.getMaHangMuc().toUpperCase().startsWith("LK")) {
                     try (PreparedStatement psUpdate = conn.prepareStatement(
@@ -315,7 +309,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
                         psUpdate.setInt(3, detail.getSoLuong());
                         int rows = psUpdate.executeUpdate();
                         if (rows == 0) {
-                            throw new PartOutOfStockException("Linh kiện không tồn tại hoặc kho không đủ hàng!");
+                            throw new LinhKienHetHangException("Linh kien khong ton tai hoac kho khong du hang!");
                         }
                     }
                 }
@@ -353,9 +347,9 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
                         ps.executeUpdate();
                     }
                 }
-                conn.commit(); // Thành công cả 2 mới ghi DB
+                conn.commit(); 
             } catch (Exception e) {
-                conn.rollback(); // Lỗi thì khôi phục lại
+                conn.rollback(); 
                 throw e;
             } finally {
                 conn.setAutoCommit(true);
@@ -363,16 +357,16 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         }
     }
 
-    // Lấy giá trị của thuộc tính DetailsByOrderId
-    public List<RepairOrderDetail> getDetailsByOrderId(int orderId) throws Exception {
-        List<RepairOrderDetail> result = new ArrayList<>();
+    
+    public List<ChiTietPhieuSua> getDetailsByOrderId(int orderId) throws Exception {
+        List<ChiTietPhieuSua> result = new ArrayList<>();
         String sql = "SELECT ma_phieu, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong FROM chi_tiet_phieu_sua WHERE ma_phieu = ?";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    result.add(new RepairOrderDetail(rs.getInt("ma_phieu"), rs.getString("ma_hang_muc"),
+                    result.add(new ChiTietPhieuSua(rs.getInt("ma_phieu"), rs.getString("ma_hang_muc"),
                             rs.getString("loai_hang_muc"), rs.getDouble("don_gia_thuc_te"), rs.getInt("so_luong")));
                 }
             }
@@ -380,47 +374,44 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         return result;
     }
 
-    /**
-     * Lay toan bo chi tiet phieu sua chua (dung cho bao cao thong ke).
-     * Thay the cho JsonStorage.loadList("chi_tiet_phieu_sua.json", ...) truoc day.
-     */
-    public List<RepairOrderDetail> getAllDetails() throws Exception {
-        List<RepairOrderDetail> result = new ArrayList<>();
+    
+    public List<ChiTietPhieuSua> getAllDetails() throws Exception {
+        List<ChiTietPhieuSua> result = new ArrayList<>();
         String sql = "SELECT ma_phieu, ma_hang_muc, loai_hang_muc, don_gia_thuc_te, so_luong FROM chi_tiet_phieu_sua";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                result.add(new RepairOrderDetail(rs.getInt("ma_phieu"), rs.getString("ma_hang_muc"),
+                result.add(new ChiTietPhieuSua(rs.getInt("ma_phieu"), rs.getString("ma_hang_muc"),
                         rs.getString("loai_hang_muc"), rs.getDouble("don_gia_thuc_te"), rs.getInt("so_luong")));
             }
         }
         return result;
     }
 
-    // Lấy giá trị của thuộc tính DanhSachChiTiet
+    
     public List<HangMuc> getDanhSachChiTiet(int orderId) throws Exception {
-        List<RepairOrderDetail> details = getDetailsByOrderId(orderId);
+        List<ChiTietPhieuSua> details = getDetailsByOrderId(orderId);
         List<HangMuc> danhSachChiTiet = new ArrayList<>();
         LinhKienDAO lkDAO = new LinhKienDAO();
         DichVuDAO dvDAO = new DichVuDAO();
         for (int i = 0; i < details.size(); i++) {
-            RepairOrderDetail d = details.get(i);
+            ChiTietPhieuSua d = details.get(i);
             if ("LINHKIEN".equalsIgnoreCase(d.getLoaiHangMuc())) {
                 LinhKien lk = lkDAO.layTheoId(d.getMaHangMuc());
                 if (lk == null) {
                     lk = new LinhKien();
                     lk.setMa(d.getMaHangMuc());
-                    lk.setTen("Linh kiện (Đã bị xóa khỏi kho)");
+                    lk.setTen("Linh kien (Da bi xoa khoi kho)");
                 }
-                lk.setDonGia(d.getDonGiaThucTe()); // Override current price with recorded price
+                lk.setDonGia(d.getDonGiaThucTe()); 
                 danhSachChiTiet.add(lk);
             } else if ("DICHVU".equalsIgnoreCase(d.getLoaiHangMuc())) {
                 DichVu dv = dvDAO.layTheoId(d.getMaHangMuc());
                 if (dv == null) {
                     dv = new DichVu();
                     dv.setMa(d.getMaHangMuc());
-                    dv.setTen("Dịch vụ (Đã bị xóa)");
+                    dv.setTen("Dich vu (Da bi xoa)");
                 }
                 dv.setDonGia(d.getDonGiaThucTe());
                 danhSachChiTiet.add(dv);
@@ -429,8 +420,8 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         return danhSachChiTiet;
     }
 
-    // Ánh xạ dữ liệu từ ResultSet sang đối tượng Java
-    private RepairOrder mapRow(ResultSet rs) throws SQLException {
+    
+    private PhieuSuaChua mapRow(ResultSet rs) throws SQLException {
         Timestamp entry = rs.getTimestamp("ngay_vao");
         Timestamp exit = rs.getTimestamp("ngay_ra");
         int orderId = rs.getInt("ma_phieu");
@@ -439,9 +430,9 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
         String status = rs.getString("trang_thai");
         String visualCondition = rs.getString("tinh_trang_ben_ngoai");
 
-        com.mycompany.quanlygara.model.Vehicle vehicle = null;
-        com.mycompany.quanlygara.model.Mechanic mechanic = null;
-        java.util.List<RepairOrderDetail> detailList = new ArrayList<>();
+        com.mycompany.quanlygara.model.Xe vehicle = null;
+        com.mycompany.quanlygara.model.KyThuatVien mechanic = null;
+        java.util.List<ChiTietPhieuSua> detailList = new ArrayList<>();
 
         try {
             XeDAO xeDAO = new XeDAO();
@@ -455,7 +446,7 @@ public class PhieuSuaChuaDAO implements IRepository<RepairOrder> {
             System.out.println("Loi khi load thong tin chi tiet cho phieu sua chua: " + e.getMessage());
         }
 
-        RepairOrder ro = new RepairOrder(
+        PhieuSuaChua ro = new PhieuSuaChua(
                 orderId,
                 vehicle,
                 entry != null ? new Date(entry.getTime()) : null,

@@ -1,0 +1,19 @@
+package com.mycompany.quanlygara.controller;
+
+import java.util.*;
+
+public class KiemTraCSDL {
+    
+    public static void main(String[] args) {
+        try {
+            BaoCaoController report = new BaoCaoController();
+            System.out.println("Testing getMostActiveMechanics...");
+            Map<String, Integer> activeMechs = report.getMostActiveMechanics(5);
+            System.out.println("Success! Size: " + activeMechs.size());
+        } catch (Exception e) {
+            System.out.println("Testing getMostActiveMechanics FAILED:");
+            e.printStackTrace();
+        }
+    }
+}
+

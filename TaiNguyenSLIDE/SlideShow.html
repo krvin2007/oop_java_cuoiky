@@ -651,6 +651,158 @@
             font-weight: bold;
         }
 
+        /* Fullscreen Image Zoom Overlay */
+        .zoomable-img-container {
+            display: inline-block;
+            cursor: zoom-in;
+            transition: var(--transition);
+        }
+        .zoomable-img-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .fullscreen-img-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 10000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: zoom-out;
+        }
+        .fullscreen-img-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .fullscreen-img-overlay img {
+            max-width: 95vw;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .fullscreen-img-overlay.active img {
+            transform: scale(1);
+        }
+        .fullscreen-img-overlay .close-hint {
+            position: absolute;
+            bottom: 20px;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 500;
+            background-color: rgba(255,255,255,0.05);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Member Assignment Cards Styling */
+        .member-cards-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            width: 100%;
+            height: calc(100% - 60px);
+            align-items: stretch;
+            padding-top: 10px;
+        }
+        .member-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: var(--transition);
+        }
+        .member-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border-color: var(--uef-blue);
+        }
+        .member-card-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+            text-align: center;
+            width: 100%;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 15px;
+        }
+        .card-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--uef-blue);
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .card-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 5px;
+        }
+        .card-role {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .badge-backend {
+            background-color: rgba(0, 86, 145, 0.1);
+            color: var(--uef-blue);
+        }
+        .badge-database {
+            background-color: rgba(255, 199, 44, 0.15);
+            color: #b58000;
+        }
+        .badge-ui {
+            background-color: rgba(153, 27, 27, 0.1);
+            color: var(--uef-red);
+        }
+        .badge-qa {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #166534;
+        }
+        .card-tasks {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            width: 100%;
+        }
+        .card-tasks li {
+            position: relative;
+            padding-left: 15px;
+            margin-bottom: 8px;
+        }
+        .card-tasks li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #22c55e;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -728,15 +880,16 @@
                 <div class="column">
                     <div class="card" style="height: 100%;">
                         <ul class="styled-list" style="line-height: 1.8;">
-                            <li><strong>Phần 1:</strong> Đặt vấn đề & Mục tiêu <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 3</span></li>
-                            <li><strong>Phần 2:</strong> Sơ đồ lớp (Class Diagram) <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 4</span></li>
-                            <li><strong>Phần 3:</strong> Thiết kế CSDL quan hệ <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 5</span></li>
-                            <li><strong>Phần 4:</strong> Áp dụng các nguyên lý OOP <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 6-9</span>
+                            <li><strong>Phân công công việc nhóm</strong> <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 3</span></li>
+                            <li><strong>Phần 1:</strong> Đặt vấn đề & Mục tiêu <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 4</span></li>
+                            <li><strong>Phần 2:</strong> Sơ đồ lớp (Class Diagram) <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 5</span></li>
+                            <li><strong>Phần 3:</strong> Thiết kế CSDL quan hệ <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 6</span></li>
+                            <li><strong>Phần 4:</strong> Áp dụng các nguyên lý OOP <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 7-10</span>
                                 <ul style="margin-top: 8px; margin-bottom: 0;">
-                                    <li>Tính Đóng gói (Encapsulation) <span style="float: right; font-size: 13px; color: var(--text-muted);">Trang 6</span></li>
-                                    <li>Tính Kế thừa (Inheritance) <span style="float: right; font-size: 13px; color: var(--text-muted);">Trang 7</span></li>
-                                    <li>Tính Đa hình (Polymorphism) <span style="float: right; font-size: 13px; color: var(--text-muted);">Trang 8</span></li>
-                                    <li>Tính Trừu tượng (Abstraction) <span style="float: right; font-size: 13px; color: var(--text-muted);">Trang 9</span></li>
+                                    <li>Tính Đóng gói (Encapsulation) <span style="float: right; font-size: 13px; color: var(--text-muted);">Trang 7</span></li>
+                                    <li>Tính Kế thừa (Inheritance) <span style="float: right; font-size: 13px; color: var(--text-muted);">Trang 8</span></li>
+                                    <li>Tính Đa hình (Polymorphism) <span style="float: right; font-size: 13px; color: var(--text-muted);">Trang 9</span></li>
+                                    <li>Tính Trừu tượng (Abstraction) <span style="float: right; font-size: 13px; color: var(--text-muted);">Trang 10</span></li>
                                 </ul>
                             </li>
                         </ul>
@@ -745,16 +898,81 @@
                 <div class="column">
                     <div class="card" style="height: 100%;">
                         <ul class="styled-list" style="line-height: 1.8;">
-                            <li><strong>Phần 5:</strong> Cơ chế xử lý CSDL (JDBC) <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 10</span></li>
-                            <li><strong>Phần 6:</strong> Ràng buộc nghiệp vụ tự động <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 11</span></li>
-                            <li><strong>Phần 7:</strong> Giải thuật thống kê (Map) <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 12</span></li>
-                            <li><strong>Phần 8:</strong> Xử lý ngoại lệ tùy chỉnh <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 13</span></li>
-                            <li><strong>Phần 9:</strong> Sơ đồ nghiệp vụ <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 14</span></li>
-                            <li><strong>Phần 10:</strong> Demo chương trình <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 15</span></li>
-                            <li><strong>Phần 11:</strong> Tổng kết & Hướng phát triển <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 16</span></li>
+                            <li><strong>Phần 5:</strong> Cơ chế xử lý CSDL (JDBC) <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 11</span></li>
+                            <li><strong>Phần 6:</strong> Ràng buộc nghiệp vụ tự động <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 12</span></li>
+                            <li><strong>Phần 7:</strong> Giải thuật thống kê (Map) <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 13</span></li>
+                            <li><strong>Phần 8:</strong> Xử lý ngoại lệ tùy chỉnh <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 14</span></li>
+                            <li><strong>Phần 9:</strong> Sơ đồ nghiệp vụ <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 15</span></li>
+                            <li><strong>Phần 10:</strong> Demo chương trình <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 16</span></li>
+                            <li><strong>Phần 11:</strong> Tổng kết & Hướng phát triển <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 17</span></li>
+                            <li><strong>Lời cảm ơn</strong> <span style="float: right; color: var(--uef-blue); font-weight: bold;">Trang 18</span></li>
                         </ul>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- SLIDE: PHÂN CÔNG CÔNG VIỆC -->
+        <div class="slide" id="slide-assignment">
+            <h2 class="slide-title"><i class="fa-solid fa-users"></i> Phân Công Công Việc Nhóm</h2>
+            <div class="member-cards-container">
+                
+                <!-- Card 1: Châu Tuấn Kiệt -->
+                <div class="member-card">
+                    <div class="member-card-header">
+                        <img src="img/kiet.jpg" alt="Châu Tuấn Kiệt" class="card-avatar">
+                        <h3 class="card-name">Châu Tuấn Kiệt</h3>
+                        <span class="card-role badge-backend">Backend Developer</span>
+                    </div>
+                    <ul class="card-tasks">
+                        <li>Lập trình các lớp DAO & Kết nối MySQL/JDBC</li>
+                        <li>Thiết lập Transaction quản lý kho vật tư</li>
+                        <li>Viết thuật toán thống kê & Tối ưu hệ thống</li>
+                    </ul>
+                </div>
+
+                <!-- Card 2: Thượng Mạnh Quỳnh -->
+                <div class="member-card">
+                    <div class="member-card-header">
+                        <img src="img/quynh.jpg" alt="Thượng Mạnh Quỳnh" class="card-avatar">
+                        <h3 class="card-name">Thượng Mạnh Quỳnh</h3>
+                        <span class="card-role badge-database">Database Designer</span>
+                    </div>
+                    <ul class="card-tasks">
+                        <li>Thiết kế cấu trúc CSDL quan hệ</li>
+                        <li>Lập trình các lớp thực thể (Model)</li>
+                        <li>Xây dựng ràng buộc nghiệp vụ nhập liệu</li>
+                    </ul>
+                </div>
+
+                <!-- Card 3: Đỗ Trung Phong -->
+                <div class="member-card">
+                    <div class="member-card-header">
+                        <img src="img/phong.jpg" alt="Đỗ Trung Phong" class="card-avatar">
+                        <h3 class="card-name">Đỗ Trung Phong</h3>
+                        <span class="card-role badge-ui">UI/Console Designer</span>
+                    </div>
+                    <ul class="card-tasks">
+                        <li>Thiết kế Giao diện GiaoDienConsole</li>
+                        <li>Xây dựng hệ thống Menu phân quyền</li>
+                        <li>Thiết kế slide báo cáo HTML</li>
+                    </ul>
+                </div>
+
+                <!-- Card 4: Lê Thành Tài -->
+                <div class="member-card">
+                    <div class="member-card-header">
+                        <img src="img/tuat.jpg" alt="Lê Thành Tài" class="card-avatar">
+                        <h3 class="card-name">Lê Thành Tài</h3>
+                        <span class="card-role badge-qa">QA & Presenter</span>
+                    </div>
+                    <ul class="card-tasks">
+                        <li>Lập trình các lớp kiểm thử (Unit Tests)</li>
+                        <li>Viết tài liệu giải thích dự án</li>
+                        <li>Thuyết trình báo cáo đồ án</li>
+                    </ul>
+                </div>
+
             </div>
         </div>
 
@@ -818,7 +1036,9 @@
             <p style="font-size: 14px; margin-bottom: 15px; color: var(--text-muted);">Sử dụng hệ quản trị CSDL <strong>MySQL / MariaDB</strong>, các thực thể liên kết chặt chẽ bằng ràng buộc khóa ngoại (Foreign Key) đảm bảo tính toàn vẹn.</p>
             
             <div style="text-align: center; margin-top: 20px;">
-                <img src="img/SoDoSQL.jpg" alt="Sơ Đồ CSDL Quan Hệ" style="max-width: 100%; max-height: 480px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); object-fit: contain;">
+                <div class="zoomable-img-container" id="sql-schema-trigger">
+                    <img src="img/SoDoSQL.png" alt="Sơ Đồ CSDL Quan Hệ" style="max-width: 100%; max-height: 480px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); object-fit: contain;">
+                </div>
             </div>
         </div>
 
@@ -830,7 +1050,7 @@
                     <div class="card" style="flex: 1;">
                         <div class="card-header"><i class="fa-solid fa-shield-halved"></i> Che giấu thông tin</div>
                         <p style="font-size: 14px; line-height: 1.6; color: var(--text-muted);">
-                            Mọi thuộc tính trong các lớp thực thể (như <code>Person</code>, <code>Vehicle</code>, <code>HangMuc</code>) đều được đặt phạm vi <code>private</code>. 
+                            Mọi thuộc tính trong các lớp thực thể (như <code>Nguoi</code>, <code>Xe</code>, <code>HangMuc</code>) đều được đặt phạm vi <code>private</code>. 
                             Việc này ngăn chặn các tác động thay đổi trực tiếp từ bên ngoài làm sai lệch dữ liệu.
                         </p>
                         <p style="font-size: 14px; line-height: 1.6; color: var(--text-muted); margin-top: 10px;">
@@ -847,11 +1067,11 @@
                 <div class="column" style="flex: 1.2;">
                     <div class="code-container">
                         <div class="code-header">
-                            <span>Person.java (Trích nguồn thực tế)</span>
+                            <span>Nguoi.java (Trích nguồn thực tế)</span>
                             <span>Java OOP</span>
                         </div>
                         <div class="code-content">
-<pre><span class="keyword">public abstract class</span> <span class="type">Person</span> {
+<pre><span class="keyword">public abstract class</span> <span class="type">Nguoi</span> {
     <span class="comment">// Các thuộc tính được đóng gói private</span>
     <span class="keyword">private</span> <span class="type">int</span> id;
     <span class="keyword">private</span> <span class="type">String</span> name;
@@ -886,11 +1106,11 @@
                         <div class="card-header"><i class="fa-solid fa-network-wired"></i> Phân cấp Kế thừa tối ưu</div>
                         <ul class="styled-list">
                             <li><strong>Kế thừa Con người:</strong> 
-                                Lớp chi trừu tượng <code>Person</code> chứa các trường chung như <code>id</code>, <code>name</code>, <code>phone</code>, <code>address</code>. 
-                                Các lớp con <code>Customer</code> và <code>Employee</code> kế thừa qua từ khóa <code>extends</code> để tái sử dụng mã nguồn.
+                                Lớp chi trừu tượng <code>Nguoi</code> chứa các trường chung như <code>id</code>, <code>name</code>, <code>phone</code>, <code>address</code>. 
+                                Các lớp con <code>ChuXe</code> và <code>NhanVien</code> kế thừa qua từ khóa <code>extends</code> để tái sử dụng mã nguồn.
                             </li>
                             <li><strong>Mở rộng Nhân sự:</strong> 
-                                <code>Employee</code> tiếp tục được kế thừa bởi các nhân sự chuyên biệt: <code>Mechanic</code> (Thợ máy), <code>Accountant</code> (Kế toán), <code>Storekeeper</code> (Thủ kho) và <code>Owner</code> (Quản lý).
+                                <code>NhanVien</code> tiếp tục được kế thừa bởi các nhân sự chuyên biệt: <code>KyThuatVien</code> (Thợ máy), <code>KeToan</code> (Kế toán), <code>ThuKho</code> (Thủ kho) và <code>QuanLy</code> (Quản lý).
                             </li>
                             <li><strong>Kế thừa Hạng mục:</strong> 
                                 Lớp <code>HangMuc</code> (cha) được kế thừa bởi <code>LinhKien</code> (bổ sung số lượng tồn kho) và <code>DichVu</code>.
@@ -978,7 +1198,7 @@
                     <div class="card" style="flex: 1;">
                         <div class="card-header"><i class="fa-solid fa-cube"></i> Lớp & Phương thức trừu tượng</div>
                         <ul class="styled-list">
-                            <li><strong>Abstract Class:</strong> Lớp <code>Person</code> và <code>HangMuc</code> được khai báo <code>abstract</code>. Các lớp này đóng vai trò định nghĩa cấu trúc khung mẫu và không thể khởi tạo đối tượng trực tiếp.</li>
+                            <li><strong>Abstract Class:</strong> Lớp <code>Nguoi</code> và <code>HangMuc</code> được khai báo <code>abstract</code>. Các lớp này đóng vai trò định nghĩa cấu trúc khung mẫu và không thể khởi tạo đối tượng trực tiếp.</li>
                             <li><strong>Abstract Method:</strong> Phương thức <code>getRoleDescription()</code> và <code>tinhThanhTien(...)</code> không có phần thân, ép buộc các lớp con phải tự triển khai chi tiết nghiệp vụ.</li>
                         </ul>
                     </div>
@@ -1021,7 +1241,7 @@
                     <div class="card" style="flex: 1;">
                         <div class="card-header"><i class="fa-solid fa-circle-nodes"></i> Quản lý Kết nối JDBC</div>
                         <p style="font-size: 14px; line-height: 1.5; color: var(--text-muted);">
-                            Thông qua lớp tập trung <code>DBConnection.java</code> để cấp phát đối tượng <code>Connection</code>. Dự án tích hợp thư viện MySQL Connector J Driver.
+                            Thông qua lớp tập trung <code>KetNoiCSDL.java</code> để cấp phát đối tượng <code>Connection</code>. Dự án tích hợp thư viện MySQL Connector J Driver.
                         </p>
                     </div>
                     <div class="card" style="flex: 1.2;">
@@ -1043,7 +1263,7 @@
                             <span>Java JDBC Transaction</span>
                         </div>
                         <div class="code-content">
-<pre><span class="keyword">try</span> (<span class="type">Connection</span> conn = <span class="type">DBConnection</span>.getConnection()) {
+<pre><span class="keyword">try</span> (<span class="type">Connection</span> conn = <span class="type">KetNoiCSDL</span>.getConnection()) {
     conn.<span class="method">setAutoCommit</span>(<span class="keyword">false</span>); <span class="comment">// Bắt đầu Transaction</span>
     <span class="keyword">try</span> {
         <span class="comment">// Lệnh SQL 1: Trừ tồn kho linh kiện</span>
@@ -1076,7 +1296,7 @@
                     <div class="card" style="flex: 1;">
                         <div class="card-header"><i class="fa-solid fa-magnifying-glass-chart"></i> Phân tích Biển Số Xe Việt Nam</div>
                         <p style="font-size: 14px; line-height: 1.6; color: var(--text-muted);">
-                            Hệ thống tích hợp bộ quy tắc phân loại 5 loại biển số xe bằng <strong>Regular Expression (Regex)</strong> cực kỳ chi tiết trong <code>Vehicle.java</code>.
+                            Hệ thống tích hợp bộ quy tắc phân loại 5 loại biển số xe bằng <strong>Regular Expression (Regex)</strong> cực kỳ chi tiết trong <code>Xe.java</code>.
                         </p>
                         <ul class="styled-list" style="margin-top: 8px;">
                             <li><strong>Biển dân sự:</strong> Trắng, Vàng, Xanh. Kiểm tra cấu trúc 2 chữ số đầu, chữ cái Seri và định dạng số đuôi.</li>
@@ -1093,7 +1313,7 @@
                 <div class="column" style="flex: 1;">
                     <div class="code-container">
                         <div class="code-header">
-                            <span>Vehicle.java (Xác thực Biển Số bằng Regex)</span>
+                            <span>Xe.java (Xác thực Biển Số bằng Regex)</span>
                             <span>Java Regular Expression</span>
                         </div>
                         <div class="code-content">
@@ -1133,7 +1353,7 @@
                         <div class="card-header"><i class="fa-solid fa-list-ol"></i> Tận dụng LinkedHashMap trong Java</div>
                         <p style="font-size: 14px; line-height: 1.5; color: var(--text-muted);">
                             Truy vấn cơ sở dữ liệu đã sắp xếp sẵn dữ liệu giảm dần nhờ lệnh <code>ORDER BY count DESC</code>. 
-                            Tại lớp <code>ReportController</code>, dữ liệu trả về được đưa vào cấu trúc <strong>LinkedHashMap</strong>.
+                            Tại lớp <code>BaoCaoController</code>, dữ liệu trả về được đưa vào cấu trúc <strong>LinkedHashMap</strong>.
                         </p>
                         <p style="font-size: 14px; line-height: 1.5; color: var(--text-muted); margin-top: 8px;">
                             <code>LinkedHashMap</code> duy trì chính xác thứ tự chèn phần tử, giúp View in báo cáo ra màn hình đúng thứ tự mà không cần tốn hiệu năng sắp xếp lại trong bộ nhớ Java.
@@ -1143,23 +1363,23 @@
                 <div class="column" style="flex: 1.1;">
                     <div class="code-container">
                         <div class="code-header">
-                            <span>ReportController.java (Thống kê và sắp xếp)</span>
+                            <span>BaoCaoController.java (Thống kê và sắp xếp)</span>
                             <span>Java Collections & SQL</span>
                         </div>
                         <div class="code-content">
 <pre><span class="keyword">public</span> <span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">Integer</span>&gt; <span class="method">getMostRepairedVehicles</span>(<span class="type">int</span> limit) {
     <span class="comment">// LinkedHashMap để giữ nguyên thứ tự sắp xếp trả về từ SQL</span>
     <span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">Integer</span>&gt; result = <span class="keyword">new</span> <span class="type">LinkedHashMap</span>&lt;&gt;();
-    <span class="type">String</span> sql = <span class="string">"SELECT ro.license_plate, COUNT(ro.order_id) as qty "</span> +
-                 <span class="string">"FROM repair_orders ro "</span> +
-                 <span class="string">"GROUP BY ro.license_plate "</span> +
+    <span class="type">String</span> sql = <span class="string">"SELECT ro.bien_so, COUNT(ro.ma_phieu) as qty "</span> +
+                 <span class="string">"FROM phieu_sua_chua ro "</span> +
+                 <span class="string">"GROUP BY ro.bien_so "</span> +
                  <span class="string">"ORDER BY qty DESC LIMIT ?"</span>; <span class="comment">// SQL sắp xếp sẵn</span>
-    <span class="keyword">try</span> (<span class="type">Connection</span> conn = <span class="type">DBConnection</span>.getConnection();
+    <span class="keyword">try</span> (<span class="type">Connection</span> conn = <span class="type">KetNoiCSDL</span>.getConnection();
          <span class="type">PreparedStatement</span> ps = conn.prepareStatement(sql)) {
         ps.setInt(1, limit);
         <span class="type">ResultSet</span> rs = ps.executeQuery();
         <span class="keyword">while</span> (rs.next()) {
-            result.put(rs.getString(<span class="string">"license_plate"</span>), rs.getInt(<span class="string">"qty"</span>));
+            result.put(rs.getString(<span class="string">"bien_so"</span>), rs.getInt(<span class="string">"qty"</span>));
         }
     }
     <span class="keyword">return</span> result;
@@ -1258,7 +1478,7 @@
                         <div class="card-header"><i class="fa-solid fa-square-check"></i> Kết quả Đạt Được</div>
                         <ul class="styled-list">
                             <li><strong>Kiến trúc chuẩn:</strong> Ứng dụng triển khai mô hình MVC khoa học, tách bạch code giao diện view và DAO kết nối MySQL.</li>
-                            <li><strong>Áp dụng triệt để OOP:</strong> Sử dụng nhuần nhuyễn Đóng gói (private fields/validation), Kế thừa (Person, HangMuc), Đa hình (Override tính thành tiền) và Trực quan (Abstract classes & Interface).</li>
+                            <li><strong>Áp dụng triệt để OOP:</strong> Sử dụng nhuần nhuyễn Đóng gói (private fields/validation), Kế thừa (Nguoi, HangMuc), Đa hình (Override tính thành tiền) và Trực quan (Abstract classes & Interface).</li>
                             <li><strong>Ổn định:</strong> Giao dịch CSDL kho (Transactions) hoạt động chính xác, xử lý triệt để ngoại lệ và chống trùng lặp dữ liệu.</li>
                         </ul>
                     </div>
@@ -1279,7 +1499,7 @@
         <!-- SLIDE 15: CẢM ƠN -->
         <div class="slide cover-slide" id="slide-15">
             <h1 class="cover-title" style="color: var(--uef-red); font-size: 64px; margin-bottom: 20px;">XIN CHÂN THÀNH CẢM ƠN!</h1>
-            <p class="cover-subtitle" style="color: var(--uef-blue); font-size: 20px; font-weight: 700; margin-bottom: 30px;">Hội đồng đánh giá & Giảng viên hướng dẫn: ThS. Châu Trần Trúc Ly</p>
+
             
             <div style="background-color: rgba(0,86,145,0.05); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); max-width: 600px; text-align: center; margin-top: 20px;">
                 <p style="font-size: 16px; margin-bottom: 10px;"><strong>ĐỒ ÁN CUỐI KỲ MÔN LẬP TRÌNH HƯỚNG ĐỐI TƯỢNG (JAVA)</strong></p>
@@ -1316,6 +1536,12 @@
         <div class="project-title">Đề tài: Hệ Thống Quản Lý Gara Ô Tô (MVC - Java - OOP)</div>
         <div class="page-number" id="page-indicator">Trang 1 / 15</div>
     </div>
+    
+    <!-- Fullscreen Image Zoom Overlay Element -->
+    <div class="fullscreen-img-overlay" id="img-zoom-overlay">
+        <img src="img/SoDoSQL.png" alt="Sơ Đồ CSDL Quan Hệ Lớn" id="zoomed-in-image">
+        <div class="close-hint">Nhấp chuột vào bất cứ đâu hoặc rê chuột ra ngoài để đóng</div>
+    </div>
 </div>
 
 <script>
@@ -1334,21 +1560,22 @@
     const slideTitles = [
         "1. Trang bìa & Giới thiệu đề tài",
         "2. Mục lục tổng quan báo cáo",
-        "3. Đặt vấn đề & Mục tiêu đề tài",
-        "4. Sơ đồ lớp (Class Diagram)",
-        "5. Thiết kế cơ sở dữ liệu quan hệ",
-        "6. Nguyên lý OOP: Tính Đóng gói",
-        "7. Nguyên lý OOP: Tính Kế thừa",
-        "8. Nguyên lý OOP: Tính Đa hình",
-        "9. Nguyên lý OOP: Tính Trừu tượng",
-        "10. Cơ chế MySQL & Kết nối JDBC",
-        "11. Ràng buộc nghiệp vụ tự động",
-        "12. Giải thuật báo cáo & Sắp xếp Map",
-        "13. Xử lý ngoại lệ tùy chỉnh",
-        "14. Sơ đồ nghiệp vụ",
-        "15. Demo chương trình",
-        "16. Tổng kết & Hướng phát triển",
-        "17. Lời cảm ơn"
+        "3. Phân công công việc nhóm",
+        "4. Đặt vấn đề & Mục tiêu đề tài",
+        "5. Sơ đồ lớp (Class Diagram)",
+        "6. Thiết kế cơ sở dữ liệu quan hệ",
+        "7. Nguyên lý OOP: Tính Đóng gói",
+        "8. Nguyên lý OOP: Tính Kế thừa",
+        "9. Nguyên lý OOP: Tính Đa hình",
+        "10. Nguyên lý OOP: Tính Trừu tượng",
+        "11. Cơ chế MySQL & Kết nối JDBC",
+        "12. Ràng buộc nghiệp vụ tự động",
+        "13. Giải thuật báo cáo & Sắp xếp Map",
+        "14. Xử lý ngoại lệ tùy chỉnh",
+        "15. Sơ đồ nghiệp vụ",
+        "16. Demo chương trình",
+        "17. Tổng kết & Hướng phát triển",
+        "18. Lời cảm ơn"
     ];
     
     let totalSlides = slideTitles.length;
@@ -1480,6 +1707,23 @@
         }
     }
 
+    // Fullscreen Image Zoom Interactivity
+    const trigger = document.getElementById('sql-schema-trigger');
+    const overlay = document.getElementById('img-zoom-overlay');
+
+    if (trigger && overlay) {
+        trigger.addEventListener('mouseenter', () => {
+            overlay.classList.add('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            overlay.classList.remove('active');
+        });
+
+        overlay.addEventListener('mouseleave', () => {
+            overlay.classList.remove('active');
+        });
+    }
 
 </script>
 </body>

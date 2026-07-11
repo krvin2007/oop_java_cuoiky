@@ -14,7 +14,7 @@ public class RemoveAccents {
     }
 
     public static void main(String[] args) throws Exception {
-        String path = "d:\\oop_java_cuoiky\\Data\\quangara.sql";
+        String path = "c:\\Users\\CHAU TUAN KIET\\Desktop\\OOP_CKKK\\Data\\quangara.sql";
         String content = new String(Files.readAllBytes(Paths.get(path)), "UTF-8");
         content = deAccent(content);
         Files.write(Paths.get(path), content.getBytes("UTF-8"));

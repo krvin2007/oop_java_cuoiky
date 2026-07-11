@@ -1,11 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.mycompany.quanlygara.controller;
 
 import com.mycompany.quanlygara.model.LinhKien;
-import com.mycompany.quanlygara.exception.PartOutOfStockException;
+import com.mycompany.quanlygara.exception.LinhKienHetHangException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,16 +10,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author ManhQuynh
- */
-public class LinhKienDAO implements IRepository<LinhKien> {
 
-    // Thêm mới một bản ghi vào cơ sở dữ liệu
+public class LinhKienDAO implements IKhoLuuTru<LinhKien> {
+
+    
     @Override
     public void themMoi(LinhKien lk) throws Exception {
-        try (Connection conn = DBConnection.getConnection()) {
+        try (Connection conn = KetNoiCSDL.getConnection()) {
             if (lk.getMa() == null || lk.getMa().trim().isEmpty()) {
                 int maxId = 0;
                 try (PreparedStatement ps = conn.prepareStatement("SELECT ma FROM linh_kien");
@@ -61,11 +55,11 @@ public class LinhKienDAO implements IRepository<LinhKien> {
         }
     }
 
-    // Cập nhật thông tin bản ghi trong cơ sở dữ liệu
+    
     @Override
     public void capNhat(LinhKien lk) throws Exception {
         String sql = "UPDATE linh_kien SET ten = ?, don_gia = ?, so_luong_ton = ?, vi_tri = ? WHERE LOWER(ma) = LOWER(?)";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, lk.getTen());
             ps.setDouble(2, lk.getDonGia());
@@ -79,11 +73,11 @@ public class LinhKienDAO implements IRepository<LinhKien> {
         }
     }
 
-    // Xóa bản ghi khỏi cơ sở dữ liệu
+    
     @Override
     public void xoa(Object id) throws Exception {
         String ma = (String) id;
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
              PreparedStatement ps = conn.prepareStatement("UPDATE linh_kien SET da_xoa = TRUE WHERE LOWER(ma) = LOWER(?)")) {
             ps.setString(1, ma);
             int rows = ps.executeUpdate();
@@ -93,14 +87,14 @@ public class LinhKienDAO implements IRepository<LinhKien> {
         }
     }
 
-    // Lấy toàn bộ danh sách dữ liệu
+    
     @Override
     public List<LinhKien> layTatCa() throws Exception {
-        // Thực thi phương thức querySql để xử lý logic tương ứng
+        
         return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE da_xoa = FALSE ORDER BY ma", null);
     }
 
-    // Lấy dữ liệu chi tiết theo mã định danh (ID)
+    
     @Override
     public LinhKien layTheoId(Object id) throws Exception {
         String ma = (String) id;
@@ -108,17 +102,17 @@ public class LinhKienDAO implements IRepository<LinhKien> {
         return list.isEmpty() ? null : list.get(0);
     }
 
-    // Tìm kiếm dữ liệu dựa trên điều kiện đầu vào
+    
     public List<LinhKien> searchByName(String keyword) throws Exception {
         return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE LOWER(ten) LIKE ? AND da_xoa = FALSE ORDER BY ma",
                 "%" + keyword.toLowerCase() + "%");
     }
 
-    // Tìm kiếm dữ liệu dựa trên điều kiện đầu vào
+    
     public List<LinhKien> searchByPriceRange(double minPrice, double maxPrice) throws Exception {
         List<LinhKien> list = new ArrayList<>();
         String sql = "SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE don_gia >= ? AND don_gia <= ? AND da_xoa = FALSE ORDER BY don_gia ASC";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, minPrice);
             ps.setDouble(2, maxPrice);
@@ -131,9 +125,9 @@ public class LinhKienDAO implements IRepository<LinhKien> {
         return list;
     }
 
-    // Thực thi phương thức deductQuantity để xử lý logic tương ứng
+    
     public void deductQuantity(String ma, int qtyToDeduct) throws Exception {
-        try (Connection conn = DBConnection.getConnection()) {
+        try (Connection conn = KetNoiCSDL.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(
                     "UPDATE linh_kien SET so_luong_ton = so_luong_ton - ? WHERE LOWER(ma) = LOWER(?) AND so_luong_ton >= ? AND da_xoa = FALSE")) {
                 ps.setInt(1, qtyToDeduct);
@@ -141,30 +135,30 @@ public class LinhKienDAO implements IRepository<LinhKien> {
                 ps.setInt(3, qtyToDeduct);
                 int rows = ps.executeUpdate();
                 if (rows == 0) {
-                    throw new PartOutOfStockException("Linh kiện với mã " + ma + " không tồn tại hoặc không đủ số lượng tồn kho!");
+                    throw new LinhKienHetHangException("Linh kien voi ma " + ma + " khong ton tai hoac khong du so luong ton kho!");
                 }
             }
         }
     }
 
-    // Sắp xếp danh sách dữ liệu
+    
     public List<LinhKien> sortByPrice(boolean ascending) throws Exception {
         String order = ascending ? "ASC" : "DESC";
-        // Thực thi phương thức querySql để xử lý logic tương ứng
+        
         return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE da_xoa = FALSE ORDER BY don_gia " + order, null);
     }
 
-    // Sắp xếp danh sách dữ liệu
+    
     public List<LinhKien> sortByQuantity(boolean ascending) throws Exception {
         String order = ascending ? "ASC" : "DESC";
-        // Thực thi phương thức querySql để xử lý logic tương ứng
+        
         return querySql("SELECT ma, ten, don_gia, so_luong_ton, vi_tri FROM linh_kien WHERE da_xoa = FALSE ORDER BY so_luong_ton " + order, null);
     }
 
-    // Thực thi phương thức querySql để xử lý logic tương ứng
+    
     private List<LinhKien> querySql(String sql, String param) throws Exception {
         List<LinhKien> list = new ArrayList<>();
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = KetNoiCSDL.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             if (param != null) {
                 ps.setString(1, param);
@@ -178,7 +172,7 @@ public class LinhKienDAO implements IRepository<LinhKien> {
         return list;
     }
 
-    // Ánh xạ dữ liệu từ ResultSet sang đối tượng Java
+    
     private LinhKien mapRow(ResultSet rs) throws SQLException {
         return new LinhKien(rs.getString("ma"), rs.getString("ten"), rs.getDouble("don_gia"), rs.getInt("so_luong_ton"), rs.getString("vi_tri"));
     }
